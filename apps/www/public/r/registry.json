@@ -1,0 +1,120 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "aspekt",
+  "homepage": "http://localhost:3000",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A Base UI button with variants, sizes, loading state, affixes, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "components/ui/button.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/button.tsx"
+        },
+        {
+          "path": "components/ui/sound.ts",
+          "type": "registry:lib",
+          "target": "components/ui/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A Base UI input with sizes, variants, clearable state, loading state, affixes, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "components/ui/input.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input.tsx"
+        },
+        {
+          "path": "components/ui/sound.ts",
+          "type": "registry:lib",
+          "target": "components/ui/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
+      "name": "sound-provider",
+      "type": "registry:ui",
+      "title": "Sound Provider",
+      "description": "A small provider and hook for enabling, disabling, and tuning Aspekt UI interaction sounds.",
+      "files": [
+        {
+          "path": "components/ui/sound-provider.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/sound-provider.tsx"
+        },
+        {
+          "path": "components/ui/sound.ts",
+          "type": "registry:lib",
+          "target": "components/ui/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "utility"
+      ]
+    },
+    {
+      "name": "aspekt-ui",
+      "type": "registry:base",
+      "title": "Aspekt UI",
+      "description": "Base install for the current Aspekt UI components.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "components/ui/button.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/button.tsx"
+        },
+        {
+          "path": "components/ui/input.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input.tsx"
+        },
+        {
+          "path": "components/ui/sound-provider.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/sound-provider.tsx"
+        },
+        {
+          "path": "components/ui/sound.ts",
+          "type": "registry:lib",
+          "target": "components/ui/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "base"
+      ]
+    }
+  ]
+}

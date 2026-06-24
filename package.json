@@ -1,0 +1,16 @@
+{
+  "name": "aspekt",
+  "private": true,
+  "packageManager": "pnpm@11.2.2",
+  "scripts": {
+    "dev": "pnpm --dir apps/www dev",
+    "build": "pnpm registry:build && pnpm --dir apps/www build",
+    "docs:dev": "pnpm --dir apps/www dev",
+    "docs:build": "pnpm --dir apps/www build",
+    "registry:build": "shadcn build registry.json -c apps -o www/public/r",
+    "registry:validate": "shadcn registry validate registry.json -c apps"
+  },
+  "devDependencies": {
+    "shadcn": "^4.11.0"
+  }
+}
