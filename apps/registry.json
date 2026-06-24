@@ -7,9 +7,8 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "A Base UI button with variants, sizes, loading state, affixes, and optional interaction sounds.",
+      "description": "A native button with variants, sizes, loading state, affixes, and optional interaction sounds.",
       "dependencies": [
-        "@base-ui/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -17,12 +16,12 @@
         {
           "path": "components/ui/button.tsx",
           "type": "registry:ui",
-          "target": "components/ui/button.tsx"
+          "target": "components/aspekt/button.tsx"
         },
         {
           "path": "components/ui/sound.ts",
           "type": "registry:lib",
-          "target": "components/ui/sound.ts"
+          "target": "components/aspekt/sound.ts"
         }
       ],
       "categories": [
@@ -44,12 +43,12 @@
         {
           "path": "components/ui/input.tsx",
           "type": "registry:ui",
-          "target": "components/ui/input.tsx"
+          "target": "components/aspekt/input.tsx"
         },
         {
           "path": "components/ui/sound.ts",
           "type": "registry:lib",
-          "target": "components/ui/sound.ts"
+          "target": "components/aspekt/sound.ts"
         }
       ],
       "categories": [
@@ -66,12 +65,12 @@
         {
           "path": "components/ui/sound-provider.tsx",
           "type": "registry:ui",
-          "target": "components/ui/sound-provider.tsx"
+          "target": "components/aspekt/sound-provider.tsx"
         },
         {
           "path": "components/ui/sound.ts",
           "type": "registry:lib",
-          "target": "components/ui/sound.ts"
+          "target": "components/aspekt/sound.ts"
         }
       ],
       "categories": [
@@ -93,22 +92,22 @@
         {
           "path": "components/ui/button.tsx",
           "type": "registry:ui",
-          "target": "components/ui/button.tsx"
+          "target": "components/aspekt/button.tsx"
         },
         {
           "path": "components/ui/input.tsx",
           "type": "registry:ui",
-          "target": "components/ui/input.tsx"
+          "target": "components/aspekt/input.tsx"
         },
         {
           "path": "components/ui/sound-provider.tsx",
           "type": "registry:ui",
-          "target": "components/ui/sound-provider.tsx"
+          "target": "components/aspekt/sound-provider.tsx"
         },
         {
           "path": "components/ui/sound.ts",
           "type": "registry:lib",
-          "target": "components/ui/sound.ts"
+          "target": "components/aspekt/sound.ts"
         }
       ],
       "categories": [

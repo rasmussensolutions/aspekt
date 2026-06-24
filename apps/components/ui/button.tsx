@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cnfast";
 
@@ -183,7 +182,10 @@ type ButtonVariant = NonNullable<
 
 type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
 
-type ButtonProps = Omit<ButtonPrimitive.Props, "prefix" | "suffix"> &
+type ButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "color" | "prefix" | "suffix"
+> &
   VariantProps<typeof buttonVariants> & {
     loading?: boolean;
     sound?: SoundName | false;
@@ -331,21 +333,25 @@ function ButtonAffix({
   );
 }
 
-function Button({
-  className,
-  variant,
-  color,
-  size,
-  shape,
-  loading = false,
-  sound,
-  prefix,
-  suffix,
-  onClick,
-  disabled,
-  children,
-  ...props
-}: ButtonProps) {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    className,
+    variant,
+    color,
+    size,
+    shape,
+    loading = false,
+    sound,
+    prefix,
+    suffix,
+    onClick,
+    disabled,
+    children,
+    type = "button",
+    ...props
+  },
+  ref,
+) {
   const resolvedVariant = variant ?? "solid";
   const resolvedColor = color ?? "blue";
   const resolvedSize = size ?? "medium";
@@ -365,10 +371,12 @@ function Button({
     sound === undefined ? buttonVariantSounds[resolvedVariant] : sound;
 
   return (
-    <ButtonPrimitive
+    <button
+      ref={ref}
       data-slot="button"
       data-loading={loading ? "" : undefined}
       data-disabled={isDisabled ? "" : undefined}
+      type={type}
       className={cn(
         buttonVariants({
           variant: resolvedVariant,
@@ -430,8 +438,8 @@ function Button({
       >
         {suffix}
       </ButtonAffix>
-    </ButtonPrimitive>
+    </button>
   );
-}
+});
 
 export { Button, buttonVariants };
