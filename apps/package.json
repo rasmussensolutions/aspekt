@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./button": "./components/ui/button.tsx",
+    "./dialog": "./components/ui/dialog.tsx",
     "./input": "./components/ui/input.tsx",
     "./sound": "./components/ui/sound.ts",
     "./sound-provider": "./components/ui/sound-provider.tsx"

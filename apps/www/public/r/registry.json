@@ -57,10 +57,42 @@
       ]
     },
     {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A Base UI dialog with Aspekt styling, dismissal, focus management, and interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "components/ui/dialog.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/dialog.tsx"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "components/ui/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "overlay"
+      ]
+    },
+    {
       "name": "sound-provider",
       "type": "registry:ui",
       "title": "Sound Provider",
-      "description": "A small provider and hook for enabling, disabling, and tuning Aspekt UI interaction sounds.",
+      "description": "An optional provider and hook for global Aspekt UI sound settings.",
       "files": [
         {
           "path": "components/ui/sound-provider.tsx",
@@ -98,6 +130,11 @@
           "path": "components/ui/input.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/input.tsx"
+        },
+        {
+          "path": "components/ui/dialog.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/dialog.tsx"
         },
         {
           "path": "components/ui/sound-provider.tsx",

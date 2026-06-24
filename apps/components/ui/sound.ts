@@ -4,6 +4,8 @@ export type SoundName =
   | "button.ghost"
   | "button.outline"
   | "button.destructive"
+  | "dialog.open"
+  | "dialog.close"
   | "input.focus"
   | "input.unfocus"
   | "input.clear"
@@ -152,6 +154,26 @@ const sounds: Record<SoundName, () => void> = {
       frequency: 220,
       duration: 0.065,
       volume: 0.025 * settings.volume,
+      type: "triangle",
+    });
+  },
+
+  "dialog.open": () => {
+    playTone({
+      frequency: 360,
+      endFrequency: 520,
+      duration: 0.07,
+      volume: 0.018 * settings.volume,
+      type: "triangle",
+    });
+  },
+
+  "dialog.close": () => {
+    playTone({
+      frequency: 420,
+      endFrequency: 260,
+      duration: 0.06,
+      volume: 0.014 * settings.volume,
       type: "triangle",
     });
   },

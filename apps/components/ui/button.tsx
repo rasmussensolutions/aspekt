@@ -182,6 +182,8 @@ type ButtonVariant = NonNullable<
 
 type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
 
+type ButtonShape = NonNullable<VariantProps<typeof buttonVariants>["shape"]>;
+
 type ButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "color" | "prefix" | "suffix"
@@ -192,6 +194,10 @@ type ButtonProps = Omit<
     prefix?: React.ReactNode;
     suffix?: React.ReactNode;
   };
+
+const ButtonShapeContext = React.createContext<ButtonShape | undefined>(
+  undefined,
+);
 
 const buttonVariantSounds = {
   solid: "button.solid",
@@ -333,6 +339,20 @@ function ButtonAffix({
   );
 }
 
+function ButtonShapeProvider({
+  children,
+  shape,
+}: {
+  children: React.ReactNode;
+  shape?: ButtonShape;
+}) {
+  return (
+    <ButtonShapeContext.Provider value={shape}>
+      {children}
+    </ButtonShapeContext.Provider>
+  );
+}
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     className,
@@ -352,10 +372,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   },
   ref,
 ) {
+  const inheritedShape = React.useContext(ButtonShapeContext);
   const resolvedVariant = variant ?? "solid";
   const resolvedColor = color ?? "blue";
   const resolvedSize = size ?? "medium";
-  const resolvedShape = shape ?? "square";
+  const resolvedShape = shape ?? inheritedShape ?? "square";
 
   const isDisabled = Boolean(disabled);
   const isInteractionBlocked = isDisabled || loading;
@@ -442,4 +463,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   );
 });
 
-export { Button, buttonVariants };
+export { Button, ButtonShapeProvider, buttonVariants };

@@ -1,7 +1,20 @@
 "use client";
 
 import { Button } from "@aspekt/ui/button";
+import {
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from "@aspekt/ui/dialog";
 import { Input } from "@aspekt/ui/input";
+import { SoundProvider, useSound } from "@aspekt/ui/sound-provider";
 import { Switch } from "@base-ui/react/switch";
 import {
   ArrowRightIcon,
@@ -10,11 +23,14 @@ import {
 } from "@phosphor-icons/react";
 import * as React from "react";
 
-type ComponentPreview = "button" | "input";
+type IntroPage = "purpose" | "principles";
+type ComponentPreview = "button" | "input" | "dialog" | "sound-provider";
+type DocsPage = IntroPage | ComponentPreview;
 type ButtonVariant = "solid" | "soft" | "ghost" | "outline";
 type ButtonSize = "micro" | "tiny" | "small" | "medium" | "large";
 type ButtonColor = "accent" | "blue" | "red" | "amber" | "neutral";
 type ButtonShape = "square" | "round";
+type DialogSize = "small" | "medium" | "large";
 type InputVariant = "outline" | "soft" | "ghost";
 
 type ButtonSettings = {
@@ -41,6 +57,11 @@ type InputSettings = {
   readOnly: boolean;
 };
 
+type DialogSettings = {
+  shape: ButtonShape;
+  size: DialogSize;
+};
+
 type OverflowEdge = "top" | "right" | "bottom" | "left";
 
 type ScrollOverflowState = Record<OverflowEdge, boolean>;
@@ -54,15 +75,37 @@ const emptyOverflowState = {
 
 const scrollOverflowThreshold = 2;
 
+const introIds = ["purpose", "principles"] as const;
+const componentIds = ["button", "input", "dialog", "sound-provider"] as const;
+const docsPageIds = [...introIds, ...componentIds] as const;
+
 const navGroups = [
+  {
+    title: "Introduction",
+    items: [
+      { label: "Purpose", page: "purpose" },
+      { label: "Principles", page: "principles" },
+    ],
+  },
+  {
+    title: "Components",
+    items: [{ label: "Dialog", page: "dialog" }],
+  },
   {
     title: "Controls",
     items: [
-      { label: "Button", component: "button" },
-      { label: "Input", component: "input" },
+      { label: "Button", page: "button" },
+      { label: "Input", page: "input" },
     ],
   },
-] as const;
+  {
+    title: "SFX",
+    items: [{ label: "Sound Provider", page: "sound-provider" }],
+  },
+] as const satisfies readonly {
+  title: string;
+  items: readonly { label: string; page: DocsPage }[];
+}[];
 
 const buttonOptions = {
   variant: ["solid", "soft", "ghost", "outline"],
@@ -77,7 +120,55 @@ const inputOptions = {
   shape: buttonOptions.shape,
 } as const;
 
+const dialogOptions = {
+  shape: buttonOptions.shape,
+  size: ["small", "medium", "large"],
+} as const;
+
 const registryBaseUrl = "https://aspekt.systems/r";
+
+const componentCopy = {
+  button: {
+    title: "Button",
+    description: "is used to initiate interactions.",
+  },
+  input: {
+    title: "Input",
+    description: "is used to collect text.",
+  },
+  dialog: {
+    title: "Dialog",
+    description: "is used for focused decisions and short modal workflows.",
+  },
+  "sound-provider": {
+    title: "Sound Provider",
+    description:
+      "is an optional app-level controller for Aspekt UI interaction sound.",
+  },
+} satisfies Record<
+  ComponentPreview,
+  {
+    title: string;
+    description: string;
+  }
+>;
+
+const introCopy = {
+  purpose: {
+    title: "Purpose",
+    description: "...",
+  },
+  principles: {
+    title: "Principles",
+    description: "...",
+  },
+} satisfies Record<
+  IntroPage,
+  {
+    title: string;
+    description: string;
+  }
+>;
 
 const defaultButtonSettings = {
   variant: "solid",
@@ -102,6 +193,11 @@ const defaultInputSettings = {
   disabled: false,
   readOnly: false,
 } satisfies InputSettings;
+
+const defaultDialogSettings = {
+  shape: "round",
+  size: "medium",
+} satisfies DialogSettings;
 
 const buttonColorDots = {
   accent: "bg-orange-600",
@@ -233,11 +329,11 @@ function ProgressiveOverflowFade({
 }
 
 function Sidebar({
-  activeComponent,
-  onComponentChange,
+  activePage,
+  onPageChange,
 }: {
-  activeComponent: ComponentPreview;
-  onComponentChange: (component: ComponentPreview) => void;
+  activePage: DocsPage;
+  onPageChange: (page: DocsPage) => void;
 }) {
   const { ref: sidebarScrollRef, overflow } =
     useScrollOverflow<HTMLDivElement>();
@@ -254,26 +350,29 @@ function Sidebar({
           </span>
         </div>
 
-        <nav className="flex flex-col gap-14" aria-label="Component library">
+        <nav
+          className="flex flex-col gap-14"
+          aria-label="Aspekt UI documentation"
+        >
           {navGroups.map((group) => (
             <div key={group.title} className="space-y-3">
-              <p className="text-base font-medium text-neutral-500 dark:text-neutral-400">
+              <p className="text-lg tracking-tight font-normal text-neutral-500 dark:text-neutral-400">
                 {group.title}
               </p>
               <ul className="space-y-2">
                 {group.items.map((item) => (
-                  <li key={item.label}>
+                  <li key={item.label} className="ml-2">
                     <button
                       type="button"
                       aria-current={
-                        item.component === activeComponent ? "page" : undefined
+                        item.page === activePage ? "page" : undefined
                       }
-                      onClick={() => onComponentChange(item.component)}
+                      onClick={() => onPageChange(item.page)}
                       className={[
                         "relative inline-flex text-left text-base leading-none outline-none transition-colors",
-                        item.component === activeComponent
-                          ? "font-medium text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-blue-600"
-                          : "text-neutral-500 hover:text-foreground focus-visible:text-foreground dark:text-neutral-400",
+                        item.page === activePage
+                          ? "font-medium text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-blue-500"
+                          : "text-neutral-400 hover:text-foreground focus-visible:text-foreground dark:text-neutral-400",
                       ].join(" ")}
                     >
                       {item.label}
@@ -538,7 +637,7 @@ function InstallCommands({
 }: {
   activeComponent: ComponentPreview;
 }) {
-  const activeLabel = activeComponent === "button" ? "Button" : "Input";
+  const activeLabel = componentCopy[activeComponent].title;
   const command = `pnpm dlx shadcn@latest add ${registryBaseUrl}/${activeComponent}.json`;
 
   return (
@@ -551,18 +650,380 @@ function InstallCommands({
   );
 }
 
+const soundProviderRootExample = `
+import { SoundProvider } from "@/components/aspekt/sound-provider";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <SoundProvider enabled volume={0.8}>
+          {children}
+        </SoundProvider>
+      </body>
+    </html>
+  );
+}
+`;
+
+const useSoundExample = `
+import { useSound } from "@/components/aspekt/sound-provider";
+
+export function SoundSettings() {
+  const { enabled, setEnabled, volume, setVolume, play } = useSound();
+
+  return (
+    <div>
+      <button onClick={() => setEnabled(!enabled)}>
+        {enabled ? "Disable" : "Enable"} sound
+      </button>
+      <input
+        min={0}
+        max={1}
+        step={0.05}
+        type="range"
+        value={volume}
+        onChange={(event) => setVolume(Number(event.currentTarget.value))}
+      />
+      <button onClick={() => play("success")}>Preview</button>
+    </div>
+  );
+}
+`;
+
+const dialogExample = `
+import { Button } from "@/components/aspekt/button";
+import {
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/aspekt/dialog";
+
+export function ExampleDialog() {
+  return (
+    <DialogRoot shape="round">
+      <DialogTrigger>Open dialog</DialogTrigger>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Publish component</DialogTitle>
+            <DialogDescription>
+              This will update the public registry JSON for this component.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose>Cancel</DialogClose>
+            <Button color="neutral">Publish</Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogPortal>
+    </DialogRoot>
+  );
+}
+`;
+
+function isComponentPreview(value: string): value is ComponentPreview {
+  return (componentIds as readonly string[]).includes(value);
+}
+
+function isIntroPage(value: string): value is IntroPage {
+  return (introIds as readonly string[]).includes(value);
+}
+
+function isDocsPage(value: string): value is DocsPage {
+  return (docsPageIds as readonly string[]).includes(value);
+}
+
+function getDocsPageCopy(page: DocsPage) {
+  return isComponentPreview(page) ? componentCopy[page] : introCopy[page];
+}
+
+function CodeBlock({ children }: { children: string }) {
+  return (
+    <pre className="overflow-x-auto rounded-lg bg-neutral-50 px-4 py-3 font-mono text-sm leading-6 text-neutral-700 dark:bg-white/5 dark:text-neutral-300">
+      <code>{children.trim()}</code>
+    </pre>
+  );
+}
+
+function SoundProviderControls() {
+  const { enabled, volume, setEnabled, setVolume, play } = useSound();
+
+  return (
+    <div className="grid w-full max-w-md gap-6 px-6">
+      <div className="grid gap-3">
+        <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-3 dark:border-white/15">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">enabled</h2>
+            <p className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
+              {String(enabled)}
+            </p>
+          </div>
+          <Switch.Root
+            checked={enabled}
+            onCheckedChange={setEnabled}
+            aria-label="Toggle interaction sound"
+            className="relative inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md bg-neutral-200 text-white outline-none transition-colors data-[checked]:bg-orange-600 focus-visible:ring-2 focus-visible:ring-orange-600/30 dark:bg-white/10"
+          >
+            {enabled && (
+              <span className="absolute h-2.5 w-1.5 rotate-45 border-b-2 border-r-2 border-white" />
+            )}
+          </Switch.Root>
+        </div>
+
+        <label className="grid gap-3 border-b border-neutral-200 pb-4 dark:border-white/15">
+          <span>
+            <span className="block text-sm font-semibold text-foreground">
+              volume
+            </span>
+            <span className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
+              {volume.toFixed(2)}
+            </span>
+          </span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={volume}
+            onChange={(event) => setVolume(Number(event.currentTarget.value))}
+            className="h-2 w-full cursor-pointer accent-orange-600"
+          />
+        </label>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <Button
+          type="button"
+          color="neutral"
+          sound={false}
+          onClick={() => play("success")}
+        >
+          Play success
+        </Button>
+        <Button
+          type="button"
+          color="red"
+          variant="outline"
+          sound={false}
+          onClick={() => play("error")}
+        >
+          Play error
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function SoundProviderPreview() {
+  return (
+    <SoundProvider enabled volume={0.8}>
+      <SoundProviderControls />
+    </SoundProvider>
+  );
+}
+
+function SoundProviderDocumentation() {
+  return (
+    <div className="grid gap-10">
+      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <h2 className="text-sm font-semibold text-foreground">optional</h2>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Aspekt UI sounds are enabled by default and components can play them
+          without a provider. Add SoundProvider when you want one global place
+          to disable sound, tune volume, or trigger sounds from your own UI.
+        </p>
+      </section>
+
+      <section className="grid gap-3">
+        <h2 className="text-sm font-semibold text-foreground">wrap your app</h2>
+        <CodeBlock>{soundProviderRootExample}</CodeBlock>
+      </section>
+
+      <section className="grid gap-3">
+        <h2 className="text-sm font-semibold text-foreground">useSound</h2>
+        <CodeBlock>{useSoundExample}</CodeBlock>
+      </section>
+    </div>
+  );
+}
+
+function DialogPreview({ settings }: { settings: DialogSettings }) {
+  return (
+    <DialogRoot shape={settings.shape}>
+      <DialogTrigger>Open dialog</DialogTrigger>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogContent size={settings.size}>
+          <DialogHeader>
+            <DialogTitle>Publish component</DialogTitle>
+            <DialogDescription>
+              This updates the hosted registry JSON and makes the latest source
+              available through the install command.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-500 dark:border-white/15 dark:bg-white/5 dark:text-neutral-300">
+            https://aspekt.systems/r/dialog.json
+          </div>
+
+          <DialogFooter>
+            <DialogClose>Cancel</DialogClose>
+            <Button type="button" color="neutral">
+              Publish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogPortal>
+    </DialogRoot>
+  );
+}
+
+function DialogDocumentation() {
+  return (
+    <div className="grid gap-10">
+      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <h2 className="text-sm font-semibold text-foreground">
+          base ui primitive
+        </h2>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Dialog is built on Base UI primitives and styled for Aspekt. It
+          includes portal rendering, backdrop dismissal, escape key dismissal,
+          focus management, and the same default interaction sound model as the
+          rest of Aspekt UI.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          DialogTrigger and DialogClose compose Aspekt Button, so button
+          variants, colors, sizes, loading state, affixes, and sound overrides
+          stay consistent with the rest of the library.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Pass shape to DialogRoot to control the dialog surface, DialogTrigger,
+          DialogClose, and Aspekt Buttons rendered inside the dialog. Individual
+          children can still override shape directly.
+        </p>
+      </section>
+
+      <section className="grid gap-3">
+        <h2 className="text-sm font-semibold text-foreground">usage</h2>
+        <CodeBlock>{dialogExample}</CodeBlock>
+      </section>
+    </div>
+  );
+}
+
+const principles = [
+  {
+    title: "Feedback belongs to the interface",
+    body: "Aspekt treats sound as part of interaction design, not as an afterthought. Visual feedback stays primary, and short optional audio cues can make successful actions, errors, and state changes easier to feel.",
+  },
+  {
+    title: "Install only what you use",
+    body: "Every component is published as a focused registry item. Consumers should be able to add Button, Dialog, Input, or Sound Provider independently without pulling a full component catalog into their project.",
+  },
+  {
+    title: "Own the source",
+    body: "Components are copied into the app through the shadcn registry model. The consumer gets normal source files they can read, edit, and adapt instead of a closed package API.",
+  },
+  {
+    title: "Respect existing projects",
+    body: "Aspekt installs into components/aspekt so it can sit beside an existing shadcn/ui setup without overwriting common files like components/ui/button.tsx.",
+  },
+] as const;
+
+function PurposeDocumentation() {
+  return (
+    <div className="grid gap-10">
+      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <h2 className="text-sm font-semibold text-foreground">why aspekt</h2>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          ...
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          ...
+        </p>
+      </section>
+
+      <section className="grid gap-3">
+        <h2 className="text-sm font-semibold text-foreground">
+          what it is for
+        </h2>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Use Aspekt when you want expressive but practical UI primitives,
+          namespaced safely inside your project, with interaction sounds enabled
+          by default and configurable globally when your app needs it.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+function PrinciplesDocumentation() {
+  return (
+    <div className="grid gap-10">
+      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <h2 className="text-sm font-semibold text-foreground">principles</h2>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          ...{" "}
+        </p>
+      </section>
+
+      <section className="grid gap-6">
+        {principles.map((principle) => (
+          <div
+            key={principle.title}
+            className="grid gap-2 border-t border-neutral-200 pt-5 dark:border-white/15"
+          >
+            <h3 className="text-sm font-semibold text-foreground">
+              {principle.title}
+            </h3>
+            <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+              {principle.body}
+            </p>
+          </div>
+        ))}
+      </section>
+    </div>
+  );
+}
+
+function IntroDocumentation({ activePage }: { activePage: IntroPage }) {
+  return activePage === "purpose" ? (
+    <PurposeDocumentation />
+  ) : (
+    <PrinciplesDocumentation />
+  );
+}
+
 export default function Home() {
   const [buttonSettings, setButtonSettings] = React.useState<ButtonSettings>(
     defaultButtonSettings,
   );
   const [inputSettings, setInputSettings] =
     React.useState<InputSettings>(defaultInputSettings);
+  const [dialogSettings, setDialogSettings] = React.useState<DialogSettings>(
+    defaultDialogSettings,
+  );
   const [inputValue, setInputValue] = React.useState("Search components");
-  const [activeComponent, setActiveComponent] =
-    React.useState<ComponentPreview>("button");
+  const [activePage, setActivePage] = React.useState<DocsPage>("purpose");
   const fakeLoadingTimeoutRef = React.useRef<number | null>(null);
   const { ref: previewScrollRef, overflow: previewOverflow } =
     useScrollOverflow<HTMLElement>();
+  const activeComponent = isComponentPreview(activePage) ? activePage : null;
+  const activeIntroPage = isIntroPage(activePage) ? activePage : null;
+  const pageCopy = getDocsPageCopy(activePage);
 
   React.useEffect(() => {
     return () => {
@@ -573,25 +1034,25 @@ export default function Home() {
   }, []);
 
   React.useEffect(() => {
-    function syncComponentFromHash() {
+    function syncPageFromHash() {
       const hash = window.location.hash.slice(1);
 
-      if (hash === "button" || hash === "input") {
-        setActiveComponent(hash);
+      if (isDocsPage(hash)) {
+        setActivePage(hash);
       }
     }
 
-    syncComponentFromHash();
-    window.addEventListener("hashchange", syncComponentFromHash);
+    syncPageFromHash();
+    window.addEventListener("hashchange", syncPageFromHash);
 
     return () => {
-      window.removeEventListener("hashchange", syncComponentFromHash);
+      window.removeEventListener("hashchange", syncPageFromHash);
     };
   }, []);
 
-  function navigateToComponent(component: ComponentPreview) {
-    setActiveComponent(component);
-    window.history.replaceState(null, "", `#${component}`);
+  function navigateToPage(page: DocsPage) {
+    setActivePage(page);
+    window.history.replaceState(null, "", `#${page}`);
   }
 
   function setButtonLoading(loading: boolean) {
@@ -619,73 +1080,83 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col lg:flex-row">
-        <Sidebar
-          activeComponent={activeComponent}
-          onComponentChange={navigateToComponent}
-        />
+        <Sidebar activePage={activePage} onPageChange={navigateToPage} />
 
         <div className="relative min-w-0 flex-1 lg:h-screen">
           <section
             ref={previewScrollRef}
-            id={activeComponent}
+            id={activePage}
             className="flex min-w-0 flex-1 flex-col px-6 pb-16 pt-4 sm:px-10 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-18"
           >
             <div className="mb-14">
               <p className="max-w-xl text-base text-neutral-500 dark:text-neutral-400">
                 <span className="font-semibold text-foreground">
-                  {activeComponent === "button" ? "Button" : "Input"}
+                  {pageCopy.title}
                 </span>{" "}
-                is used to{" "}
-                {activeComponent === "button"
-                  ? "initiate interactions."
-                  : "collect text."}
+                {pageCopy.description}
               </p>
             </div>
 
-            <div className="relative mb-12 flex min-h-80 items-center justify-center overflow-hidden rounded-lg bg-neutral-50 dark:bg-neutral-900/70 sm:min-h-96 lg:min-h-[30rem]">
-              {activeComponent === "button" ? (
-                <Button
-                  variant={buttonSettings.variant}
-                  color={buttonSettings.color}
-                  size={buttonSettings.size}
-                  shape={buttonSettings.shape}
-                  prefix={
-                    buttonSettings.prefix ? <PlusCircleIcon /> : undefined
-                  }
-                  suffix={
-                    buttonSettings.suffix ? <ArrowRightIcon /> : undefined
-                  }
-                  loading={buttonSettings.loading}
-                  disabled={buttonSettings.disabled}
-                  onClick={triggerFakeLoading}
-                >
-                  Click me
-                </Button>
-              ) : (
-                <Input
-                  aria-label="Preview input"
-                  value={inputValue}
-                  onChange={(event) => setInputValue(event.currentTarget.value)}
-                  onClear={() => setInputValue("")}
-                  placeholder="Type something"
-                  variant={inputSettings.variant}
-                  size={inputSettings.size}
-                  shape={inputSettings.shape}
-                  prefix={
-                    inputSettings.prefix ? <MagnifyingGlassIcon /> : undefined
-                  }
-                  suffix={inputSettings.suffix ? "USD" : undefined}
-                  loading={inputSettings.loading}
-                  invalid={inputSettings.invalid}
-                  clearable={inputSettings.clearable}
-                  disabled={inputSettings.disabled}
-                  readOnly={inputSettings.readOnly}
-                  className="max-w-xs"
-                />
-              )}
-            </div>
+            {activeComponent ? (
+              <>
+                <div className="relative mb-12 flex min-h-80 items-center justify-center overflow-hidden rounded-lg bg-neutral-50 dark:bg-neutral-900/70 sm:min-h-96 lg:min-h-[30rem]">
+                  {activeComponent === "button" ? (
+                    <Button
+                      variant={buttonSettings.variant}
+                      color={buttonSettings.color}
+                      size={buttonSettings.size}
+                      shape={buttonSettings.shape}
+                      prefix={
+                        buttonSettings.prefix ? <PlusCircleIcon /> : undefined
+                      }
+                      suffix={
+                        buttonSettings.suffix ? <ArrowRightIcon /> : undefined
+                      }
+                      loading={buttonSettings.loading}
+                      disabled={buttonSettings.disabled}
+                      onClick={triggerFakeLoading}
+                    >
+                      Click me
+                    </Button>
+                  ) : activeComponent === "input" ? (
+                    <Input
+                      aria-label="Preview input"
+                      value={inputValue}
+                      onChange={(event) =>
+                        setInputValue(event.currentTarget.value)
+                      }
+                      onClear={() => setInputValue("")}
+                      placeholder="Type something"
+                      variant={inputSettings.variant}
+                      size={inputSettings.size}
+                      shape={inputSettings.shape}
+                      prefix={
+                        inputSettings.prefix ? (
+                          <MagnifyingGlassIcon />
+                        ) : undefined
+                      }
+                      suffix={inputSettings.suffix ? "USD" : undefined}
+                      loading={inputSettings.loading}
+                      invalid={inputSettings.invalid}
+                      clearable={inputSettings.clearable}
+                      disabled={inputSettings.disabled}
+                      readOnly={inputSettings.readOnly}
+                      className="max-w-xs"
+                    />
+                  ) : activeComponent === "dialog" ? (
+                    <DialogPreview settings={dialogSettings} />
+                  ) : (
+                    <SoundProviderPreview />
+                  )}
+                </div>
 
-            <InstallCommands activeComponent={activeComponent} />
+                <InstallCommands activeComponent={activeComponent} />
+              </>
+            ) : (
+              activeIntroPage && (
+                <IntroDocumentation activePage={activeIntroPage} />
+              )
+            )}
 
             {activeComponent === "button" && (
               <div className="grid gap-8">
@@ -849,6 +1320,34 @@ export default function Home() {
                   }
                 />
               </div>
+            )}
+
+            {activeComponent === "dialog" && (
+              <div className="mb-12 grid gap-8">
+                <OptionRow
+                  label="shape"
+                  values={dialogOptions.shape}
+                  active={dialogSettings.shape}
+                  onValueChange={(shape) =>
+                    setDialogSettings((settings) => ({ ...settings, shape }))
+                  }
+                />
+
+                <OptionRow
+                  label="size"
+                  values={dialogOptions.size}
+                  active={dialogSettings.size}
+                  onValueChange={(size) =>
+                    setDialogSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+              </div>
+            )}
+
+            {activeComponent === "dialog" && <DialogDocumentation />}
+
+            {activeComponent === "sound-provider" && (
+              <SoundProviderDocumentation />
             )}
           </section>
           <ProgressiveOverflowFade edge="top" visible={previewOverflow.top} />
