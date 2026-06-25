@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SoundProvider } from "@aspekt/ui/sound-provider";
 
 export const metadata: Metadata = {
   title: "Aspekt UI",
@@ -13,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SoundProvider variant="pop" volume={10}>
+          {children}
+        </SoundProvider>
+      </body>
     </html>
   );
 }

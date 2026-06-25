@@ -3,12 +3,12 @@
   "private": true,
   "packageManager": "pnpm@11.2.2",
   "scripts": {
-    "dev": "pnpm --dir apps/www dev",
-    "build": "pnpm registry:build && pnpm --dir apps/www build",
-    "docs:dev": "pnpm --dir apps/www dev",
-    "docs:build": "pnpm --dir apps/www build",
-    "registry:build": "shadcn build registry.json -c apps -o www/public/r",
-    "registry:validate": "shadcn registry validate registry.json -c apps",
+    "dev": "pnpm --filter @aspekt/ui build && pnpm --dir apps/www dev",
+    "build": "pnpm --filter @aspekt/ui build && pnpm registry:build && pnpm --dir apps/www build",
+    "docs:dev": "pnpm --filter @aspekt/ui build && pnpm --dir apps/www dev",
+    "docs:build": "pnpm --filter @aspekt/ui build && pnpm --dir apps/www build",
+    "registry:build": "shadcn build apps/registry.json -c . -o apps/www/public/r",
+    "registry:validate": "shadcn registry validate apps/registry.json -c .",
     "registry:ship": "node scripts/ship.mjs",
     "ship": "node scripts/ship.mjs"
   },

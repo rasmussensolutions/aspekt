@@ -14,12 +14,12 @@
       ],
       "files": [
         {
-          "path": "components/ui/button.tsx",
+          "path": "packages/ui/src/button.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/button.tsx"
         },
         {
-          "path": "components/ui/sound.ts",
+          "path": "packages/ui/src/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -41,12 +41,93 @@
       ],
       "files": [
         {
-          "path": "components/ui/input.tsx",
+          "path": "packages/ui/src/input.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/input.tsx"
         },
         {
-          "path": "components/ui/sound.ts",
+          "path": "packages/ui/src/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "A Base UI checkbox with sizes, variants, indeterminate state, validation styling, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/checkbox.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/checkbox.tsx"
+        },
+        {
+          "path": "packages/ui/src/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "A Base UI select with sizes, variants, popup styling, item indicators, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/select.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/select.tsx"
+        },
+        {
+          "path": "packages/ui/src/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "A Base UI toggle button with variants, sizes, affixes, pressed state styling, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/toggle.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/toggle.tsx"
+        },
+        {
+          "path": "packages/ui/src/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -68,17 +149,49 @@
       ],
       "files": [
         {
-          "path": "components/ui/dialog.tsx",
+          "path": "packages/ui/src/dialog.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/dialog.tsx"
         },
         {
-          "path": "components/ui/button.tsx",
+          "path": "packages/ui/src/button.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/button.tsx"
         },
         {
-          "path": "components/ui/sound.ts",
+          "path": "packages/ui/src/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "overlay"
+      ]
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "A Base UI drawer with Aspekt styling, edge placement, optional backdrop, detached spacing, swipe dismissal, and interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/drawer.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/drawer.tsx"
+        },
+        {
+          "path": "packages/ui/src/button.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/ui/src/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -95,12 +208,12 @@
       "description": "An optional provider and hook for global Aspekt UI sound settings.",
       "files": [
         {
-          "path": "components/ui/sound-provider.tsx",
+          "path": "packages/ui/src/sound-provider.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/sound-provider.tsx"
         },
         {
-          "path": "components/ui/sound.ts",
+          "path": "packages/ui/src/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -122,27 +235,47 @@
       ],
       "files": [
         {
-          "path": "components/ui/button.tsx",
+          "path": "packages/ui/src/button.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/button.tsx"
         },
         {
-          "path": "components/ui/input.tsx",
+          "path": "packages/ui/src/input.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/input.tsx"
         },
         {
-          "path": "components/ui/dialog.tsx",
+          "path": "packages/ui/src/checkbox.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/checkbox.tsx"
+        },
+        {
+          "path": "packages/ui/src/select.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/select.tsx"
+        },
+        {
+          "path": "packages/ui/src/toggle.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/toggle.tsx"
+        },
+        {
+          "path": "packages/ui/src/dialog.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/dialog.tsx"
         },
         {
-          "path": "components/ui/sound-provider.tsx",
+          "path": "packages/ui/src/drawer.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/drawer.tsx"
+        },
+        {
+          "path": "packages/ui/src/sound-provider.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/sound-provider.tsx"
         },
         {
-          "path": "components/ui/sound.ts",
+          "path": "packages/ui/src/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }

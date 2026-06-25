@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@aspekt/ui/button";
+import { Checkbox } from "@aspekt/ui/checkbox";
 import {
   DialogClose,
   DialogContent,
@@ -13,25 +14,85 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@aspekt/ui/dialog";
+import {
+  DrawerBody,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
+  DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerViewport,
+} from "@aspekt/ui/drawer";
+import { Heading } from "@aspekt/ui/heading";
+import { Text } from "@aspekt/ui/text";
+
 import { Input } from "@aspekt/ui/input";
+import {
+  SelectItem,
+  SelectList,
+  SelectPopup,
+  SelectPortal,
+  SelectPositioner,
+  SelectRoot,
+  SelectScrollDownArrow,
+  SelectScrollUpArrow,
+  SelectTrigger,
+} from "@aspekt/ui/select";
 import { SoundProvider, useSound } from "@aspekt/ui/sound-provider";
 import { Switch } from "@base-ui/react/switch";
 import {
   ArrowRightIcon,
   MagnifyingGlassIcon,
   PlusCircleIcon,
+  StackIcon,
 } from "@phosphor-icons/react";
 import * as React from "react";
+import { Toggle } from "@aspekt/ui/toggle";
 
 type IntroPage = "purpose" | "principles";
-type ComponentPreview = "button" | "input" | "dialog" | "sound-provider";
+type ComponentPreview =
+  | "button"
+  | "checkbox"
+  | "input"
+  | "select"
+  | "toggle"
+  | "dialog"
+  | "drawer"
+  | "sound-provider"
+  | "heading"
+  | "text";
+
 type DocsPage = IntroPage | ComponentPreview;
 type ButtonVariant = "solid" | "soft" | "ghost" | "outline";
 type ButtonSize = "micro" | "tiny" | "small" | "medium" | "large";
 type ButtonColor = "accent" | "blue" | "red" | "amber" | "neutral";
 type ButtonShape = "square" | "round";
 type DialogSize = "small" | "medium" | "large";
+type DrawerSide = "top" | "right" | "bottom" | "left";
 type InputVariant = "outline" | "soft" | "ghost";
+type SelectVariant = "outline" | "soft" | "ghost";
+type CheckboxVariant = "solid" | "soft" | "outline";
+type SelectPreviewValue = "react" | "next" | "svelte" | "vue" | "astro";
+type HeadingSize = "display" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+type HeadingTone = "default" | "muted" | "subtle" | "accent";
+type HeadingLevelOption = "1" | "2" | "3" | "4" | "5" | "6";
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+type TextSize = "lg" | "base" | "sm" | "xs";
+type TextTone =
+  | "default"
+  | "muted"
+  | "subtle"
+  | "accent"
+  | "danger"
+  | "success"
+  | "warning";
+type TextWeight = "normal" | "medium" | "semibold";
+type TextAs = "p" | "span" | "div";
 
 type ButtonSettings = {
   variant: ButtonVariant;
@@ -57,9 +118,64 @@ type InputSettings = {
   readOnly: boolean;
 };
 
+type SelectSettings = {
+  variant: SelectVariant;
+  size: ButtonSize;
+  shape: ButtonShape;
+  prefix: boolean;
+  suffix: boolean;
+  invalid: boolean;
+  disabled: boolean;
+  readOnly: boolean;
+};
+
+type CheckboxSettings = {
+  variant: CheckboxVariant;
+  size: ButtonSize;
+  color: ButtonColor;
+  shape: ButtonShape;
+  checked: boolean;
+  indeterminate: boolean;
+  invalid: boolean;
+  disabled: boolean;
+  readOnly: boolean;
+};
+
+type ToggleSettings = {
+  variant: ButtonVariant;
+  size: ButtonSize;
+  color: ButtonColor;
+  shape: ButtonShape;
+  prefix: boolean;
+  suffix: boolean;
+  pressed: boolean;
+  disabled: boolean;
+};
+
 type DialogSettings = {
   shape: ButtonShape;
   size: DialogSize;
+};
+
+type DrawerSettings = {
+  backdrop: boolean;
+  detached: boolean;
+  shape: ButtonShape;
+  side: DrawerSide;
+  size: DialogSize;
+};
+
+type HeadingSettings = {
+  size: HeadingSize;
+  tone: HeadingTone;
+  level: HeadingLevelOption;
+};
+
+type TextSettings = {
+  size: TextSize;
+  tone: TextTone;
+  weight: TextWeight;
+  as: TextAs;
 };
 
 type OverflowEdge = "top" | "right" | "bottom" | "left";
@@ -76,7 +192,18 @@ const emptyOverflowState = {
 const scrollOverflowThreshold = 2;
 
 const introIds = ["purpose", "principles"] as const;
-const componentIds = ["button", "input", "dialog", "sound-provider"] as const;
+const componentIds = [
+  "button",
+  "checkbox",
+  "input",
+  "select",
+  "toggle",
+  "dialog",
+  "drawer",
+  "heading",
+  "text",
+  "sound-provider",
+] as const;
 const docsPageIds = [...introIds, ...componentIds] as const;
 
 const navGroups = [
@@ -88,16 +215,35 @@ const navGroups = [
     ],
   },
   {
-    title: "Components",
-    items: [{ label: "Dialog", page: "dialog" }],
+    title: "Typography",
+    items: [
+      { label: "Heading", page: "heading" },
+      { label: "Text", page: "text" },
+      { label: "Code", page: "input" },
+      { label: "Kbd", page: "input" },
+      { label: "Prose", page: "input" },
+      { label: "Blockquote", page: "input" },
+      { label: "List", page: "input" },
+    ],
   },
   {
     title: "Controls",
     items: [
       { label: "Button", page: "button" },
+      { label: "Checkbox", page: "checkbox" },
       { label: "Input", page: "input" },
+      { label: "Select", page: "select" },
+      { label: "Toggle", page: "toggle" },
     ],
   },
+  {
+    title: "Components",
+    items: [
+      { label: "Dialog", page: "dialog" },
+      { label: "Drawer", page: "drawer" },
+    ],
+  },
+
   {
     title: "SFX",
     items: [{ label: "Sound Provider", page: "sound-provider" }],
@@ -120,10 +266,59 @@ const inputOptions = {
   shape: buttonOptions.shape,
 } as const;
 
+const selectOptions = {
+  variant: ["outline", "soft", "ghost"],
+  size: buttonOptions.size,
+  shape: buttonOptions.shape,
+} as const;
+
+const checkboxOptions = {
+  variant: ["solid", "soft", "outline"],
+  size: buttonOptions.size,
+  color: buttonOptions.color,
+  shape: buttonOptions.shape,
+} as const;
+
+const toggleOptions = {
+  variant: buttonOptions.variant,
+  size: buttonOptions.size,
+  color: buttonOptions.color,
+  shape: buttonOptions.shape,
+} as const;
+
 const dialogOptions = {
   shape: buttonOptions.shape,
   size: ["small", "medium", "large"],
 } as const;
+
+const drawerOptions = {
+  shape: buttonOptions.shape,
+  side: ["bottom", "right", "left", "top"],
+  size: dialogOptions.size,
+} as const;
+
+const headingOptions = {
+  size: ["display", "h1", "h2", "h3", "h4", "h5", "h6"],
+  tone: ["default", "muted", "subtle", "accent"],
+  level: ["1", "2", "3", "4", "5", "6"],
+} as const;
+
+const textOptions = {
+  size: ["lg", "base", "sm", "xs"],
+  tone: [
+    "default",
+    "muted",
+    "subtle",
+    "accent",
+    "danger",
+    "success",
+    "warning",
+  ],
+  weight: ["normal", "medium", "semibold"],
+  as: ["p", "span", "div"],
+} as const;
+
+const soundVariantOptions = ["soft", "click", "snap", "pop", "thock"] as const;
 
 const registryBaseUrl = "https://aspekt.systems/r";
 
@@ -132,13 +327,37 @@ const componentCopy = {
     title: "Button",
     description: "is used to initiate interactions.",
   },
+  checkbox: {
+    title: "Checkbox",
+    description: "is used to select one or more options.",
+  },
   input: {
     title: "Input",
     description: "is used to collect text.",
   },
+  select: {
+    title: "Select",
+    description: "is used to choose one value from a menu.",
+  },
+  toggle: {
+    title: "Toggle",
+    description: "is used to toggle a value on or off.",
+  },
   dialog: {
     title: "Dialog",
     description: "is used for focused decisions and short modal workflows.",
+  },
+  drawer: {
+    title: "Drawer",
+    description: "is used to reveal contextual content from an edge.",
+  },
+  heading: {
+    title: "Heading",
+    description: "is used to define the title of a section.",
+  },
+  text: {
+    title: "Text",
+    description: "is used to display text.",
   },
   "sound-provider": {
     title: "Sound Provider",
@@ -152,6 +371,20 @@ const componentCopy = {
     description: string;
   }
 >;
+
+const componentImportExamples = {
+  button: 'import { Button } from "@aspekt/ui/button";',
+  checkbox: 'import { Checkbox } from "@aspekt/ui/checkbox";',
+  input: 'import { Input } from "@aspekt/ui/input";',
+  select: 'import { SelectRoot, SelectTrigger } from "@aspekt/ui/select";',
+  toggle: 'import { Toggle } from "@aspekt/ui/toggle";',
+  dialog: 'import { DialogRoot, DialogTrigger } from "@aspekt/ui/dialog";',
+  drawer: 'import { DrawerRoot, DrawerTrigger } from "@aspekt/ui/drawer";',
+  heading: 'import { Heading } from "@aspekt/ui/heading";',
+  text: 'import { Text } from "@aspekt/ui/text";',
+  "sound-provider":
+    'import { SoundProvider, useSound } from "@aspekt/ui/sound-provider";',
+} satisfies Record<ComponentPreview, string>;
 
 const introCopy = {
   purpose: {
@@ -194,10 +427,85 @@ const defaultInputSettings = {
   readOnly: false,
 } satisfies InputSettings;
 
+const defaultSelectSettings = {
+  variant: "outline",
+  size: "medium",
+  shape: "square",
+  prefix: true,
+  suffix: false,
+  invalid: false,
+  disabled: false,
+  readOnly: false,
+} satisfies SelectSettings;
+
+const defaultCheckboxSettings = {
+  variant: "outline",
+  size: "medium",
+  color: "blue",
+  shape: "square",
+  checked: true,
+  indeterminate: false,
+  invalid: false,
+  disabled: false,
+  readOnly: false,
+} satisfies CheckboxSettings;
+
+const defaultToggleSettings = {
+  variant: "soft",
+  size: "medium",
+  color: "blue",
+  shape: "square",
+  prefix: true,
+  suffix: false,
+  pressed: false,
+  disabled: false,
+} satisfies ToggleSettings;
+
 const defaultDialogSettings = {
   shape: "round",
   size: "medium",
 } satisfies DialogSettings;
+
+const defaultDrawerSettings = {
+  backdrop: true,
+  detached: false,
+  shape: "round",
+  side: "bottom",
+  size: "medium",
+} satisfies DrawerSettings;
+
+const defaultHeadingSettings = {
+  size: "h1",
+  tone: "default",
+  level: "2",
+} satisfies HeadingSettings;
+
+const defaultTextSettings = {
+  size: "base",
+  tone: "default",
+  weight: "normal",
+  as: "p",
+} satisfies TextSettings;
+
+const selectPreviewItems = [
+  { label: "React", value: "react" },
+  { label: "Next.js", value: "next" },
+  { label: "Svelte", value: "svelte" },
+  { label: "Vue", value: "vue" },
+  { label: "Astro", value: "astro" },
+] as const satisfies readonly {
+  label: string;
+  value: SelectPreviewValue;
+}[];
+
+const headingLevelValues = {
+  "1": 1,
+  "2": 2,
+  "3": 3,
+  "4": 4,
+  "5": 5,
+  "6": 6,
+} satisfies Record<HeadingLevelOption, HeadingLevel>;
 
 const buttonColorDots = {
   accent: "bg-orange-600",
@@ -344,8 +652,8 @@ function Sidebar({
         ref={sidebarScrollRef}
         className="flex h-full flex-col px-6 py-8 sm:px-10 lg:overflow-y-auto lg:px-8 lg:py-18"
       >
-        <div className="mb-16 flex items-center gap-2">
-          <span className="rounded-full text-base leading-none text-neutral-600 dark:border-white/30 dark:text-neutral-300">
+        <div className="mb-16 flex items-center gap-2 select-none pointer-events-none">
+          <span className="rounded-full text-lg leading-none text-neutral-600 dark:border-white/30 dark:text-neutral-300">
             aspekt.systems
           </span>
         </div>
@@ -371,7 +679,7 @@ function Sidebar({
                       className={[
                         "relative inline-flex text-left text-base leading-none outline-none transition-colors",
                         item.page === activePage
-                          ? "font-medium text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-blue-500"
+                          ? "font-medium text-foreground"
                           : "text-neutral-400 hover:text-foreground focus-visible:text-foreground dark:text-neutral-400",
                       ].join(" ")}
                     >
@@ -638,20 +946,31 @@ function InstallCommands({
   activeComponent: ComponentPreview;
 }) {
   const activeLabel = componentCopy[activeComponent].title;
-  const command = `pnpm dlx shadcn@latest add ${registryBaseUrl}/${activeComponent}.json`;
+  const packageCommand = "npm install @aspekt/ui";
+  const importCommand = componentImportExamples[activeComponent];
+  const registryCommand = `pnpm dlx shadcn@latest add ${registryBaseUrl}/${activeComponent}.json`;
 
   return (
     <div className="mb-12 grid gap-2 rounded-lg border border-neutral-200 bg-white p-3 dark:border-white/15 dark:bg-neutral-900">
       <div className="text-sm font-medium text-foreground">{activeLabel}</div>
       <pre className="overflow-x-auto rounded-md bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
-        <code>{command}</code>
+        <code>{packageCommand}</code>
+      </pre>
+      <pre className="overflow-x-auto rounded-md bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
+        <code>{'import "@aspekt/ui/styles.css";'}</code>
+      </pre>
+      <pre className="overflow-x-auto rounded-md bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
+        <code>{importCommand}</code>
+      </pre>
+      <pre className="overflow-x-auto rounded-md bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
+        <code>{registryCommand}</code>
       </pre>
     </div>
   );
 }
 
 const soundProviderRootExample = `
-import { SoundProvider } from "@/components/aspekt/sound-provider";
+import { SoundProvider } from "@aspekt/ui/sound-provider";
 
 export default function RootLayout({
   children,
@@ -661,7 +980,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SoundProvider enabled volume={0.8}>
+        <SoundProvider enabled variant="soft" volume={0.8}>
           {children}
         </SoundProvider>
       </body>
@@ -671,10 +990,12 @@ export default function RootLayout({
 `;
 
 const useSoundExample = `
-import { useSound } from "@/components/aspekt/sound-provider";
+import { useSound } from "@aspekt/ui/sound-provider";
 
 export function SoundSettings() {
-  const { enabled, setEnabled, volume, setVolume, play } = useSound();
+  const variants = ["soft", "click", "snap", "pop", "thock"] as const;
+  const { enabled, setEnabled, variant, setVariant, volume, setVolume, play } =
+    useSound();
 
   return (
     <div>
@@ -689,6 +1010,14 @@ export function SoundSettings() {
         value={volume}
         onChange={(event) => setVolume(Number(event.currentTarget.value))}
       />
+      <button
+        onClick={() => {
+          const index = variants.indexOf(variant);
+          setVariant(variants[(index + 1) % variants.length]);
+        }}
+      >
+        Use next sound variant
+      </button>
       <button onClick={() => play("success")}>Preview</button>
     </div>
   );
@@ -696,7 +1025,7 @@ export function SoundSettings() {
 `;
 
 const dialogExample = `
-import { Button } from "@/components/aspekt/button";
+import { Button } from "@aspekt/ui/button";
 import {
   DialogClose,
   DialogContent,
@@ -708,7 +1037,7 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/aspekt/dialog";
+} from "@aspekt/ui/dialog";
 
 export function ExampleDialog() {
   return (
@@ -730,6 +1059,51 @@ export function ExampleDialog() {
         </DialogContent>
       </DialogPortal>
     </DialogRoot>
+  );
+}
+`;
+
+const drawerExample = `
+import { Button } from "@aspekt/ui/button";
+import {
+  DrawerBody,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
+  DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerViewport,
+} from "@aspekt/ui/drawer";
+
+export function ExampleDrawer() {
+  return (
+    <DrawerRoot backdrop={false} detached shape="round" side="right">
+      <DrawerTrigger>Open drawer</DrawerTrigger>
+      <DrawerPortal>
+        <DrawerOverlay />
+        <DrawerViewport>
+          <DrawerContent>
+            <DrawerBody>
+              <DrawerHeader>
+                <DrawerTitle>Component details</DrawerTitle>
+                <DrawerDescription>
+                  Review registry metadata before publishing.
+                </DrawerDescription>
+              </DrawerHeader>
+              <DrawerFooter>
+                <DrawerClose>Cancel</DrawerClose>
+                <Button color="neutral">Save</Button>
+              </DrawerFooter>
+            </DrawerBody>
+          </DrawerContent>
+        </DrawerViewport>
+      </DrawerPortal>
+    </DrawerRoot>
   );
 }
 `;
@@ -759,7 +1133,8 @@ function CodeBlock({ children }: { children: string }) {
 }
 
 function SoundProviderControls() {
-  const { enabled, volume, setEnabled, setVolume, play } = useSound();
+  const { enabled, variant, volume, setEnabled, setVariant, setVolume, play } =
+    useSound();
 
   return (
     <div className="grid w-full max-w-md gap-6 px-6">
@@ -781,6 +1156,18 @@ function SoundProviderControls() {
               <span className="absolute h-2.5 w-1.5 rotate-45 border-b-2 border-r-2 border-white" />
             )}
           </Switch.Root>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-3 dark:border-white/15">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">variant</h2>
+            <ValueList values={soundVariantOptions} />
+          </div>
+          <SegmentedControl
+            values={soundVariantOptions}
+            active={variant}
+            onValueChange={setVariant}
+          />
         </div>
 
         <label className="grid gap-3 border-b border-neutral-200 pb-4 dark:border-white/15">
@@ -826,10 +1213,152 @@ function SoundProviderControls() {
     </div>
   );
 }
+function HeadingPreview({ settings }: { settings: HeadingSettings }) {
+  return (
+    <div className="px-6 text-center">
+      <Heading
+        size={settings.size}
+        tone={settings.tone}
+        level={headingLevelValues[settings.level]}
+        className="max-w-2xl"
+      >
+        Build interfaces with intention
+      </Heading>
+    </div>
+  );
+}
+
+function CheckboxPreview({
+  settings,
+  onCheckedChange,
+}: {
+  settings: CheckboxSettings;
+  onCheckedChange: (checked: boolean) => void;
+}) {
+  return (
+    <label
+      className={[
+        "inline-flex items-center gap-3 px-6 text-sm font-medium text-foreground",
+        settings.disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+      ].join(" ")}
+    >
+      <Checkbox
+        checked={settings.checked}
+        onCheckedChange={onCheckedChange}
+        indeterminate={settings.indeterminate}
+        variant={settings.variant}
+        color={settings.color}
+        size={settings.size}
+        shape={settings.shape}
+        invalid={settings.invalid}
+        disabled={settings.disabled}
+        readOnly={settings.readOnly}
+      />
+      Receive product updates
+    </label>
+  );
+}
+
+function TogglePreview({
+  settings,
+  onPressedChange,
+}: {
+  settings: ToggleSettings;
+  onPressedChange: (pressed: boolean) => void;
+}) {
+  return (
+    <div className="px-6">
+      <Toggle
+        pressed={settings.pressed}
+        onPressedChange={onPressedChange}
+        variant={settings.variant}
+        color={settings.color}
+        size={settings.size}
+        shape={settings.shape}
+        prefix={settings.prefix ? <StackIcon /> : undefined}
+        suffix={
+          settings.suffix ? (settings.pressed ? "On" : "Off") : undefined
+        }
+        disabled={settings.disabled}
+      >
+        Toggle me
+      </Toggle>
+    </div>
+  );
+}
+
+function TextPreview({ settings }: { settings: TextSettings }) {
+  return (
+    <Text
+      as={settings.as}
+      size={settings.size}
+      tone={settings.tone}
+      weight={settings.weight}
+      className="block max-w-xl px-6"
+    >
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla laoreet
+      purus eu mattis placerat. Etiam massa mi, congue sed tellus eget,
+      imperdiet eleifend nulla. Donec ex lacus, ultricies ac magna eu, accumsan
+      suscipit justo. Maecenas consectetur lorem ex, et congue mi maximus et.
+      Proin sed efficitur sapien. Vestibulum volutpat, odio sollicitudin lacinia
+      porta, lectus elit hendrerit magna, eget tempus felis justo sed magna.
+    </Text>
+  );
+}
+
+function SelectPreview({
+  settings,
+  value,
+  onValueChange,
+}: {
+  settings: SelectSettings;
+  value: SelectPreviewValue;
+  onValueChange: (value: SelectPreviewValue) => void;
+}) {
+  return (
+    <SelectRoot
+      value={value}
+      onValueChange={(nextValue) => {
+        if (nextValue) {
+          onValueChange(nextValue);
+        }
+      }}
+      items={selectPreviewItems}
+      size={settings.size}
+      shape={settings.shape}
+      disabled={settings.disabled}
+      readOnly={settings.readOnly}
+    >
+      <SelectTrigger
+        aria-label="Preview select"
+        variant={settings.variant}
+        invalid={settings.invalid}
+        prefix={settings.prefix ? <StackIcon /> : undefined}
+        suffix={settings.suffix ? "UI" : undefined}
+        className="max-w-xs"
+      />
+      <SelectPortal>
+        <SelectPositioner>
+          <SelectPopup>
+            <SelectScrollUpArrow />
+            <SelectList>
+              {selectPreviewItems.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectList>
+            <SelectScrollDownArrow />
+          </SelectPopup>
+        </SelectPositioner>
+      </SelectPortal>
+    </SelectRoot>
+  );
+}
 
 function SoundProviderPreview() {
   return (
-    <SoundProvider enabled volume={0.8}>
+    <SoundProvider enabled variant="soft" volume={0.8}>
       <SoundProviderControls />
     </SoundProvider>
   );
@@ -843,7 +1372,8 @@ function SoundProviderDocumentation() {
         <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
           Aspekt UI sounds are enabled by default and components can play them
           without a provider. Add SoundProvider when you want one global place
-          to disable sound, tune volume, or trigger sounds from your own UI.
+          to disable sound, choose a sound variant, tune volume, or trigger
+          sounds from your own UI.
         </p>
       </section>
 
@@ -891,6 +1421,69 @@ function DialogPreview({ settings }: { settings: DialogSettings }) {
   );
 }
 
+function DrawerPreview({ settings }: { settings: DrawerSettings }) {
+  return (
+    <DrawerRoot
+      backdrop={settings.backdrop}
+      detached={settings.detached}
+      shape={settings.shape}
+      side={settings.side}
+    >
+      <DrawerTrigger>Open drawer</DrawerTrigger>
+      <DrawerPortal>
+        <DrawerOverlay />
+        <DrawerViewport>
+          <DrawerContent size={settings.size}>
+            <DrawerBody>
+              <DrawerHeader>
+                <DrawerTitle>Review registry item</DrawerTitle>
+                <DrawerDescription>
+                  Confirm the public install target before publishing the
+                  component.
+                </DrawerDescription>
+              </DrawerHeader>
+
+              <div className="grid gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-white/15 dark:bg-white/5">
+                <div className="flex min-w-0 items-center justify-between gap-4">
+                  <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                    component
+                  </span>
+                  <span className="min-w-0 break-all text-right font-mono text-foreground">
+                    drawer
+                  </span>
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-4">
+                  <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                    target
+                  </span>
+                  <span className="min-w-0 break-all text-right font-mono text-foreground">
+                    components/aspekt/drawer.tsx
+                  </span>
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-4">
+                  <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                    install
+                  </span>
+                  <span className="min-w-0 break-all text-right font-mono text-foreground">
+                    /r/drawer.json
+                  </span>
+                </div>
+              </div>
+
+              <DrawerFooter>
+                <DrawerClose>Cancel</DrawerClose>
+                <Button type="button" color="neutral">
+                  Save
+                </Button>
+              </DrawerFooter>
+            </DrawerBody>
+          </DrawerContent>
+        </DrawerViewport>
+      </DrawerPortal>
+    </DrawerRoot>
+  );
+}
+
 function DialogDocumentation() {
   return (
     <div className="grid gap-10">
@@ -924,6 +1517,45 @@ function DialogDocumentation() {
   );
 }
 
+function DrawerDocumentation() {
+  return (
+    <div className="grid gap-10">
+      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <h2 className="text-sm font-semibold text-foreground">
+          base ui primitive
+        </h2>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Drawer is built on Base UI primitives and styled for Aspekt. It
+          includes portal rendering, backdrop dismissal, escape key dismissal,
+          focus management, swipe-to-dismiss gestures, and the same interaction
+          sound model as the rest of Aspekt UI.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          DrawerViewport wraps the moving panel so Base UI can manage swipe
+          movement and touch scroll locking. DrawerBody maps to Base UI
+          Drawer.Content for selectable and scrollable drawer content.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Pass side, backdrop, detached, shape, and size to control the drawer
+          edge, dimming, spacing, and surface. DrawerTrigger and DrawerClose
+          compose Aspekt Button, so variants, sizes, loading state, affixes,
+          and sound overrides stay consistent.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Keep DrawerOverlay in the portal when you want outside-click
+          dismissal. Setting backdrop to false keeps that layer transparent
+          instead of rendering the dark dim.
+        </p>
+      </section>
+
+      <section className="grid gap-3">
+        <h2 className="text-sm font-semibold text-foreground">usage</h2>
+        <CodeBlock>{drawerExample}</CodeBlock>
+      </section>
+    </div>
+  );
+}
+
 const principles = [
   {
     title: "Feedback belongs to the interface",
@@ -931,15 +1563,15 @@ const principles = [
   },
   {
     title: "Install only what you use",
-    body: "Every component is published as a focused registry item. Consumers should be able to add Button, Dialog, Input, or Sound Provider independently without pulling a full component catalog into their project.",
+    body: "Every component is published through focused package exports. Consumers can import Button, Dialog, Input, or Sound Provider independently without pulling a full component catalog into a bundle.",
   },
   {
-    title: "Own the source",
-    body: "Components are copied into the app through the shadcn registry model. The consumer gets normal source files they can read, edit, and adapt instead of a closed package API.",
+    title: "Use the package",
+    body: "Aspekt is a normal npm package first. Install @aspekt/ui, import the shared stylesheet once, then use the focused component exports wherever the app needs them.",
   },
   {
     title: "Respect existing projects",
-    body: "Aspekt installs into components/aspekt so it can sit beside an existing shadcn/ui setup without overwriting common files like components/ui/button.tsx.",
+    body: "The compatibility registry still installs into components/aspekt, so teams that prefer source-owned components can keep that workflow beside an existing shadcn/ui setup.",
   },
 ] as const;
 
@@ -1011,12 +1643,30 @@ export default function Home() {
   const [buttonSettings, setButtonSettings] = React.useState<ButtonSettings>(
     defaultButtonSettings,
   );
+  const [checkboxSettings, setCheckboxSettings] =
+    React.useState<CheckboxSettings>(defaultCheckboxSettings);
   const [inputSettings, setInputSettings] =
     React.useState<InputSettings>(defaultInputSettings);
+  const [selectSettings, setSelectSettings] = React.useState<SelectSettings>(
+    defaultSelectSettings,
+  );
+  const [toggleSettings, setToggleSettings] = React.useState<ToggleSettings>(
+    defaultToggleSettings,
+  );
   const [dialogSettings, setDialogSettings] = React.useState<DialogSettings>(
     defaultDialogSettings,
   );
+  const [drawerSettings, setDrawerSettings] = React.useState<DrawerSettings>(
+    defaultDrawerSettings,
+  );
+  const [headingSettings, setHeadingSettings] = React.useState<HeadingSettings>(
+    defaultHeadingSettings,
+  );
+  const [textSettings, setTextSettings] =
+    React.useState<TextSettings>(defaultTextSettings);
   const [inputValue, setInputValue] = React.useState("Search components");
+  const [selectValue, setSelectValue] =
+    React.useState<SelectPreviewValue>("react");
   const [activePage, setActivePage] = React.useState<DocsPage>("purpose");
   const fakeLoadingTimeoutRef = React.useRef<number | null>(null);
   const { ref: previewScrollRef, overflow: previewOverflow } =
@@ -1088,11 +1738,9 @@ export default function Home() {
             id={activePage}
             className="flex min-w-0 flex-1 flex-col px-6 pb-16 pt-4 sm:px-10 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-18"
           >
-            <div className="mb-14">
-              <p className="max-w-xl text-base text-neutral-500 dark:text-neutral-400">
-                <span className="font-semibold text-foreground">
-                  {pageCopy.title}
-                </span>{" "}
+            <div className="mb-14 ">
+              <p className="max-w-xl text-lg text-neutral-500 dark:text-neutral-400">
+                <span className=" text-foreground">{pageCopy.title}</span>{" "}
                 {pageCopy.description}
               </p>
             </div>
@@ -1118,6 +1766,17 @@ export default function Home() {
                     >
                       Click me
                     </Button>
+                  ) : activeComponent === "checkbox" ? (
+                    <CheckboxPreview
+                      settings={checkboxSettings}
+                      onCheckedChange={(checked) =>
+                        setCheckboxSettings((settings) => ({
+                          ...settings,
+                          checked,
+                          indeterminate: false,
+                        }))
+                      }
+                    />
                   ) : activeComponent === "input" ? (
                     <Input
                       aria-label="Preview input"
@@ -1143,8 +1802,30 @@ export default function Home() {
                       readOnly={inputSettings.readOnly}
                       className="max-w-xs"
                     />
+                  ) : activeComponent === "select" ? (
+                    <SelectPreview
+                      settings={selectSettings}
+                      value={selectValue}
+                      onValueChange={setSelectValue}
+                    />
+                  ) : activeComponent === "toggle" ? (
+                    <TogglePreview
+                      settings={toggleSettings}
+                      onPressedChange={(pressed) =>
+                        setToggleSettings((settings) => ({
+                          ...settings,
+                          pressed,
+                        }))
+                      }
+                    />
                   ) : activeComponent === "dialog" ? (
                     <DialogPreview settings={dialogSettings} />
+                  ) : activeComponent === "drawer" ? (
+                    <DrawerPreview settings={drawerSettings} />
+                  ) : activeComponent === "heading" ? (
+                    <HeadingPreview settings={headingSettings} />
+                  ) : activeComponent === "text" ? (
+                    <TextPreview settings={textSettings} />
                   ) : (
                     <SoundProviderPreview />
                   )}
@@ -1230,6 +1911,103 @@ export default function Home() {
                 />
 
                 <ButtonVariationShowcase />
+              </div>
+            )}
+
+            {activeComponent === "checkbox" && (
+              <div className="grid gap-8">
+                <OptionRow
+                  label="variant"
+                  values={checkboxOptions.variant}
+                  active={checkboxSettings.variant}
+                  onValueChange={(variant) =>
+                    setCheckboxSettings((settings) => ({
+                      ...settings,
+                      variant,
+                    }))
+                  }
+                />
+
+                <OptionRow
+                  label="size"
+                  values={checkboxOptions.size}
+                  active={checkboxSettings.size}
+                  onValueChange={(size) =>
+                    setCheckboxSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+
+                <OptionRow
+                  label="color"
+                  values={checkboxOptions.color}
+                  active={checkboxSettings.color}
+                  dots={buttonColorDots}
+                  onValueChange={(color) =>
+                    setCheckboxSettings((settings) => ({ ...settings, color }))
+                  }
+                />
+
+                <OptionRow
+                  label="shape"
+                  values={checkboxOptions.shape}
+                  active={checkboxSettings.shape}
+                  onValueChange={(shape) =>
+                    setCheckboxSettings((settings) => ({ ...settings, shape }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="checked"
+                  checked={checkboxSettings.checked}
+                  onCheckedChange={(checked) =>
+                    setCheckboxSettings((settings) => ({
+                      ...settings,
+                      checked,
+                      indeterminate: false,
+                    }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="indeterminate"
+                  checked={checkboxSettings.indeterminate}
+                  onCheckedChange={(indeterminate) =>
+                    setCheckboxSettings((settings) => ({
+                      ...settings,
+                      indeterminate,
+                    }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="invalid"
+                  checked={checkboxSettings.invalid}
+                  onCheckedChange={(invalid) =>
+                    setCheckboxSettings((settings) => ({ ...settings, invalid }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="disabled"
+                  checked={checkboxSettings.disabled}
+                  onCheckedChange={(disabled) =>
+                    setCheckboxSettings((settings) => ({
+                      ...settings,
+                      disabled,
+                    }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="readOnly"
+                  checked={checkboxSettings.readOnly}
+                  onCheckedChange={(readOnly) =>
+                    setCheckboxSettings((settings) => ({
+                      ...settings,
+                      readOnly,
+                    }))
+                  }
+                />
               </div>
             )}
 
@@ -1322,6 +2100,154 @@ export default function Home() {
               </div>
             )}
 
+            {activeComponent === "select" && (
+              <div className="grid gap-8">
+                <OptionRow
+                  label="variant"
+                  values={selectOptions.variant}
+                  active={selectSettings.variant}
+                  onValueChange={(variant) =>
+                    setSelectSettings((settings) => ({ ...settings, variant }))
+                  }
+                />
+
+                <OptionRow
+                  label="size"
+                  values={selectOptions.size}
+                  active={selectSettings.size}
+                  onValueChange={(size) =>
+                    setSelectSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+
+                <OptionRow
+                  label="shape"
+                  values={selectOptions.shape}
+                  active={selectSettings.shape}
+                  onValueChange={(shape) =>
+                    setSelectSettings((settings) => ({ ...settings, shape }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="prefix"
+                  checked={selectSettings.prefix}
+                  typeLabel="ReactNode"
+                  onCheckedChange={(prefix) =>
+                    setSelectSettings((settings) => ({ ...settings, prefix }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="suffix"
+                  checked={selectSettings.suffix}
+                  typeLabel="ReactNode"
+                  onCheckedChange={(suffix) =>
+                    setSelectSettings((settings) => ({ ...settings, suffix }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="invalid"
+                  checked={selectSettings.invalid}
+                  onCheckedChange={(invalid) =>
+                    setSelectSettings((settings) => ({ ...settings, invalid }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="disabled"
+                  checked={selectSettings.disabled}
+                  onCheckedChange={(disabled) =>
+                    setSelectSettings((settings) => ({ ...settings, disabled }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="readOnly"
+                  checked={selectSettings.readOnly}
+                  onCheckedChange={(readOnly) =>
+                    setSelectSettings((settings) => ({ ...settings, readOnly }))
+                  }
+                />
+              </div>
+            )}
+
+            {activeComponent === "toggle" && (
+              <div className="grid gap-8">
+                <OptionRow
+                  label="variant"
+                  values={toggleOptions.variant}
+                  active={toggleSettings.variant}
+                  onValueChange={(variant) =>
+                    setToggleSettings((settings) => ({ ...settings, variant }))
+                  }
+                />
+
+                <OptionRow
+                  label="size"
+                  values={toggleOptions.size}
+                  active={toggleSettings.size}
+                  onValueChange={(size) =>
+                    setToggleSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+
+                <OptionRow
+                  label="color"
+                  values={toggleOptions.color}
+                  active={toggleSettings.color}
+                  dots={buttonColorDots}
+                  onValueChange={(color) =>
+                    setToggleSettings((settings) => ({ ...settings, color }))
+                  }
+                />
+
+                <OptionRow
+                  label="shape"
+                  values={toggleOptions.shape}
+                  active={toggleSettings.shape}
+                  onValueChange={(shape) =>
+                    setToggleSettings((settings) => ({ ...settings, shape }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="prefix"
+                  checked={toggleSettings.prefix}
+                  typeLabel="ReactNode"
+                  onCheckedChange={(prefix) =>
+                    setToggleSettings((settings) => ({ ...settings, prefix }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="suffix"
+                  checked={toggleSettings.suffix}
+                  typeLabel="ReactNode"
+                  onCheckedChange={(suffix) =>
+                    setToggleSettings((settings) => ({ ...settings, suffix }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="pressed"
+                  checked={toggleSettings.pressed}
+                  onCheckedChange={(pressed) =>
+                    setToggleSettings((settings) => ({ ...settings, pressed }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="disabled"
+                  checked={toggleSettings.disabled}
+                  onCheckedChange={(disabled) =>
+                    setToggleSettings((settings) => ({ ...settings, disabled }))
+                  }
+                />
+              </div>
+            )}
+
             {activeComponent === "dialog" && (
               <div className="mb-12 grid gap-8">
                 <OptionRow
@@ -1344,7 +2270,133 @@ export default function Home() {
               </div>
             )}
 
+            {activeComponent === "drawer" && (
+              <div className="mb-12 grid gap-8">
+                <OptionRow
+                  label="side"
+                  values={drawerOptions.side}
+                  active={drawerSettings.side}
+                  onValueChange={(side) =>
+                    setDrawerSettings((settings) => ({ ...settings, side }))
+                  }
+                />
+
+                <OptionRow
+                  label="shape"
+                  values={drawerOptions.shape}
+                  active={drawerSettings.shape}
+                  onValueChange={(shape) =>
+                    setDrawerSettings((settings) => ({ ...settings, shape }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="backdrop"
+                  checked={drawerSettings.backdrop}
+                  onCheckedChange={(backdrop) =>
+                    setDrawerSettings((settings) => ({
+                      ...settings,
+                      backdrop,
+                    }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="detached"
+                  checked={drawerSettings.detached}
+                  onCheckedChange={(detached) =>
+                    setDrawerSettings((settings) => ({
+                      ...settings,
+                      detached,
+                    }))
+                  }
+                />
+
+                <OptionRow
+                  label="size"
+                  values={drawerOptions.size}
+                  active={drawerSettings.size}
+                  onValueChange={(size) =>
+                    setDrawerSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+              </div>
+            )}
+
+            {activeComponent === "heading" && (
+              <div className="grid gap-8">
+                <OptionRow
+                  label="size"
+                  values={headingOptions.size}
+                  active={headingSettings.size}
+                  onValueChange={(size) =>
+                    setHeadingSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+
+                <OptionRow
+                  label="tone"
+                  values={headingOptions.tone}
+                  active={headingSettings.tone}
+                  onValueChange={(tone) =>
+                    setHeadingSettings((settings) => ({ ...settings, tone }))
+                  }
+                />
+
+                <OptionRow
+                  label="level"
+                  values={headingOptions.level}
+                  active={headingSettings.level}
+                  onValueChange={(level) =>
+                    setHeadingSettings((settings) => ({ ...settings, level }))
+                  }
+                />
+              </div>
+            )}
+
+            {activeComponent === "text" && (
+              <div className="grid gap-8">
+                <OptionRow
+                  label="size"
+                  values={textOptions.size}
+                  active={textSettings.size}
+                  onValueChange={(size) =>
+                    setTextSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+
+                <OptionRow
+                  label="tone"
+                  values={textOptions.tone}
+                  active={textSettings.tone}
+                  onValueChange={(tone) =>
+                    setTextSettings((settings) => ({ ...settings, tone }))
+                  }
+                />
+
+                <OptionRow
+                  label="weight"
+                  values={textOptions.weight}
+                  active={textSettings.weight}
+                  onValueChange={(weight) =>
+                    setTextSettings((settings) => ({ ...settings, weight }))
+                  }
+                />
+
+                <OptionRow
+                  label="as"
+                  values={textOptions.as}
+                  active={textSettings.as}
+                  onValueChange={(as) =>
+                    setTextSettings((settings) => ({ ...settings, as }))
+                  }
+                />
+              </div>
+            )}
+
             {activeComponent === "dialog" && <DialogDocumentation />}
+
+            {activeComponent === "drawer" && <DrawerDocumentation />}
 
             {activeComponent === "sound-provider" && (
               <SoundProviderDocumentation />
