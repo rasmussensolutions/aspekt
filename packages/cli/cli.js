@@ -61,7 +61,7 @@ function readJson(path) {
 function loadRegistry() {
   if (!existsSync(registryPath)) {
     fail(
-      "The Aspekt registry is missing. Run `pnpm --filter aspekt registry:sync` in the Aspekt repo before publishing.",
+      "The Aspekt registry is missing. Run `pnpm --filter @aspekt/cli registry:sync` in the Aspekt repo before publishing.",
     );
   }
 
@@ -77,9 +77,9 @@ function printHelp() {
   console.log(`aspekt
 
 Usage:
-  npx aspekt init [options]
-  npx aspekt add <component...> [options]
-  npx aspekt list
+  npx @aspekt/cli init [options]
+  npx @aspekt/cli add <component...> [options]
+  npx @aspekt/cli list
 
 Commands:
   init                 Add Aspekt theme tokens and install shared dependencies.
@@ -162,7 +162,7 @@ function listItems(registry) {
   }
 
   console.log("\nInstall with:");
-  console.log("  npx aspekt add button");
+  console.log("  npx @aspekt/cli add button");
 }
 
 function getTargetPath(file, options) {
@@ -222,7 +222,9 @@ function addComponents(registry, names, options) {
   const requestedNames = options.all ? ["all"] : names;
 
   if (requestedNames.length === 0) {
-    fail("Pass at least one component name, for example `npx aspekt add button`.");
+    fail(
+      "Pass at least one component name, for example `npx @aspekt/cli add button`.",
+    );
   }
 
   const cwd = resolve(options.cwd);
@@ -334,7 +336,7 @@ function initProject(registry, options) {
   }
 
   console.log("\nNext:");
-  console.log("  npx aspekt add button");
+  console.log("  npx @aspekt/cli add button");
 }
 
 function updateCssFile(cssPath) {
@@ -448,7 +450,7 @@ function main() {
   } else if (command === "init") {
     initProject(registry, options);
   } else {
-    fail(`Unknown command "${command}". Run \`npx aspekt --help\`.`);
+    fail(`Unknown command "${command}". Run \`npx @aspekt/cli --help\`.`);
   }
 }
 

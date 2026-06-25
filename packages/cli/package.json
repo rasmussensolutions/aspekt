@@ -1,5 +1,5 @@
 {
-  "name": "aspekt",
+  "name": "@aspekt/cli",
   "version": "0.1.0",
   "description": "CLI for adding Aspekt UI source components to React and Tailwind projects.",
   "type": "module",

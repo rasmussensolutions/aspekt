@@ -8,8 +8,8 @@ Use the Aspekt CLI to copy component source into your React and Tailwind
 project:
 
 ```sh
-npx aspekt init
-npx aspekt add button
+npx @aspekt/cli init
+npx @aspekt/cli add button
 ```
 
 Then import the copied component from your app:
