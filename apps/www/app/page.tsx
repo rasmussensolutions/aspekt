@@ -30,6 +30,20 @@ import {
   DrawerTrigger,
   DrawerViewport,
 } from "@aspekt/ui/drawer";
+import {
+  PopoverArrow,
+  PopoverBackdrop,
+  PopoverClose,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverPopup,
+  PopoverPortal,
+  PopoverPositioner,
+  PopoverRoot,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@aspekt/ui/popover";
 import { Heading } from "@aspekt/ui/heading";
 import { Kbd } from "@aspekt/ui/kbd";
 import { List, ListItem } from "@aspekt/ui/list";
@@ -72,6 +86,7 @@ type ComponentPreview =
   | "toggle"
   | "dialog"
   | "drawer"
+  | "popover"
   | "snippet"
   | "sound-provider"
   | "heading"
@@ -89,6 +104,7 @@ type ButtonColor = "accent" | "blue" | "red" | "amber" | "neutral";
 type ButtonShape = "square" | "round";
 type DialogSize = "small" | "medium" | "large";
 type DrawerSide = "top" | "right" | "bottom" | "left";
+type PopoverSide = "top" | "right" | "bottom" | "left";
 type InputVariant = "outline" | "soft" | "ghost";
 type SelectVariant = "outline" | "soft" | "ghost";
 type CheckboxVariant = "solid" | "soft" | "outline";
@@ -224,6 +240,14 @@ type DrawerSettings = {
   size: DialogSize;
 };
 
+type PopoverSettings = {
+  arrow: boolean;
+  modal: boolean;
+  shape: ButtonShape;
+  side: PopoverSide;
+  size: DialogSize;
+};
+
 type HeadingSettings = {
   size: HeadingSize;
   tone: HeadingTone;
@@ -300,6 +324,7 @@ const componentIds = [
   "toggle",
   "dialog",
   "drawer",
+  "popover",
   "snippet",
   "heading",
   "text",
@@ -349,6 +374,7 @@ const navGroups = [
     items: [
       { label: "Dialog", page: "dialog" },
       { label: "Drawer", page: "drawer" },
+      { label: "Popover", page: "popover" },
       { label: "Snippet", page: "snippet" },
     ],
   },
@@ -415,6 +441,12 @@ const dialogOptions = {
 } as const;
 
 const drawerOptions = {
+  shape: buttonOptions.shape,
+  side: ["bottom", "right", "left", "top"],
+  size: dialogOptions.size,
+} as const;
+
+const popoverOptions = {
   shape: buttonOptions.shape,
   side: ["bottom", "right", "left", "top"],
   size: dialogOptions.size,
@@ -514,6 +546,10 @@ const componentCopy = {
     title: "Drawer",
     description: "is used to reveal contextual content from an edge.",
   },
+  popover: {
+    title: "Popover",
+    description: "is used to reveal anchored contextual content.",
+  },
   snippet: {
     title: "Snippet",
     description: "is used to display formatted code examples.",
@@ -569,6 +605,7 @@ const componentImportExamples = {
   toggle: 'import { Toggle } from "@aspekt/ui/toggle";',
   dialog: 'import { DialogRoot, DialogTrigger } from "@aspekt/ui/dialog";',
   drawer: 'import { DrawerRoot, DrawerTrigger } from "@aspekt/ui/drawer";',
+  popover: 'import { PopoverRoot, PopoverTrigger } from "@aspekt/ui/popover";',
   snippet: 'import { Snippet } from "@aspekt/ui/snippet";',
   heading: 'import { Heading } from "@aspekt/ui/heading";',
   text: 'import { Text } from "@aspekt/ui/text";',
@@ -665,6 +702,26 @@ const componentUsageExamples = {
     </DrawerViewport>
   </DrawerPortal>
 </DrawerRoot>`,
+  popover: `<PopoverRoot>
+  <PopoverTrigger>Open popover</PopoverTrigger>
+  <PopoverPortal>
+    <PopoverPositioner>
+      <PopoverPopup>
+        <PopoverArrow />
+        <PopoverHeader>
+          <PopoverTitle>Publish target</PopoverTitle>
+          <PopoverDescription>
+            Review the npm package before publishing.
+          </PopoverDescription>
+        </PopoverHeader>
+        <PopoverFooter>
+          <PopoverClose>Cancel</PopoverClose>
+          <Button color="neutral">Publish</Button>
+        </PopoverFooter>
+      </PopoverPopup>
+    </PopoverPositioner>
+  </PopoverPortal>
+</PopoverRoot>`,
   snippet: `<Snippet
   filename="example.tsx"
   language="tsx"
@@ -810,6 +867,14 @@ const defaultDrawerSettings = {
   size: "medium",
 } satisfies DrawerSettings;
 
+const defaultPopoverSettings = {
+  arrow: true,
+  modal: false,
+  shape: "round",
+  side: "bottom",
+  size: "medium",
+} satisfies PopoverSettings;
+
 const defaultHeadingSettings = {
   size: "h1",
   tone: "default",
@@ -895,7 +960,7 @@ pnpm --filter @aspekt/ui build`,
     filename: "package.json",
     code: `{
   "dependencies": {
-    "@aspekt/ui": "^0.1.4"
+    "@aspekt/ui": "^0.1.5"
   }
 }`,
   },
@@ -1525,6 +1590,48 @@ export function ExampleDrawer() {
 }
 `;
 
+const popoverExample = `
+import { Button } from "@aspekt/ui/button";
+import {
+  PopoverArrow,
+  PopoverClose,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverPopup,
+  PopoverPortal,
+  PopoverPositioner,
+  PopoverRoot,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@aspekt/ui/popover";
+
+export function ExamplePopover() {
+  return (
+    <PopoverRoot shape="round">
+      <PopoverTrigger>Open popover</PopoverTrigger>
+      <PopoverPortal>
+        <PopoverPositioner side="bottom">
+          <PopoverPopup>
+            <PopoverArrow />
+            <PopoverHeader>
+              <PopoverTitle>Publish target</PopoverTitle>
+              <PopoverDescription>
+                Review the npm package before publishing.
+              </PopoverDescription>
+            </PopoverHeader>
+            <PopoverFooter>
+              <PopoverClose>Cancel</PopoverClose>
+              <Button color="neutral">Publish</Button>
+            </PopoverFooter>
+          </PopoverPopup>
+        </PopoverPositioner>
+      </PopoverPortal>
+    </PopoverRoot>
+  );
+}
+`;
+
 function isComponentPreview(value: string): value is ComponentPreview {
   return (componentIds as readonly string[]).includes(value);
 }
@@ -2083,6 +2190,62 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
   );
 }
 
+function PopoverPreview({ settings }: { settings: PopoverSettings }) {
+  return (
+    <PopoverRoot modal={settings.modal} shape={settings.shape}>
+      <PopoverTrigger>Open popover</PopoverTrigger>
+      <PopoverPortal>
+        {settings.modal && <PopoverBackdrop />}
+        <PopoverPositioner side={settings.side}>
+          <PopoverPopup size={settings.size}>
+            {settings.arrow && <PopoverArrow />}
+            <PopoverHeader>
+              <PopoverTitle>Publish target</PopoverTitle>
+              <PopoverDescription>
+                Confirm the package metadata before publishing to npm.
+              </PopoverDescription>
+            </PopoverHeader>
+
+            <div className="grid gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-white/15 dark:bg-white/5">
+              <div className="flex min-w-0 items-center justify-between gap-4">
+                <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                  package
+                </span>
+                <span className="min-w-0 break-all text-right font-mono text-foreground">
+                  @aspekt/ui
+                </span>
+              </div>
+              <div className="flex min-w-0 items-center justify-between gap-4">
+                <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                  version
+                </span>
+                <span className="min-w-0 break-all text-right font-mono text-foreground">
+                  0.1.5
+                </span>
+              </div>
+              <div className="flex min-w-0 items-center justify-between gap-4">
+                <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                  export
+                </span>
+                <span className="min-w-0 break-all text-right font-mono text-foreground">
+                  @aspekt/ui/popover
+                </span>
+              </div>
+            </div>
+
+            <PopoverFooter>
+              <PopoverClose>Cancel</PopoverClose>
+              <Button type="button" color="neutral">
+                Publish
+              </Button>
+            </PopoverFooter>
+          </PopoverPopup>
+        </PopoverPositioner>
+      </PopoverPortal>
+    </PopoverRoot>
+  );
+}
+
 function SnippetPreview({ settings }: { settings: SnippetSettings }) {
   const example = snippetExamples[settings.language];
 
@@ -2176,6 +2339,49 @@ function DrawerDocumentation() {
         <Snippet
           code={drawerExample.trim()}
           filename="example-drawer.tsx"
+          language="tsx"
+        />
+      </section>
+    </div>
+  );
+}
+
+function PopoverDocumentation() {
+  return (
+    <div className="grid gap-10">
+      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <h2 className="text-sm font-semibold text-foreground">
+          base ui primitive
+        </h2>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Popover is built on Base UI primitives and styled for Aspekt. It
+          includes anchored positioning, portal rendering, outside interaction
+          dismissal, escape key dismissal, optional modal behavior, and the same
+          interaction sound model as the rest of Aspekt UI.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          PopoverTrigger and PopoverClose compose Aspekt Button, so button
+          variants, colors, sizes, loading state, affixes, and sound overrides
+          stay consistent with Dialog, Drawer, and other actions.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Use PopoverPositioner for side, alignment, collision, and offset
+          behavior. PopoverPopup controls the surface size and shape, and
+          PopoverArrow can be included when the anchor relationship should be
+          explicit.
+        </p>
+        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          Set modal when the content needs focus trapping and outside pointer
+          blocking. In modal mode, include PopoverClose inside PopoverPopup so
+          keyboard and touch screen reader users have a clear escape path.
+        </p>
+      </section>
+
+      <section className="grid gap-3">
+        <h2 className="text-sm font-semibold text-foreground">usage</h2>
+        <Snippet
+          code={popoverExample.trim()}
+          filename="example-popover.tsx"
           language="tsx"
         />
       </section>
@@ -2499,6 +2705,8 @@ export default function Home() {
   const [drawerSettings, setDrawerSettings] = React.useState<DrawerSettings>(
     defaultDrawerSettings,
   );
+  const [popoverSettings, setPopoverSettings] =
+    React.useState<PopoverSettings>(defaultPopoverSettings);
   const [snippetSettings, setSnippetSettings] = React.useState<SnippetSettings>(
     defaultSnippetSettings,
   );
@@ -2701,6 +2909,8 @@ export default function Home() {
                     <DialogPreview settings={dialogSettings} />
                   ) : activeComponent === "drawer" ? (
                     <DrawerPreview settings={drawerSettings} />
+                  ) : activeComponent === "popover" ? (
+                    <PopoverPreview settings={popoverSettings} />
                   ) : activeComponent === "snippet" ? (
                     <SnippetPreview settings={snippetSettings} />
                   ) : activeComponent === "heading" ? (
@@ -3367,6 +3577,53 @@ export default function Home() {
               </div>
             )}
 
+            {activeComponent === "popover" && (
+              <div className="mb-12 grid gap-8">
+                <OptionRow
+                  label="side"
+                  values={popoverOptions.side}
+                  active={popoverSettings.side}
+                  onValueChange={(side) =>
+                    setPopoverSettings((settings) => ({ ...settings, side }))
+                  }
+                />
+
+                <OptionRow
+                  label="shape"
+                  values={popoverOptions.shape}
+                  active={popoverSettings.shape}
+                  onValueChange={(shape) =>
+                    setPopoverSettings((settings) => ({ ...settings, shape }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="modal"
+                  checked={popoverSettings.modal}
+                  onCheckedChange={(modal) =>
+                    setPopoverSettings((settings) => ({ ...settings, modal }))
+                  }
+                />
+
+                <BooleanOptionRow
+                  label="arrow"
+                  checked={popoverSettings.arrow}
+                  onCheckedChange={(arrow) =>
+                    setPopoverSettings((settings) => ({ ...settings, arrow }))
+                  }
+                />
+
+                <OptionRow
+                  label="size"
+                  values={popoverOptions.size}
+                  active={popoverSettings.size}
+                  onValueChange={(size) =>
+                    setPopoverSettings((settings) => ({ ...settings, size }))
+                  }
+                />
+              </div>
+            )}
+
             {activeComponent === "snippet" && (
               <div className="mb-12 grid gap-8">
                 <OptionRow
@@ -3667,6 +3924,8 @@ export default function Home() {
             {activeComponent === "dialog" && <DialogDocumentation />}
 
             {activeComponent === "drawer" && <DrawerDocumentation />}
+
+            {activeComponent === "popover" && <PopoverDocumentation />}
 
             {activeComponent === "sound-provider" && (
               <SoundProviderDocumentation />

@@ -256,6 +256,38 @@
       ]
     },
     {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "A Base UI popover with anchored positioning, Aspekt styling, optional arrow, modal backdrop support, and interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/popover.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/popover.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/button.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "overlay"
+      ]
+    },
+    {
       "name": "code",
       "type": "registry:ui",
       "title": "Code",
@@ -470,6 +502,11 @@
           "path": "packages/ui/src/components/drawer.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/drawer.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/popover.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/popover.tsx"
         },
         {
           "path": "packages/ui/src/components/snippet.tsx",
