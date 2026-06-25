@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 import { playSound, type SoundName } from "./sound";
@@ -176,19 +176,23 @@ const buttonVariants = cva(
   },
 );
 
-type ButtonVariant = NonNullable<
-  VariantProps<typeof buttonVariants>["variant"]
->;
+type ButtonVariant = "solid" | "soft" | "ghost" | "outline";
 
-type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
+type ButtonColor = "accent" | "blue" | "red" | "amber" | "neutral";
 
-type ButtonShape = NonNullable<VariantProps<typeof buttonVariants>["shape"]>;
+type ButtonSize = "micro" | "tiny" | "small" | "medium" | "large";
+
+type ButtonShape = "square" | "round";
 
 type ButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "color" | "prefix" | "suffix"
 > &
-  VariantProps<typeof buttonVariants> & {
+  {
+    variant?: ButtonVariant | null;
+    color?: ButtonColor | null;
+    size?: ButtonSize | null;
+    shape?: ButtonShape | null;
     loading?: boolean;
     sound?: SoundName | false;
     prefix?: React.ReactNode;
@@ -464,3 +468,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 });
 
 export { Button, ButtonShapeProvider, buttonVariants };
+export type {
+  ButtonColor,
+  ButtonProps,
+  ButtonShape,
+  ButtonSize,
+  ButtonVariant,
+};

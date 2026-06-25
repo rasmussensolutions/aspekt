@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -34,8 +34,17 @@ const kbdVariants = cva(
   },
 );
 
-type KbdProps = React.HTMLAttributes<HTMLElement> &
-  VariantProps<typeof kbdVariants>;
+type KbdVariant = "soft" | "outline";
+
+type KbdSize = "sm" | "base" | "lg";
+
+type KbdShape = "square" | "round";
+
+type KbdProps = React.HTMLAttributes<HTMLElement> & {
+  shape?: KbdShape | null;
+  size?: KbdSize | null;
+  variant?: KbdVariant | null;
+};
 
 function Kbd({ className, shape, size, variant, ...props }: KbdProps) {
   return (
@@ -48,3 +57,4 @@ function Kbd({ className, shape, size, variant, ...props }: KbdProps) {
 }
 
 export { Kbd, kbdVariants };
+export type { KbdProps, KbdShape, KbdSize, KbdVariant };

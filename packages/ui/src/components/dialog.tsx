@@ -2,7 +2,7 @@
 
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 import { Button, ButtonShapeProvider } from "./button";
@@ -43,9 +43,9 @@ type DialogSound =
       open?: SoundName | false;
     };
 
-type DialogShape = NonNullable<
-  VariantProps<typeof dialogContentVariants>["shape"]
->;
+type DialogSize = "small" | "medium" | "large";
+
+type DialogShape = "square" | "round";
 
 const DialogShapeContext = React.createContext<DialogShape>("square");
 
@@ -76,9 +76,10 @@ type DialogOverlayProps = Omit<
 type DialogContentProps = Omit<
   React.ComponentProps<typeof DialogPrimitive.Popup>,
   "className"
-> &
-  VariantProps<typeof dialogContentVariants> & {
+> & {
     className?: string;
+    shape?: DialogShape | null;
+    size?: DialogSize | null;
   };
 
 type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
@@ -357,4 +358,20 @@ export {
   DialogTitle,
   DialogTrigger,
   dialogContentVariants,
+};
+export type {
+  DialogButtonProps,
+  DialogCloseProps,
+  DialogContentProps,
+  DialogDescriptionProps,
+  DialogFooterProps,
+  DialogHeaderProps,
+  DialogOverlayProps,
+  DialogPortalProps,
+  DialogRootProps,
+  DialogShape,
+  DialogSize,
+  DialogSound,
+  DialogTitleProps,
+  DialogTriggerProps,
 };

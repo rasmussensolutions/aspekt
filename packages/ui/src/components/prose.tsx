@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -39,11 +39,16 @@ const proseVariants = cva(
   },
 );
 
+type ProseSize = "sm" | "base" | "lg";
+
+type ProseTone = "default" | "muted";
+
 type ProseProps<T extends React.ElementType = "div"> =
-  React.ComponentPropsWithoutRef<T> &
-    VariantProps<typeof proseVariants> & {
-      as?: T;
-    };
+  React.ComponentPropsWithoutRef<T> & {
+    as?: T;
+    size?: ProseSize | null;
+    tone?: ProseTone | null;
+  };
 
 function Prose<T extends React.ElementType = "div">({
   as,
@@ -64,3 +69,4 @@ function Prose<T extends React.ElementType = "div">({
 }
 
 export { Prose, proseVariants };
+export type { ProseProps, ProseSize, ProseTone };

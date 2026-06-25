@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -36,9 +36,20 @@ const listVariants = cva(
   },
 );
 
-type ListProps = React.HTMLAttributes<HTMLElement> &
-  VariantProps<typeof listVariants> & {
+type ListVariant = "disc" | "decimal" | "none";
+
+type ListSize = "sm" | "base" | "lg";
+
+type ListSpacing = "tight" | "normal" | "loose";
+
+type ListTone = "default" | "muted" | "subtle";
+
+type ListProps = React.HTMLAttributes<HTMLElement> & {
     as?: "ul" | "ol";
+    size?: ListSize | null;
+    spacing?: ListSpacing | null;
+    tone?: ListTone | null;
+    variant?: ListVariant | null;
   };
 
 type ListItemProps = React.LiHTMLAttributes<HTMLLIElement>;
@@ -73,3 +84,11 @@ function ListItem({ className, ...props }: ListItemProps) {
 }
 
 export { List, ListItem, listVariants };
+export type {
+  ListItemProps,
+  ListProps,
+  ListSize,
+  ListSpacing,
+  ListTone,
+  ListVariant,
+};

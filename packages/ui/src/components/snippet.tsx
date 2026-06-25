@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 import bash from "refractor/bash";
@@ -47,8 +47,11 @@ type SnippetLanguage =
   | "tsx"
   | (string & {});
 
-type SnippetProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> &
-  VariantProps<typeof snippetVariants> & {
+type SnippetVariant = "soft" | "outline";
+
+type SnippetShape = "square" | "round";
+
+type SnippetProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
     children?: string;
     code?: string;
     copiedLabel?: string;
@@ -59,8 +62,10 @@ type SnippetProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> &
     highlightedLines?: readonly number[];
     language?: SnippetLanguage;
     preClassName?: string;
+    shape?: SnippetShape | null;
     showHeader?: boolean;
     showLineNumbers?: boolean;
+    variant?: SnippetVariant | null;
     wrap?: boolean;
   };
 
@@ -432,4 +437,4 @@ function Snippet({
 }
 
 export { Snippet, snippetVariants };
-export type { SnippetLanguage };
+export type { SnippetLanguage, SnippetProps, SnippetShape, SnippetVariant };

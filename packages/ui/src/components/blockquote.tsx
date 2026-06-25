@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -50,10 +50,21 @@ const blockquoteSourceVariants = cva("mt-3 block text-sm not-italic", {
   },
 });
 
-type BlockquoteProps = React.BlockquoteHTMLAttributes<HTMLQuoteElement> &
-  VariantProps<typeof blockquoteVariants> & {
+type BlockquoteSize = "sm" | "base" | "lg";
+
+type BlockquoteTone =
+  | "default"
+  | "muted"
+  | "accent"
+  | "danger"
+  | "success"
+  | "warning";
+
+type BlockquoteProps = React.BlockquoteHTMLAttributes<HTMLQuoteElement> & {
+    size?: BlockquoteSize | null;
     source?: React.ReactNode;
     sourceClassName?: string;
+    tone?: BlockquoteTone | null;
   };
 
 function Blockquote({
@@ -85,3 +96,4 @@ function Blockquote({
 }
 
 export { Blockquote, blockquoteSourceVariants, blockquoteVariants };
+export type { BlockquoteProps, BlockquoteSize, BlockquoteTone };

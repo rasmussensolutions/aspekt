@@ -1,7 +1,7 @@
 "use client";
 
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -180,6 +180,10 @@ type SliderValue = number | readonly number[];
 type SliderRootProps = SliderPrimitive.Root.Props<SliderValue>;
 type SliderOrientation = NonNullable<SliderRootProps["orientation"]>;
 type SliderElasticEdge = "before" | "after" | null;
+type SliderVariant = "solid" | "soft" | "outline";
+type SliderColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type SliderSize = "micro" | "tiny" | "small" | "medium" | "large";
+type SliderShape = "square" | "round";
 
 type SliderElasticState = {
   activeThumbIndex: number;
@@ -215,24 +219,25 @@ type SliderSound =
 type SliderProps = Omit<
   SliderRootProps,
   "children" | "className" | "color"
-> &
-  VariantProps<typeof sliderRootVariants> &
-  VariantProps<typeof sliderTrackVariants> &
-  VariantProps<typeof sliderIndicatorVariants> & {
+> & {
     className?: string;
+    color?: SliderColor | null;
     controlClassName?: string;
     elastic?: boolean;
     indicatorClassName?: string;
     invalid?: boolean;
     label?: React.ReactNode;
     labelClassName?: string;
+    shape?: SliderShape | null;
     showValue?: boolean;
+    size?: SliderSize | null;
     sound?: SliderSound;
     thumbClassName?: string;
     thumbLabel?: string;
     thumbLabels?: readonly string[];
     trackClassName?: string;
     valueClassName?: string;
+    variant?: SliderVariant | null;
   };
 
 function getSliderValues(value: SliderValue | undefined) {
@@ -598,3 +603,12 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
 });
 
 export { Slider, sliderRootVariants as sliderVariants };
+export type {
+  SliderColor,
+  SliderProps,
+  SliderShape,
+  SliderSize,
+  SliderSound,
+  SliderValue,
+  SliderVariant,
+};

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 import { cn } from "cnfast";
 
@@ -32,9 +32,14 @@ const headingVariants = cva(
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-type HeadingProps = React.HTMLAttributes<HTMLHeadingElement> &
-  VariantProps<typeof headingVariants> & {
+type HeadingSize = "display" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+
+type HeadingTone = "default" | "muted" | "subtle" | "accent";
+
+type HeadingProps = React.HTMLAttributes<HTMLHeadingElement> & {
     level?: HeadingLevel;
+    size?: HeadingSize | null;
+    tone?: HeadingTone | null;
   };
 
 function Heading({ className, size, tone, level = 2, ...props }: HeadingProps) {
@@ -49,3 +54,4 @@ function Heading({ className, size, tone, level = 2, ...props }: HeadingProps) {
 }
 
 export { Heading, headingVariants };
+export type { HeadingLevel, HeadingProps, HeadingSize, HeadingTone };

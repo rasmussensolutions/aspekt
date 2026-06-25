@@ -1,7 +1,7 @@
 "use client";
 
 import { Select as SelectPrimitive } from "@base-ui/react/select";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -71,13 +71,11 @@ const selectPopupVariants = cva(
   },
 );
 
-type SelectSize = NonNullable<
-  VariantProps<typeof selectTriggerVariants>["size"]
->;
+type SelectVariant = "soft" | "ghost" | "outline";
 
-type SelectShape = NonNullable<
-  VariantProps<typeof selectTriggerVariants>["shape"]
->;
+type SelectSize = "micro" | "tiny" | "small" | "medium" | "large";
+
+type SelectShape = "square" | "round";
 
 type SelectSound =
   | false
@@ -106,15 +104,17 @@ type SelectLabelProps = Omit<
 type SelectTriggerProps = Omit<
   React.ComponentProps<typeof SelectPrimitive.Trigger>,
   "children" | "className" | "prefix" | "suffix"
-> &
-  VariantProps<typeof selectTriggerVariants> & {
+> & {
     children?: React.ReactNode;
     className?: string;
     invalid?: boolean;
     placeholder?: React.ReactNode;
     prefix?: React.ReactNode;
+    shape?: SelectShape | null;
+    size?: SelectSize | null;
     suffix?: React.ReactNode;
     valueClassName?: string;
+    variant?: SelectVariant | null;
   };
 
 type SelectValueProps = Omit<
@@ -136,9 +136,9 @@ type SelectPositionerProps = Omit<
 type SelectPopupProps = Omit<
   React.ComponentProps<typeof SelectPrimitive.Popup>,
   "className"
-> &
-  VariantProps<typeof selectPopupVariants> & {
+> & {
     className?: string;
+    shape?: SelectShape | null;
   };
 
 type SelectListProps = Omit<
@@ -650,4 +650,24 @@ export {
   SelectValue,
   selectPopupVariants,
   selectTriggerVariants,
+};
+export type {
+  SelectGroupLabelProps,
+  SelectGroupProps,
+  SelectItemIndicatorProps,
+  SelectItemProps,
+  SelectItemTextProps,
+  SelectLabelProps,
+  SelectListProps,
+  SelectPopupProps,
+  SelectPortalProps,
+  SelectPositionerProps,
+  SelectRootProps,
+  SelectScrollArrowProps,
+  SelectShape,
+  SelectSize,
+  SelectSound,
+  SelectTriggerProps,
+  SelectValueProps,
+  SelectVariant,
 };

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 import { cn } from "cnfast";
 
@@ -33,11 +33,26 @@ const textVariants = cva("text-pretty text-foreground", {
   },
 });
 
+type TextSize = "xs" | "sm" | "base" | "lg";
+
+type TextTone =
+  | "default"
+  | "muted"
+  | "subtle"
+  | "accent"
+  | "danger"
+  | "success"
+  | "warning";
+
+type TextWeight = "normal" | "medium" | "semibold";
+
 type TextProps<T extends React.ElementType = "p"> =
-  React.ComponentPropsWithoutRef<T> &
-    VariantProps<typeof textVariants> & {
-      as?: T;
-    };
+  React.ComponentPropsWithoutRef<T> & {
+    as?: T;
+    size?: TextSize | null;
+    tone?: TextTone | null;
+    weight?: TextWeight | null;
+  };
 
 function Text<T extends React.ElementType = "p">({
   as,
@@ -58,3 +73,4 @@ function Text<T extends React.ElementType = "p">({
 }
 
 export { Text, textVariants };
+export type { TextProps, TextSize, TextTone, TextWeight };

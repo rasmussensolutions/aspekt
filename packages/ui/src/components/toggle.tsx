@@ -1,7 +1,7 @@
 "use client";
 
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -183,7 +183,13 @@ const toggleVariants = cva(
   },
 );
 
-type ToggleSize = NonNullable<VariantProps<typeof toggleVariants>["size"]>;
+type ToggleVariant = "solid" | "soft" | "ghost" | "outline";
+
+type ToggleColor = "accent" | "blue" | "red" | "amber" | "neutral";
+
+type ToggleSize = "micro" | "tiny" | "small" | "medium" | "large";
+
+type ToggleShape = "square" | "round";
 
 type ToggleSound =
   | SoundName
@@ -196,12 +202,15 @@ type ToggleSound =
 type ToggleProps = Omit<
   TogglePrimitive.Props,
   "className" | "color" | "prefix" | "suffix"
-> &
-  VariantProps<typeof toggleVariants> & {
+> & {
     className?: string;
+    color?: ToggleColor | null;
     prefix?: React.ReactNode;
+    shape?: ToggleShape | null;
+    size?: ToggleSize | null;
     sound?: ToggleSound;
     suffix?: React.ReactNode;
+    variant?: ToggleVariant | null;
   };
 
 const toggleIndicatorSizes = {
@@ -392,3 +401,11 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(function Toggle(
 });
 
 export { Toggle, toggleVariants };
+export type {
+  ToggleColor,
+  ToggleProps,
+  ToggleShape,
+  ToggleSize,
+  ToggleSound,
+  ToggleVariant,
+};

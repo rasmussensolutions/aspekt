@@ -895,7 +895,7 @@ pnpm --filter @aspekt/ui build`,
     filename: "package.json",
     code: `{
   "dependencies": {
-    "@aspekt/ui": "^0.1.3"
+    "@aspekt/ui": "^0.1.4"
   }
 }`,
   },

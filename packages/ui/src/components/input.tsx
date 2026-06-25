@@ -1,7 +1,7 @@
 "use client";
 
 import { Input as InputPrimitive } from "@base-ui/react/input";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -47,7 +47,11 @@ const inputVariants = cva(
   },
 );
 
-type InputSize = NonNullable<VariantProps<typeof inputVariants>["size"]>;
+type InputVariant = "soft" | "ghost" | "outline";
+
+type InputSize = "micro" | "tiny" | "small" | "medium" | "large";
+
+type InputShape = "square" | "round";
 
 type InputPrimitiveProps = React.ComponentPropsWithoutRef<
   typeof InputPrimitive
@@ -60,13 +64,14 @@ type InputFocusEvent = Parameters<
   NonNullable<InputPrimitiveProps["onFocus"]>
 >[0];
 
-type InputProps = Omit<InputPrimitiveProps, "prefix" | "size" | "suffix"> &
-  VariantProps<typeof inputVariants> & {
+type InputProps = Omit<InputPrimitiveProps, "prefix" | "size" | "suffix"> & {
     clearable?: boolean;
     invalid?: boolean;
     loading?: boolean;
     onClear?: () => void;
     prefix?: React.ReactNode;
+    shape?: InputShape | null;
+    size?: InputSize | null;
     sound?:
       | false
       | {
@@ -75,6 +80,7 @@ type InputProps = Omit<InputPrimitiveProps, "prefix" | "size" | "suffix"> &
           unfocus?: SoundName | false;
         };
     suffix?: React.ReactNode;
+    variant?: InputVariant | null;
   };
 
 const inputSlotWidths = {
@@ -497,3 +503,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
 });
 
 export { Input, inputVariants };
+export type { InputProps, InputShape, InputSize, InputVariant };

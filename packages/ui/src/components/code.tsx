@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -36,14 +36,25 @@ const codeVariants = cva("font-mono tabular-nums text-foreground", {
   },
 });
 
-type CodeProps = React.HTMLAttributes<HTMLElement> &
-  VariantProps<typeof codeVariants> & {
+type CodeVariant = "inline" | "block";
+
+type CodeTone =
+  | "default"
+  | "muted"
+  | "accent"
+  | "danger"
+  | "success"
+  | "warning";
+
+type CodeProps = React.HTMLAttributes<HTMLElement> & {
     as?: "code" | "pre";
     copiedLabel?: string;
     copyable?: boolean;
     copyButtonClassName?: string;
     copyLabel?: string;
     copyValue?: string;
+    tone?: CodeTone | null;
+    variant?: CodeVariant | null;
   };
 
 function getCopyText(children: React.ReactNode): string {
@@ -125,3 +136,4 @@ function Code({
 }
 
 export { Code, CodeCopyButton, codeVariants };
+export type { CodeProps, CodeTone, CodeVariant };

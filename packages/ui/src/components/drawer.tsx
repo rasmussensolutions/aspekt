@@ -2,7 +2,7 @@
 
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 import { Button, ButtonShapeProvider } from "./button";
@@ -216,13 +216,11 @@ type DrawerSound =
       open?: SoundName | false;
     };
 
-type DrawerSide = NonNullable<
-  VariantProps<typeof drawerContentVariants>["side"]
->;
+type DrawerSide = "top" | "right" | "bottom" | "left";
 
-type DrawerShape = NonNullable<
-  VariantProps<typeof drawerContentVariants>["shape"]
->;
+type DrawerSize = "small" | "medium" | "large";
+
+type DrawerShape = "square" | "round";
 
 type DrawerBackdrop = boolean;
 
@@ -264,17 +262,21 @@ type DrawerOverlayProps = Omit<
 type DrawerViewportProps = Omit<
   React.ComponentProps<typeof DrawerPrimitive.Viewport>,
   "className"
-> &
-  VariantProps<typeof drawerViewportVariants> & {
+> & {
     className?: string;
+    detached?: DrawerDetached | null;
+    side?: DrawerSide | null;
   };
 
 type DrawerContentProps = Omit<
   React.ComponentProps<typeof DrawerPrimitive.Popup>,
   "className"
-> &
-  VariantProps<typeof drawerContentVariants> & {
+> & {
     className?: string;
+    detached?: DrawerDetached | null;
+    shape?: DrawerShape | null;
+    side?: DrawerSide | null;
+    size?: DrawerSize | null;
   };
 
 type DrawerBodyProps = Omit<
@@ -642,4 +644,25 @@ export {
   DrawerViewport,
   drawerContentVariants,
   drawerViewportVariants,
+};
+export type {
+  DrawerBackdrop,
+  DrawerBodyProps,
+  DrawerButtonProps,
+  DrawerCloseProps,
+  DrawerContentProps,
+  DrawerDescriptionProps,
+  DrawerDetached,
+  DrawerFooterProps,
+  DrawerHeaderProps,
+  DrawerOverlayProps,
+  DrawerPortalProps,
+  DrawerRootProps,
+  DrawerShape,
+  DrawerSide,
+  DrawerSize,
+  DrawerSound,
+  DrawerTitleProps,
+  DrawerTriggerProps,
+  DrawerViewportProps,
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -216,6 +216,14 @@ type SwitchRootProps = React.ComponentPropsWithoutRef<
   typeof SwitchPrimitive.Root
 >;
 
+type SwitchVariant = "solid" | "soft" | "outline";
+
+type SwitchColor = "accent" | "blue" | "red" | "amber" | "neutral";
+
+type SwitchSize = "micro" | "tiny" | "small" | "medium" | "large";
+
+type SwitchShape = "square" | "round";
+
 type SwitchSound =
   | SoundName
   | false
@@ -227,13 +235,16 @@ type SwitchSound =
 type SwitchProps = Omit<
   SwitchRootProps,
   "children" | "className" | "color"
-> &
-  VariantProps<typeof switchVariants> & {
+> & {
     className?: string;
+    color?: SwitchColor | null;
     invalid?: boolean;
+    shape?: SwitchShape | null;
+    size?: SwitchSize | null;
     sound?: SwitchSound;
     thumb?: React.ReactNode;
     thumbClassName?: string;
+    variant?: SwitchVariant | null;
   };
 
 function getSwitchSound(sound: SwitchSound | undefined, checked: boolean) {
@@ -311,3 +322,11 @@ const Switch = React.forwardRef<HTMLElement, SwitchProps>(function Switch(
 });
 
 export { Switch, switchVariants };
+export type {
+  SwitchColor,
+  SwitchProps,
+  SwitchShape,
+  SwitchSize,
+  SwitchSound,
+  SwitchVariant,
+};

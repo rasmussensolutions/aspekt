@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
@@ -155,6 +155,14 @@ type CheckboxRootProps = React.ComponentPropsWithoutRef<
   typeof CheckboxPrimitive.Root
 >;
 
+type CheckboxVariant = "solid" | "soft" | "outline";
+
+type CheckboxColor = "accent" | "blue" | "red" | "amber" | "neutral";
+
+type CheckboxSize = "micro" | "tiny" | "small" | "medium" | "large";
+
+type CheckboxShape = "square" | "round";
+
 type CheckboxSound =
   | SoundName
   | false
@@ -166,13 +174,16 @@ type CheckboxSound =
 type CheckboxProps = Omit<
   CheckboxRootProps,
   "children" | "className" | "color"
-> &
-  VariantProps<typeof checkboxVariants> & {
+> & {
     className?: string;
+    color?: CheckboxColor | null;
     indicator?: React.ReactNode;
     indeterminateIndicator?: React.ReactNode;
     invalid?: boolean;
+    shape?: CheckboxShape | null;
+    size?: CheckboxSize | null;
     sound?: CheckboxSound;
+    variant?: CheckboxVariant | null;
   };
 
 function getCheckboxSound(sound: CheckboxSound | undefined, checked: boolean) {
@@ -288,3 +299,11 @@ const Checkbox = React.forwardRef<HTMLElement, CheckboxProps>(
 );
 
 export { Checkbox, checkboxVariants };
+export type {
+  CheckboxColor,
+  CheckboxProps,
+  CheckboxShape,
+  CheckboxSize,
+  CheckboxSound,
+  CheckboxVariant,
+};
