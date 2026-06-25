@@ -2705,8 +2705,9 @@ export default function Home() {
   const [drawerSettings, setDrawerSettings] = React.useState<DrawerSettings>(
     defaultDrawerSettings,
   );
-  const [popoverSettings, setPopoverSettings] =
-    React.useState<PopoverSettings>(defaultPopoverSettings);
+  const [popoverSettings, setPopoverSettings] = React.useState<PopoverSettings>(
+    defaultPopoverSettings,
+  );
   const [snippetSettings, setSnippetSettings] = React.useState<SnippetSettings>(
     defaultSnippetSettings,
   );

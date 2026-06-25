@@ -1,0 +1,27 @@
+{
+  "name": "aspekt",
+  "version": "0.1.0",
+  "description": "CLI for adding Aspekt UI source components to React and Tailwind projects.",
+  "type": "module",
+  "bin": {
+    "aspekt": "./cli.js"
+  },
+  "files": [
+    "cli.js",
+    "registry",
+    "README.md"
+  ],
+  "scripts": {
+    "registry:sync": "node scripts/sync-registry.mjs",
+    "dev": "node cli.js",
+    "pack:dry-run": "pnpm pack --dry-run",
+    "prepack": "node scripts/sync-registry.mjs",
+    "prepublishOnly": "node scripts/sync-registry.mjs"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

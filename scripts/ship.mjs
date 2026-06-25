@@ -37,6 +37,7 @@ if (!commitMessage) {
 
 run("pnpm", ["registry:validate"]);
 run("pnpm", ["registry:build"]);
+run("pnpm", ["cli:sync"]);
 run("pnpm", ["--dir", "apps/www", "lint"]);
 run("pnpm", ["docs:build"]);
 
@@ -53,4 +54,3 @@ run("git", ["commit", "-m", commitMessage]);
 if (shouldPush) {
   run("git", ["push"]);
 }
-

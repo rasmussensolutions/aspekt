@@ -2,7 +2,30 @@
 
 React components for Aspekt.
 
-## Install
+## Recommended usage
+
+Use the Aspekt CLI to copy component source into your React and Tailwind
+project:
+
+```sh
+npx aspekt init
+npx aspekt add button
+```
+
+Then import the copied component from your app:
+
+```tsx
+import { Button } from "@/components/aspekt/button";
+
+export function Example() {
+  return <Button>Save</Button>;
+}
+```
+
+## Package install
+
+The compiled package is still available if you prefer a traditional npm
+dependency:
 
 ```sh
 npm install @aspekt/ui
