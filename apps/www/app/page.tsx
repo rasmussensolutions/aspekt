@@ -1725,15 +1725,14 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col lg:flex-row">
+    <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
+      <div className="mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)]">
         <Sidebar activePage={activePage} onPageChange={navigateToPage} />
 
-        <div className="relative min-w-0 flex-1 lg:h-screen">
+        <div className="relative min-w-0 overflow-hidden lg:h-screen">
           <section
             ref={previewScrollRef}
-            id={activePage}
-            className="flex min-w-0 flex-1 flex-col px-6 pb-16 pt-4 sm:px-10 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-18"
+            className="flex min-h-0 min-w-0 flex-col overflow-x-hidden px-6 pb-16 pt-4 sm:px-10 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-18"
           >
             <div className="mb-14 ">
               <p className="max-w-xl text-lg text-neutral-500 dark:text-neutral-400">
