@@ -10,6 +10,7 @@ export * from "./components/heading";
 export * from "./components/input";
 export * from "./components/kbd";
 export * from "./components/list";
+export * from "./components/popover";
 export * from "./components/prose";
 export * from "./components/select";
 export * from "./components/slider";

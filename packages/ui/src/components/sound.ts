@@ -8,6 +8,8 @@ export type SoundName =
   | "dialog.close"
   | "drawer.open"
   | "drawer.close"
+  | "popover.open"
+  | "popover.close"
   | "input.focus"
   | "input.unfocus"
   | "input.clear"
@@ -359,6 +361,26 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
+  "popover.open": () => {
+    playTone({
+      frequency: 440,
+      endFrequency: 560,
+      duration: 0.052,
+      volume: 0.014 * settings.volume,
+      type: "triangle",
+    });
+  },
+
+  "popover.close": () => {
+    playTone({
+      frequency: 360,
+      endFrequency: 260,
+      duration: 0.044,
+      volume: 0.011 * settings.volume,
+      type: "triangle",
+    });
+  },
+
   "input.focus": playButtonSolidSound,
 
   "input.unfocus": () => {
@@ -570,6 +592,22 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
+  "popover.open": () => {
+    playTactileClick({
+      brightness: 0.56,
+      duration: 0.01,
+      volume: 0.008 * settings.volume,
+    });
+  },
+
+  "popover.close": () => {
+    playTactileClick({
+      brightness: 0.38,
+      duration: 0.009,
+      volume: 0.007 * settings.volume,
+    });
+  },
+
   "input.focus": () => {
     playTactileClick({
       brightness: 0.62,
@@ -775,6 +813,22 @@ const snapSounds: Record<SoundName, () => void> = {
       brightness: 0.64,
       duration: 0.006,
       volume: 0.0075 * settings.volume,
+    });
+  },
+
+  "popover.open": () => {
+    playSnap({
+      brightness: 0.84,
+      duration: 0.005,
+      volume: 0.0068 * settings.volume,
+    });
+  },
+
+  "popover.close": () => {
+    playSnap({
+      brightness: 0.62,
+      duration: 0.004,
+      volume: 0.0058 * settings.volume,
     });
   },
 
@@ -992,6 +1046,24 @@ const popSounds: Record<SoundName, () => void> = {
       endFrequency: 110,
       duration: 0.04,
       volume: 0.014 * settings.volume,
+    });
+  },
+
+  "popover.open": () => {
+    playPop({
+      frequency: 220,
+      endFrequency: 300,
+      duration: 0.034,
+      volume: 0.012 * settings.volume,
+    });
+  },
+
+  "popover.close": () => {
+    playPop({
+      frequency: 190,
+      endFrequency: 120,
+      duration: 0.03,
+      volume: 0.01 * settings.volume,
     });
   },
 
@@ -1224,6 +1296,26 @@ const thockSounds: Record<SoundName, () => void> = {
       endFrequency: 78,
       duration: 0.032,
       volume: 0.01 * settings.volume,
+    });
+  },
+
+  "popover.open": () => {
+    playThock({
+      brightness: 0.17,
+      frequency: 148,
+      endFrequency: 190,
+      duration: 0.028,
+      volume: 0.0085 * settings.volume,
+    });
+  },
+
+  "popover.close": () => {
+    playThock({
+      brightness: 0.1,
+      frequency: 128,
+      endFrequency: 84,
+      duration: 0.026,
+      volume: 0.0075 * settings.volume,
     });
   },
 

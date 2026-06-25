@@ -1,6 +1,6 @@
 {
   "name": "@aspekt/ui",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Aspekt UI React components.",
   "type": "module",
   "repository": {
@@ -47,6 +47,10 @@
     "./list": {
       "types": "./dist/components/list.d.ts",
       "import": "./dist/list.js"
+    },
+    "./popover": {
+      "types": "./dist/components/popover.d.ts",
+      "import": "./dist/popover.js"
     },
     "./toggle": {
       "types": "./dist/components/toggle.d.ts",
@@ -128,6 +132,9 @@
       ],
       "list": [
         "dist/components/list.d.ts"
+      ],
+      "popover": [
+        "dist/components/popover.d.ts"
       ],
       "prose": [
         "dist/components/prose.d.ts"
