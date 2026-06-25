@@ -111,6 +111,60 @@
       ]
     },
     {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "A Base UI slider with sizes, variants, value display, validation styling, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/slider.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/slider.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "A Base UI switch with sizes, variants, validation styling, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/switch.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/switch.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/sound.ts",
+          "type": "registry:lib",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
       "name": "toggle",
       "type": "registry:ui",
       "title": "Toggle",
@@ -202,6 +256,143 @@
       ]
     },
     {
+      "name": "code",
+      "type": "registry:ui",
+      "title": "Code",
+      "description": "Inline code and code block typography for Aspekt UI.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/code.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/code.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/code-copy-button.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/code-copy-button.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "typography"
+      ]
+    },
+    {
+      "name": "snippet",
+      "type": "registry:ui",
+      "title": "Snippet",
+      "description": "Formatted code examples with language-aware highlighting, headers, copy, line numbers, and wrapping.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast",
+        "refractor"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/snippet.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/snippet.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/code-copy-button.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/code-copy-button.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "code"
+      ]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Keyboard input typography for Aspekt UI.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/kbd.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/kbd.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "typography"
+      ]
+    },
+    {
+      "name": "prose",
+      "type": "registry:ui",
+      "title": "Prose",
+      "description": "Long-form rich text styling for Aspekt UI.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/prose.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/prose.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "typography"
+      ]
+    },
+    {
+      "name": "blockquote",
+      "type": "registry:ui",
+      "title": "Blockquote",
+      "description": "Block quote typography with optional source text for Aspekt UI.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/blockquote.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/blockquote.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "typography"
+      ]
+    },
+    {
+      "name": "list",
+      "type": "registry:ui",
+      "title": "List",
+      "description": "List and list item typography for Aspekt UI.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/ui/src/components/list.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/list.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "typography"
+      ]
+    },
+    {
       "name": "sound-provider",
       "type": "registry:ui",
       "title": "Sound Provider",
@@ -231,7 +422,8 @@
       "dependencies": [
         "@base-ui/react",
         "class-variance-authority",
-        "cnfast"
+        "cnfast",
+        "refractor"
       ],
       "files": [
         {
@@ -255,6 +447,16 @@
           "target": "components/aspekt/select.tsx"
         },
         {
+          "path": "packages/ui/src/components/slider.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/slider.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/switch.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/switch.tsx"
+        },
+        {
           "path": "packages/ui/src/components/toggle.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/toggle.tsx"
@@ -268,6 +470,41 @@
           "path": "packages/ui/src/components/drawer.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/drawer.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/snippet.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/snippet.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/code.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/code.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/code-copy-button.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/code-copy-button.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/kbd.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/kbd.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/prose.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/prose.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/blockquote.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/blockquote.tsx"
+        },
+        {
+          "path": "packages/ui/src/components/list.tsx",
+          "type": "registry:ui",
+          "target": "components/aspekt/list.tsx"
         },
         {
           "path": "packages/ui/src/components/sound-provider.tsx",

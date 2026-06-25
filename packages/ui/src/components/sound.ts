@@ -14,8 +14,11 @@ export type SoundName =
   | "select.open"
   | "select.close"
   | "select.change"
+  | "slider.commit"
   | "toggle.on"
   | "toggle.off"
+  | "switch.on"
+  | "switch.off"
   | "checkbox.check"
   | "checkbox.uncheck"
   | "success"
@@ -407,6 +410,15 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
+  "slider.commit": () => {
+    playTone({
+      frequency: 620,
+      duration: 0.034,
+      volume: 0.013 * settings.volume,
+      type: "sine",
+    });
+  },
+
   "toggle.on": () => {
     playTone({
       frequency: 520,
@@ -423,6 +435,26 @@ const softSounds: Record<SoundName, () => void> = {
       endFrequency: 280,
       duration: 0.045,
       volume: 0.013 * settings.volume,
+      type: "triangle",
+    });
+  },
+
+  "switch.on": () => {
+    playTone({
+      frequency: 500,
+      endFrequency: 680,
+      duration: 0.048,
+      volume: 0.016 * settings.volume,
+      type: "triangle",
+    });
+  },
+
+  "switch.off": () => {
+    playTone({
+      frequency: 390,
+      endFrequency: 250,
+      duration: 0.043,
+      volume: 0.012 * settings.volume,
       type: "triangle",
     });
   },
@@ -586,6 +618,14 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
+  "slider.commit": () => {
+    playTactileClick({
+      brightness: 0.62,
+      duration: 0.008,
+      volume: 0.0075 * settings.volume,
+    });
+  },
+
   "toggle.on": () => {
     playTactileClick({
       brightness: 0.7,
@@ -599,6 +639,22 @@ const clickSounds: Record<SoundName, () => void> = {
       brightness: 0.42,
       duration: 0.01,
       volume: 0.0075 * settings.volume,
+    });
+  },
+
+  "switch.on": () => {
+    playTactileClick({
+      brightness: 0.66,
+      duration: 0.01,
+      volume: 0.0085 * settings.volume,
+    });
+  },
+
+  "switch.off": () => {
+    playTactileClick({
+      brightness: 0.4,
+      duration: 0.01,
+      volume: 0.007 * settings.volume,
     });
   },
 
@@ -770,6 +826,14 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
+  "slider.commit": () => {
+    playSnap({
+      brightness: 0.78,
+      duration: 0.004,
+      volume: 0.006 * settings.volume,
+    });
+  },
+
   "toggle.on": () => {
     playSnap({
       brightness: 0.9,
@@ -783,6 +847,22 @@ const snapSounds: Record<SoundName, () => void> = {
       brightness: 0.66,
       duration: 0.005,
       volume: 0.006 * settings.volume,
+    });
+  },
+
+  "switch.on": () => {
+    playSnap({
+      brightness: 0.88,
+      duration: 0.005,
+      volume: 0.0065 * settings.volume,
+    });
+  },
+
+  "switch.off": () => {
+    playSnap({
+      brightness: 0.62,
+      duration: 0.005,
+      volume: 0.0055 * settings.volume,
     });
   },
 
@@ -969,6 +1049,15 @@ const popSounds: Record<SoundName, () => void> = {
     });
   },
 
+  "slider.commit": () => {
+    playPop({
+      frequency: 190,
+      endFrequency: 240,
+      duration: 0.026,
+      volume: 0.01 * settings.volume,
+    });
+  },
+
   "toggle.on": () => {
     playPop({
       frequency: 220,
@@ -984,6 +1073,24 @@ const popSounds: Record<SoundName, () => void> = {
       endFrequency: 120,
       duration: 0.032,
       volume: 0.011 * settings.volume,
+    });
+  },
+
+  "switch.on": () => {
+    playPop({
+      frequency: 210,
+      endFrequency: 300,
+      duration: 0.034,
+      volume: 0.013 * settings.volume,
+    });
+  },
+
+  "switch.off": () => {
+    playPop({
+      frequency: 205,
+      endFrequency: 110,
+      duration: 0.031,
+      volume: 0.01 * settings.volume,
     });
   },
 
@@ -1178,6 +1285,16 @@ const thockSounds: Record<SoundName, () => void> = {
     });
   },
 
+  "slider.commit": () => {
+    playThock({
+      brightness: 0.16,
+      frequency: 132,
+      endFrequency: 152,
+      duration: 0.026,
+      volume: 0.0075 * settings.volume,
+    });
+  },
+
   "toggle.on": () => {
     playThock({
       brightness: 0.2,
@@ -1195,6 +1312,26 @@ const thockSounds: Record<SoundName, () => void> = {
       endFrequency: 86,
       duration: 0.028,
       volume: 0.0075 * settings.volume,
+    });
+  },
+
+  "switch.on": () => {
+    playThock({
+      brightness: 0.18,
+      frequency: 148,
+      endFrequency: 198,
+      duration: 0.027,
+      volume: 0.0085 * settings.volume,
+    });
+  },
+
+  "switch.off": () => {
+    playThock({
+      brightness: 0.11,
+      frequency: 134,
+      endFrequency: 80,
+      duration: 0.027,
+      volume: 0.007 * settings.volume,
     });
   },
 
