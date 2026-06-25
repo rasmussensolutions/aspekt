@@ -957,9 +957,6 @@ function InstallCommands({
         <code>{packageCommand}</code>
       </pre>
       <pre className="overflow-x-auto rounded-md bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
-        <code>{'import "@aspekt/ui/styles.css";'}</code>
-      </pre>
-      <pre className="overflow-x-auto rounded-md bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
         <code>{importCommand}</code>
       </pre>
       <pre className="overflow-x-auto rounded-md bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
@@ -1567,7 +1564,7 @@ const principles = [
   },
   {
     title: "Use the package",
-    body: "Aspekt is a normal npm package first. Install @aspekt/ui, import the shared stylesheet once, then use the focused component exports wherever the app needs them.",
+    body: "Aspekt is a normal npm package first. Install @aspekt/ui, then use the focused component exports wherever the app needs them. Component imports load the shared stylesheet automatically.",
   },
   {
     title: "Respect existing projects",

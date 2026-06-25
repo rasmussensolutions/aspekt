@@ -14,12 +14,12 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/button.tsx",
+          "path": "packages/ui/src/components/button.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/button.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -41,12 +41,12 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/input.tsx",
+          "path": "packages/ui/src/components/input.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/input.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -68,12 +68,12 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/checkbox.tsx",
+          "path": "packages/ui/src/components/checkbox.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/checkbox.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -95,12 +95,12 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/select.tsx",
+          "path": "packages/ui/src/components/select.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/select.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -122,12 +122,12 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/toggle.tsx",
+          "path": "packages/ui/src/components/toggle.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/toggle.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -149,17 +149,17 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/dialog.tsx",
+          "path": "packages/ui/src/components/dialog.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/dialog.tsx"
         },
         {
-          "path": "packages/ui/src/button.tsx",
+          "path": "packages/ui/src/components/button.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/button.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -181,17 +181,17 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/drawer.tsx",
+          "path": "packages/ui/src/components/drawer.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/drawer.tsx"
         },
         {
-          "path": "packages/ui/src/button.tsx",
+          "path": "packages/ui/src/components/button.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/button.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -208,12 +208,12 @@
       "description": "An optional provider and hook for global Aspekt UI sound settings.",
       "files": [
         {
-          "path": "packages/ui/src/sound-provider.tsx",
+          "path": "packages/ui/src/components/sound-provider.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/sound-provider.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
@@ -235,47 +235,47 @@
       ],
       "files": [
         {
-          "path": "packages/ui/src/button.tsx",
+          "path": "packages/ui/src/components/button.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/button.tsx"
         },
         {
-          "path": "packages/ui/src/input.tsx",
+          "path": "packages/ui/src/components/input.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/input.tsx"
         },
         {
-          "path": "packages/ui/src/checkbox.tsx",
+          "path": "packages/ui/src/components/checkbox.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/checkbox.tsx"
         },
         {
-          "path": "packages/ui/src/select.tsx",
+          "path": "packages/ui/src/components/select.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/select.tsx"
         },
         {
-          "path": "packages/ui/src/toggle.tsx",
+          "path": "packages/ui/src/components/toggle.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/toggle.tsx"
         },
         {
-          "path": "packages/ui/src/dialog.tsx",
+          "path": "packages/ui/src/components/dialog.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/dialog.tsx"
         },
         {
-          "path": "packages/ui/src/drawer.tsx",
+          "path": "packages/ui/src/components/drawer.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/drawer.tsx"
         },
         {
-          "path": "packages/ui/src/sound-provider.tsx",
+          "path": "packages/ui/src/components/sound-provider.tsx",
           "type": "registry:ui",
           "target": "components/aspekt/sound-provider.tsx"
         },
         {
-          "path": "packages/ui/src/sound.ts",
+          "path": "packages/ui/src/components/sound.ts",
           "type": "registry:lib",
           "target": "components/aspekt/sound.ts"
         }
