@@ -8,6 +8,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -35,12 +36,17 @@ const themeEnd = "/* aspekt:end */";
 
 const sourceManifest = JSON.parse(readFileSync(sourceManifestPath, "utf8"));
 
+function hashContent(content) {
+  return `sha256-${createHash("sha256").update(content).digest("hex")}`;
+}
+
 rmSync(outputTemplatesTempRoot, { recursive: true, force: true });
 mkdirSync(join(outputTemplatesTempRoot, "components"), { recursive: true });
 
 const items = sourceManifest.items.map((item) => {
   const files = item.files.map((file) => {
     const sourcePath = join(repoRoot, file.path);
+    const content = readFileSync(sourcePath, "utf8");
     const source = file.path.replace(
       /^packages\/components\/src\/components\//,
       "components/",
@@ -51,6 +57,7 @@ const items = sourceManifest.items.map((item) => {
     copyFileSync(sourcePath, outputPath);
 
     return {
+      hash: hashContent(content),
       source,
       target: file.target,
     };

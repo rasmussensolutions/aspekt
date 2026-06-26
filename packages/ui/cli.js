@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import {
   existsSync,
@@ -8,6 +9,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
+import { createInterface } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
 
 const packageRoot = dirname(fileURLToPath(import.meta.url));
@@ -15,6 +17,7 @@ const templatesRoot = join(packageRoot, "templates");
 const manifestPath = join(templatesRoot, "manifest.json");
 const themeCssPath = join(templatesRoot, "theme.css");
 const packageJsonPath = join(packageRoot, "package.json");
+const statePath = ".aspekt/components.json";
 
 const themeStart = "/* aspekt:start */";
 
@@ -53,11 +56,13 @@ function printHelp() {
 Usage:
   npx @aspekt/ui init [options]
   npx @aspekt/ui add <component...> [options]
+  npx @aspekt/ui update [component...] [options]
   npx @aspekt/ui list
 
 Commands:
   init                 Add Aspekt theme tokens and install shared dependencies.
   add                  Copy one or more components into your project.
+  update               Detect installed components and replace outdated templates.
   list                 Show available components.
 
 Options:
@@ -66,6 +71,7 @@ Options:
   --css <path>         CSS file to update during init.
   --all                Add all components.
   -f, --force          Overwrite existing files.
+  -y, --yes            Skip confirmation prompts.
   --dry-run            Print actions without writing files or installing deps.
   --no-install         Skip installing component dependencies.
   -h, --help           Show help.
@@ -83,6 +89,7 @@ function parseArgv(argv) {
     force: false,
     install: true,
     path: undefined,
+    yes: false,
   };
 
   for (let index = 0; index < rest.length; index += 1) {
@@ -102,6 +109,8 @@ function parseArgv(argv) {
       options.install = false;
     } else if (value === "--force" || value === "-f") {
       options.force = true;
+    } else if (value === "--yes" || value === "-y") {
+      options.yes = true;
     } else if (value === "--help" || value === "-h") {
       options.help = true;
     } else if (value === "--version" || value === "-v") {
@@ -118,6 +127,47 @@ function parseArgv(argv) {
 
 function getVersion() {
   return readJson(packageJsonPath).version;
+}
+
+function hashContent(content) {
+  return `sha256-${createHash("sha256").update(content).digest("hex")}`;
+}
+
+function getStateFilePath(cwd) {
+  return resolve(cwd, statePath);
+}
+
+function loadState(cwd) {
+  const path = getStateFilePath(cwd);
+
+  if (!existsSync(path)) {
+    return {
+      components: {},
+      path: "components/aspekt",
+      version: getVersion(),
+    };
+  }
+
+  const state = readJson(path);
+
+  return {
+    components: state.components ?? {},
+    path: state.path ?? "components/aspekt",
+    version: state.version ?? getVersion(),
+  };
+}
+
+function saveState(cwd, state, options) {
+  if (options.dryRun) return;
+
+  const path = getStateFilePath(cwd);
+  const next = {
+    ...state,
+    version: getVersion(),
+  };
+
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${JSON.stringify(next, null, 2)}\n`);
 }
 
 function getPublicItems(manifest) {
@@ -145,6 +195,38 @@ function getTargetPath(file, options) {
   }
 
   return file.target;
+}
+
+function getTemplate(file) {
+  const sourcePath = join(templatesRoot, file.source);
+
+  if (!existsSync(sourcePath)) {
+    fail(`Template source file is missing: ${file.source}.`);
+  }
+
+  const content = readFileSync(sourcePath, "utf8");
+
+  return {
+    content,
+    hash: file.hash ?? hashContent(content),
+    sourcePath,
+  };
+}
+
+function collectItemFiles(item, options) {
+  return (item.files ?? []).map((file) => {
+    const template = getTemplate(file);
+    const target = getTargetPath(file, options);
+
+    return {
+      hash: template.hash,
+      source: file.source,
+      sourceContent: template.content,
+      sourcePath: template.sourcePath,
+      target,
+      targetPath: resolve(options.cwd, target),
+    };
+  });
 }
 
 function collectItems(manifest, names) {
@@ -192,6 +274,31 @@ function ensureProject(cwd, options) {
   }
 }
 
+function rememberInstalledItems(cwd, items, options) {
+  const state = loadState(cwd);
+
+  state.path = options.path ?? state.path ?? "components/aspekt";
+
+  for (const item of items) {
+    const files = collectItemFiles(item, { ...options, cwd });
+    const fileState = {};
+
+    for (const file of files) {
+      fileState[file.target] = {
+        hash: file.hash,
+        source: file.source,
+      };
+    }
+
+    state.components[item.name] = {
+      files: fileState,
+      version: getVersion(),
+    };
+  }
+
+  saveState(cwd, state, options);
+}
+
 function addComponents(manifest, names, options) {
   const requestedNames = options.all ? ["all"] : names;
 
@@ -206,25 +313,21 @@ function addComponents(manifest, names, options) {
 
   const { dependencies, files, items } = collectItems(manifest, requestedNames);
   const writes = files.map((file) => {
-    const sourcePath = join(templatesRoot, file.source);
     const target = getTargetPath(file, options);
     const targetPath = resolve(cwd, target);
-
-    if (!existsSync(sourcePath)) {
-      fail(`Template source file is missing: ${file.source}.`);
-    }
-
-    const sourceContent = readFileSync(sourcePath, "utf8");
+    const template = getTemplate(file);
     const existingContent = existsSync(targetPath)
       ? readFileSync(targetPath, "utf8")
       : undefined;
 
     return {
       existingContent,
-      isChanged: existingContent !== undefined && existingContent !== sourceContent,
-      isUnchanged: existingContent === sourceContent,
-      sourceContent,
-      sourcePath,
+      hash: template.hash,
+      isChanged: existingContent !== undefined && existingContent !== template.content,
+      isUnchanged: existingContent === template.content,
+      source: file.source,
+      sourceContent: template.content,
+      sourcePath: template.sourcePath,
       target,
       targetPath,
     };
@@ -269,6 +372,8 @@ function addComponents(manifest, names, options) {
     mkdirSync(dirname(write.targetPath), { recursive: true });
     writeFileSync(write.targetPath, write.sourceContent);
   }
+
+  rememberInstalledItems(cwd, items, options);
 
   console.log(
     `Added ${items.map((item) => item.name).join(", ")} to ${cwd}.`,
@@ -409,7 +514,301 @@ function installDependencies(cwd, dependencies, options) {
   }
 }
 
-function main() {
+function getUpdateItems(manifest, names, options, cwd, state) {
+  const publicItems = getPublicItems(manifest);
+  const publicNames = new Set(publicItems.map((item) => item.name));
+
+  if (options.all) {
+    return publicItems;
+  }
+
+  if (names.length > 0) {
+    return names.map((name) => {
+      const item = getItem(manifest, name);
+
+      if (!item || item.kind === "base") {
+        const available = [...publicNames].join(", ");
+        fail(`Unknown component "${name}". Available components: ${available}.`);
+      }
+
+      return item;
+    });
+  }
+
+  const detectedNames = new Set(
+    Object.keys(state.components).filter((name) => publicNames.has(name)),
+  );
+
+  for (const item of publicItems) {
+    const primaryFile = item.files?.[0];
+    if (!primaryFile) continue;
+
+    const primaryTarget = resolve(cwd, getTargetPath(primaryFile, options));
+    if (existsSync(primaryTarget)) {
+      detectedNames.add(item.name);
+    }
+  }
+
+  return publicItems.filter((item) => detectedNames.has(item.name));
+}
+
+function analyzeUpdateItem(item, state, options, cwd) {
+  const componentState = state.components[item.name];
+  const hasTrackedState = Boolean(componentState);
+  const primaryFile = item.files?.[0];
+  const hasLegacyFile =
+    primaryFile &&
+    existsSync(resolve(cwd, getTargetPath(primaryFile, options))) &&
+    !hasTrackedState;
+
+  if (!hasTrackedState && !hasLegacyFile) {
+    return {
+      item,
+      needsUpdate: false,
+      status: "not installed",
+      writes: [],
+    };
+  }
+
+  const files = collectItemFiles(item, { ...options, cwd });
+  const writes = [];
+  let hasLocalChanges = false;
+  let hasLegacyFiles = hasLegacyFile;
+  let hasMissingFiles = false;
+  let hasNewFiles = false;
+  let hasOutdatedFiles = false;
+  let hasTrackOnlyFiles = false;
+
+  for (const file of files) {
+    const recorded = componentState?.files?.[file.target];
+    const exists = existsSync(file.targetPath);
+    const currentContent = exists ? readFileSync(file.targetPath, "utf8") : undefined;
+    const currentHash = currentContent === undefined ? undefined : hashContent(currentContent);
+    const isAlreadyLatest = Boolean(exists && currentHash === file.hash);
+    const isLocalChange = Boolean(
+      recorded?.hash && exists && currentHash !== recorded.hash && !isAlreadyLatest,
+    );
+    const isOutdated = Boolean(recorded?.hash && recorded.hash !== file.hash);
+    const isTrackedMissing = Boolean(recorded?.hash && !exists);
+    const isNewFile = hasTrackedState && !recorded?.hash && !exists;
+    const isLegacyDifferent = Boolean(!recorded?.hash && exists && currentHash !== file.hash);
+    const isTrackOnly = Boolean(
+      (!recorded?.hash && isAlreadyLatest) || (isOutdated && isAlreadyLatest),
+    );
+    const needsWrite =
+      isTrackedMissing ||
+      isNewFile ||
+      (isOutdated && !isAlreadyLatest) ||
+      isLegacyDifferent;
+
+    hasLocalChanges ||= isLocalChange && isOutdated;
+    hasMissingFiles ||= isTrackedMissing;
+    hasNewFiles ||= isNewFile;
+    hasOutdatedFiles ||= (isOutdated && !isAlreadyLatest) || isLegacyDifferent;
+    hasTrackOnlyFiles ||= isTrackOnly;
+
+    if (needsWrite) {
+      writes.push({
+        ...file,
+        currentHash,
+        isLegacyDifferent,
+        isLocalChange,
+        isNewFile,
+        isOutdated,
+        isTrackedMissing,
+      });
+    }
+  }
+
+  const needsUpdate = writes.length > 0;
+  const needsTracking = hasTrackOnlyFiles || needsUpdate;
+  const status = hasLocalChanges
+    ? "local changes"
+    : hasLegacyFiles
+      ? "legacy install"
+      : hasMissingFiles
+        ? "missing files"
+        : hasNewFiles
+          ? "new files"
+          : hasOutdatedFiles
+            ? "update available"
+            : needsTracking
+              ? "tracking metadata"
+              : "current";
+
+  return {
+    hasLocalChanges,
+    hasLegacyFiles,
+    item,
+    needsTracking,
+    needsUpdate,
+    status,
+    writes,
+  };
+}
+
+function printUpdatePlan(analyses, options) {
+  const actionable = analyses.filter((analysis) => analysis.needsUpdate);
+
+  if (actionable.length === 0) {
+    console.log("All detected Aspekt components are current.");
+    return;
+  }
+
+  console.log(options.dryRun ? "Would update:" : "Update available:");
+
+  for (const analysis of actionable) {
+    console.log(`  ${analysis.item.name.padEnd(16)} ${analysis.status}`);
+    for (const write of analysis.writes) {
+      const suffix = write.isLocalChange
+        ? " (modified locally)"
+        : write.isTrackedMissing
+          ? " (missing)"
+          : write.isNewFile
+            ? " (new)"
+            : write.isLegacyDifferent
+              ? " (legacy)"
+              : "";
+      console.log(`    ${write.target}${suffix}`);
+    }
+  }
+}
+
+async function confirmUpdate(analyses, options) {
+  if (options.dryRun || options.yes) return true;
+
+  const actionable = analyses.filter((analysis) => analysis.needsUpdate);
+  if (actionable.length === 0) return false;
+
+  const risky = actionable.some(
+    (analysis) => analysis.hasLocalChanges || analysis.hasLegacyFiles,
+  );
+  const prompt = risky
+    ? "This may overwrite locally edited or legacy-detected files. Continue? [y/N] "
+    : "Update these components? [y/N] ";
+
+  if (!process.stdin.isTTY) {
+    fail("Update requires confirmation. Re-run with --yes to continue non-interactively.");
+  }
+
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  try {
+    const answer = await rl.question(prompt);
+    return /^(y|yes)$/i.test(answer.trim());
+  } finally {
+    rl.close();
+  }
+}
+
+function rememberUpdatedItems(cwd, analyses, options) {
+  const state = loadState(cwd);
+  state.path = options.path ?? state.path ?? "components/aspekt";
+
+  for (const analysis of analyses) {
+    if (!analysis.needsUpdate && !analysis.needsTracking) continue;
+
+    const files = collectItemFiles(analysis.item, { ...options, cwd });
+    const fileState = {};
+
+    for (const file of files) {
+      fileState[file.target] = {
+        hash: file.hash,
+        source: file.source,
+      };
+    }
+
+    state.components[analysis.item.name] = {
+      files: fileState,
+      version: getVersion(),
+    };
+  }
+
+  saveState(cwd, state, options);
+}
+
+async function updateComponents(manifest, names, options) {
+  const cwd = resolve(options.cwd);
+  ensureProject(cwd, options);
+
+  const state = loadState(cwd);
+  const items = getUpdateItems(manifest, names, options, cwd, state);
+
+  if (items.length === 0) {
+    console.log("No Aspekt components detected.");
+    return;
+  }
+
+  const analyses = items.map((item) => analyzeUpdateItem(item, state, options, cwd));
+  const installedAnalyses = analyses.filter(
+    (analysis) => analysis.status !== "not installed",
+  );
+  const actionable = analyses.filter((analysis) => analysis.needsUpdate);
+  const dependencies = new Set();
+
+  if (installedAnalyses.length === 0) {
+    console.log(
+      names.length > 0 || options.all
+        ? "No selected Aspekt components are installed."
+        : "No Aspekt components detected.",
+    );
+    return;
+  }
+
+  printUpdatePlan(analyses, options);
+
+  if (options.dryRun) {
+    for (const analysis of actionable) {
+      for (const dependency of analysis.item.dependencies ?? []) {
+        dependencies.add(dependency);
+      }
+    }
+
+    if (dependencies.size > 0) {
+      console.log("\nWould install:");
+      console.log(`  ${[...dependencies].join(" ")}`);
+    }
+
+    return;
+  }
+
+  if (actionable.length === 0) {
+    rememberUpdatedItems(cwd, analyses, options);
+    return;
+  }
+
+  const shouldUpdate = await confirmUpdate(analyses, options);
+  if (!shouldUpdate) {
+    console.log("Update cancelled.");
+    return;
+  }
+
+  for (const analysis of actionable) {
+    for (const write of analysis.writes) {
+      mkdirSync(dirname(write.targetPath), { recursive: true });
+      writeFileSync(write.targetPath, write.sourceContent);
+    }
+
+    for (const dependency of analysis.item.dependencies ?? []) {
+      dependencies.add(dependency);
+    }
+  }
+
+  rememberUpdatedItems(cwd, analyses, options);
+
+  console.log(
+    `Updated ${actionable.map((analysis) => analysis.item.name).join(", ")} in ${cwd}.`,
+  );
+
+  if (dependencies.size > 0) {
+    installDependencies(cwd, [...dependencies], options);
+  }
+}
+
+async function main() {
   const { args, command, options } = parseArgv(process.argv.slice(2));
 
   if (
@@ -439,6 +838,8 @@ function main() {
     listItems(manifest);
   } else if (command === "add") {
     addComponents(manifest, args, options);
+  } else if (command === "update") {
+    await updateComponents(manifest, args, options);
   } else if (command === "init") {
     initProject(manifest, options);
   } else {
@@ -446,4 +847,6 @@ function main() {
   }
 }
 
-main();
+main().catch((error) => {
+  fail(error instanceof Error ? error.message : String(error));
+});
