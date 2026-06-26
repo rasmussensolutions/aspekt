@@ -9,6 +9,8 @@ node_modules/
 out/
 next-env.d.ts
 
+output/
+
 # Builds and reports
 dist/
 build/
