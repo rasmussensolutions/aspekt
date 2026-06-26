@@ -4,6 +4,7 @@ import {
   copyFileSync,
   mkdirSync,
   readFileSync,
+  renameSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -20,9 +21,7 @@ const sourceManifestPath = join(
   "manifest.json",
 );
 const outputTemplatesRoot = join(cliRoot, "templates");
-const outputComponentsRoot = join(outputTemplatesRoot, "components");
-const outputManifestPath = join(outputTemplatesRoot, "manifest.json");
-const outputThemePath = join(outputTemplatesRoot, "theme.css");
+const outputTemplatesTempRoot = join(cliRoot, ".templates-tmp");
 const sourceStylesPath = join(
   repoRoot,
   "packages",
@@ -36,8 +35,8 @@ const themeEnd = "/* aspekt:end */";
 
 const sourceManifest = JSON.parse(readFileSync(sourceManifestPath, "utf8"));
 
-rmSync(outputTemplatesRoot, { recursive: true, force: true });
-mkdirSync(outputComponentsRoot, { recursive: true });
+rmSync(outputTemplatesTempRoot, { recursive: true, force: true });
+mkdirSync(join(outputTemplatesTempRoot, "components"), { recursive: true });
 
 const items = sourceManifest.items.map((item) => {
   const files = item.files.map((file) => {
@@ -46,7 +45,7 @@ const items = sourceManifest.items.map((item) => {
       /^packages\/components\/src\/components\//,
       "components/",
     );
-    const outputPath = join(outputTemplatesRoot, source);
+    const outputPath = join(outputTemplatesTempRoot, source);
 
     mkdirSync(dirname(outputPath), { recursive: true });
     copyFileSync(sourcePath, outputPath);
@@ -82,8 +81,18 @@ const outputManifest = {
   items,
 };
 
-writeFileSync(outputManifestPath, `${JSON.stringify(outputManifest, null, 2)}\n`);
-writeFileSync(outputThemePath, `${themeStart}\n${themeCss}\n${themeEnd}\n`);
+writeFileSync(
+  join(outputTemplatesTempRoot, "manifest.json"),
+  `${JSON.stringify(outputManifest, null, 2)}\n`,
+);
+writeFileSync(
+  join(outputTemplatesTempRoot, "theme.css"),
+  `${themeStart}\n${themeCss}\n${themeEnd}\n`,
+);
+
+rmSync(outputTemplatesRoot, { recursive: true, force: true });
+mkdirSync(dirname(outputTemplatesRoot), { recursive: true });
+renameSync(outputTemplatesTempRoot, outputTemplatesRoot);
 
 console.log(
   `Synced ${items.length} template items to ${outputTemplatesRoot.replace(
