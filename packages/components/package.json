@@ -13,166 +13,180 @@
     "url": "https://github.com/rasmussensolutions/aspekt/issues"
   },
   "homepage": "https://www.aspekt.systems",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
     },
-    "./styles.css": "./dist/styles.css",
+    "./styles.css": "./src/styles.css",
     "./button": {
-      "types": "./dist/components/button.d.ts",
-      "import": "./dist/button.js"
+      "types": "./src/button.ts",
+      "import": "./src/button.ts"
     },
     "./checkbox": {
-      "types": "./dist/components/checkbox.d.ts",
-      "import": "./dist/checkbox.js"
+      "types": "./src/checkbox.ts",
+      "import": "./src/checkbox.ts"
     },
     "./code": {
-      "types": "./dist/components/code.d.ts",
-      "import": "./dist/code.js"
+      "types": "./src/code.ts",
+      "import": "./src/code.ts"
     },
     "./kbd": {
-      "types": "./dist/components/kbd.d.ts",
-      "import": "./dist/kbd.js"
+      "types": "./src/kbd.ts",
+      "import": "./src/kbd.ts"
     },
     "./prose": {
-      "types": "./dist/components/prose.d.ts",
-      "import": "./dist/prose.js"
+      "types": "./src/prose.ts",
+      "import": "./src/prose.ts"
     },
     "./blockquote": {
-      "types": "./dist/components/blockquote.d.ts",
-      "import": "./dist/blockquote.js"
+      "types": "./src/blockquote.ts",
+      "import": "./src/blockquote.ts"
     },
     "./list": {
-      "types": "./dist/components/list.d.ts",
-      "import": "./dist/list.js"
+      "types": "./src/list.ts",
+      "import": "./src/list.ts"
     },
     "./popover": {
-      "types": "./dist/components/popover.d.ts",
-      "import": "./dist/popover.js"
+      "types": "./src/popover.ts",
+      "import": "./src/popover.ts"
     },
     "./toggle": {
-      "types": "./dist/components/toggle.d.ts",
-      "import": "./dist/toggle.js"
+      "types": "./src/toggle.ts",
+      "import": "./src/toggle.ts"
     },
     "./dialog": {
-      "types": "./dist/components/dialog.d.ts",
-      "import": "./dist/dialog.js"
+      "types": "./src/dialog.ts",
+      "import": "./src/dialog.ts"
     },
     "./drawer": {
-      "types": "./dist/components/drawer.d.ts",
-      "import": "./dist/drawer.js"
+      "types": "./src/drawer.ts",
+      "import": "./src/drawer.ts"
     },
     "./input": {
-      "types": "./dist/components/input.d.ts",
-      "import": "./dist/input.js"
+      "types": "./src/input.ts",
+      "import": "./src/input.ts"
     },
     "./select": {
-      "types": "./dist/components/select.d.ts",
-      "import": "./dist/select.js"
+      "types": "./src/select.ts",
+      "import": "./src/select.ts"
     },
     "./snippet": {
-      "types": "./dist/components/snippet.d.ts",
-      "import": "./dist/snippet.js"
+      "types": "./src/snippet.ts",
+      "import": "./src/snippet.ts"
     },
     "./slider": {
-      "types": "./dist/components/slider.d.ts",
-      "import": "./dist/slider.js"
+      "types": "./src/slider.ts",
+      "import": "./src/slider.ts"
     },
     "./switch": {
-      "types": "./dist/components/switch.d.ts",
-      "import": "./dist/switch.js"
+      "types": "./src/switch.ts",
+      "import": "./src/switch.ts"
+    },
+    "./tabs": {
+      "types": "./src/tabs.ts",
+      "import": "./src/tabs.ts"
+    },
+    "./table": {
+      "types": "./src/table.ts",
+      "import": "./src/table.ts"
     },
     "./heading": {
-      "types": "./dist/components/heading.d.ts",
-      "import": "./dist/heading.js"
+      "types": "./src/heading.ts",
+      "import": "./src/heading.ts"
     },
     "./text": {
-      "types": "./dist/components/text.d.ts",
-      "import": "./dist/text.js"
+      "types": "./src/text.ts",
+      "import": "./src/text.ts"
     },
     "./sound": {
-      "types": "./dist/components/sound.d.ts",
-      "import": "./dist/sound.js"
+      "types": "./src/sound.ts",
+      "import": "./src/sound.ts"
     },
     "./sound-provider": {
-      "types": "./dist/components/sound-provider.d.ts",
-      "import": "./dist/sound-provider.js"
+      "types": "./src/sound-provider.ts",
+      "import": "./src/sound-provider.ts"
     }
   },
   "typesVersions": {
     "*": {
       "blockquote": [
-        "dist/components/blockquote.d.ts"
+        "src/blockquote.ts"
       ],
       "button": [
-        "dist/components/button.d.ts"
+        "src/button.ts"
       ],
       "checkbox": [
-        "dist/components/checkbox.d.ts"
+        "src/checkbox.ts"
       ],
       "code": [
-        "dist/components/code.d.ts"
+        "src/code.ts"
       ],
       "dialog": [
-        "dist/components/dialog.d.ts"
+        "src/dialog.ts"
       ],
       "drawer": [
-        "dist/components/drawer.d.ts"
+        "src/drawer.ts"
       ],
       "heading": [
-        "dist/components/heading.d.ts"
+        "src/heading.ts"
       ],
       "input": [
-        "dist/components/input.d.ts"
+        "src/input.ts"
       ],
       "kbd": [
-        "dist/components/kbd.d.ts"
+        "src/kbd.ts"
       ],
       "list": [
-        "dist/components/list.d.ts"
+        "src/list.ts"
       ],
       "popover": [
-        "dist/components/popover.d.ts"
+        "src/popover.ts"
       ],
       "prose": [
-        "dist/components/prose.d.ts"
+        "src/prose.ts"
       ],
       "select": [
-        "dist/components/select.d.ts"
+        "src/select.ts"
       ],
       "slider": [
-        "dist/components/slider.d.ts"
+        "src/slider.ts"
       ],
       "snippet": [
-        "dist/components/snippet.d.ts"
+        "src/snippet.ts"
       ],
       "sound": [
-        "dist/components/sound.d.ts"
+        "src/sound.ts"
       ],
       "sound-provider": [
-        "dist/components/sound-provider.d.ts"
+        "src/sound-provider.ts"
       ],
       "switch": [
-        "dist/components/switch.d.ts"
+        "src/switch.ts"
+      ],
+      "tabs": [
+        "src/tabs.ts"
+      ],
+      "table": [
+        "src/table.ts"
       ],
       "text": [
-        "dist/components/text.d.ts"
+        "src/text.ts"
       ],
       "toggle": [
-        "dist/components/toggle.d.ts"
+        "src/toggle.ts"
       ]
     }
   },
   "files": [
-    "dist",
+    "src",
     "README.md"
   ],
   "sideEffects": [
-    "./dist/*.js",
-    "./dist/styles.css"
+    "./src/*.ts",
+    "./src/styles.css"
   ],
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
@@ -184,6 +198,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "cnfast": "^0.0.8",
     "refractor": "^5.0.0"

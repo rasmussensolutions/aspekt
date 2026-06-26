@@ -74,10 +74,10 @@ type InputProps = Omit<InputPrimitiveProps, "prefix" | "size" | "suffix"> & {
     size?: InputSize | null;
     sound?:
       | false
-      | {
+        | {
+          blur?: SoundName | false;
           clear?: SoundName | false;
           focus?: SoundName | false;
-          unfocus?: SoundName | false;
         };
     suffix?: React.ReactNode;
     variant?: InputVariant | null;
@@ -336,9 +336,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
   const showPrefix = Boolean(prefix);
   const showSuffix = Boolean(suffix) || loading || showClear;
   const showStatusSlot = loading || showClear;
-  const clearSound = sound === undefined ? "input.clear" : sound && sound.clear;
-  const focusSound = sound === undefined ? "input.focus" : sound && sound.focus;
-  const unfocusSound = sound === undefined ? false : sound && sound.unfocus;
+  const clearSound = sound === undefined ? "clear" : sound && sound.clear;
+  const focusSound = sound === undefined ? "focus" : sound && sound.focus;
+  const blurSound = sound === undefined ? false : sound && sound.blur;
 
   function setInputRef(node: React.ComponentRef<typeof InputPrimitive> | null) {
     const input = node as HTMLInputElement | null;
@@ -368,8 +368,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
   }
 
   function handleBlur(event: InputBlurEvent) {
-    if (unfocusSound) {
-      playSound(unfocusSound);
+    if (blurSound) {
+      playSound(blurSound);
     }
 
     onBlur?.(event);

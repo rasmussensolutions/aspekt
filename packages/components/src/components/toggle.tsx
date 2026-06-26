@@ -241,7 +241,7 @@ function getToggleSound(sound: ToggleSound | undefined, pressed: boolean) {
   if (sound === false) return false;
 
   if (sound === undefined) {
-    return pressed ? "toggle.on" : "toggle.off";
+    return pressed ? "on" : "off";
   }
 
   if (typeof sound === "string") return sound;

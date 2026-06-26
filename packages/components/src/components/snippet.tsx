@@ -1,3 +1,5 @@
+"use client";
+
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
@@ -14,7 +16,7 @@ import typescript from "refractor/typescript";
 import { CodeCopyButton } from "./code-copy-button";
 
 const snippetVariants = cva(
-  "overflow-hidden border font-mono text-sm leading-6 text-neutral-700 shadow-sm dark:text-neutral-300",
+  "overflow-hidden border font-mono text-sm leading-6 text-neutral-700 dark:text-neutral-300",
   {
     variants: {
       variant: {
@@ -51,23 +53,38 @@ type SnippetVariant = "soft" | "outline";
 
 type SnippetShape = "square" | "round";
 
+type SnippetTab = {
+  code: string;
+  copiedLabel?: string;
+  copyLabel?: string;
+  filename?: React.ReactNode;
+  highlightedLines?: readonly number[];
+  label: React.ReactNode;
+  language?: SnippetLanguage;
+  value?: string;
+};
+
 type SnippetProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
-    children?: string;
-    code?: string;
-    copiedLabel?: string;
-    copyable?: boolean;
-    copyButtonClassName?: string;
-    copyLabel?: string;
-    filename?: React.ReactNode;
-    highlightedLines?: readonly number[];
-    language?: SnippetLanguage;
-    preClassName?: string;
-    shape?: SnippetShape | null;
-    showHeader?: boolean;
-    showLineNumbers?: boolean;
-    variant?: SnippetVariant | null;
-    wrap?: boolean;
-  };
+  activeTab?: string;
+  children?: string;
+  code?: string;
+  copiedLabel?: string;
+  copyable?: boolean;
+  copyButtonClassName?: string;
+  copyLabel?: string;
+  defaultTab?: string;
+  filename?: React.ReactNode;
+  highlightedLines?: readonly number[];
+  language?: SnippetLanguage;
+  onTabChange?: (value: string) => void;
+  preClassName?: string;
+  shape?: SnippetShape | null;
+  showHeader?: boolean;
+  showLineNumbers?: boolean;
+  tabs?: readonly SnippetTab[];
+  variant?: SnippetVariant | null;
+  wrap?: boolean;
+};
 
 type RefractorSyntax = {
   (prism: typeof refractor): undefined | void;
@@ -303,7 +320,20 @@ function getSnippetCode(
   return (code ?? children ?? "").replace(/\n$/, "");
 }
 
+function getSnippetTabValue(tab: SnippetTab, index: number) {
+  if (tab.value) {
+    return tab.value;
+  }
+
+  if (typeof tab.label === "string" || typeof tab.label === "number") {
+    return String(tab.label);
+  }
+
+  return String(index);
+}
+
 function Snippet({
+  activeTab,
   children,
   className,
   code,
@@ -311,33 +341,101 @@ function Snippet({
   copyable = true,
   copyButtonClassName,
   copyLabel,
+  defaultTab,
   filename,
   highlightedLines,
   language = "text",
+  onTabChange,
   preClassName,
   shape,
   showHeader = true,
   showLineNumbers = false,
+  tabs,
   variant,
   wrap = false,
   ...props
 }: SnippetProps) {
-  const value = getSnippetCode(code, children);
-  const normalizedLanguage = normalizeLanguage(language);
+  const snippetId = React.useId();
+  const snippetTabs = React.useMemo(
+    () =>
+      tabs?.map((tab, index) => ({
+        ...tab,
+        panelId: `${snippetId}-panel-${index}`,
+        tabId: `${snippetId}-tab-${index}`,
+        value: getSnippetTabValue(tab, index),
+      })) ?? [],
+    [snippetId, tabs],
+  );
+  const [uncontrolledTab, setUncontrolledTab] = React.useState(
+    () => defaultTab ?? snippetTabs[0]?.value ?? "",
+  );
+  const hasTabs = snippetTabs.length > 0;
+  const selectedTab =
+    snippetTabs.find((tab) => tab.value === (activeTab ?? uncontrolledTab)) ??
+    snippetTabs[0];
+  const selectedTabValue = selectedTab?.value ?? "";
+  const value = getSnippetCode(selectedTab?.code ?? code, children);
+  const selectedLanguage = selectedTab?.language ?? language;
+  const selectedFilename = selectedTab?.filename ?? filename;
+  const selectedHighlightedLines =
+    selectedTab?.highlightedLines ?? highlightedLines;
+  const selectedCopyLabel = selectedTab?.copyLabel ?? copyLabel;
+  const selectedCopiedLabel = selectedTab?.copiedLabel ?? copiedLabel;
+  const normalizedLanguage = normalizeLanguage(selectedLanguage);
   const lines = value.split("\n");
   const highlightedCodeLines = getHighlightedLines(value, normalizedLanguage);
-  const highlightedLineSet = new Set(highlightedLines);
-  const hasHeader = showHeader && Boolean(filename || language || copyable);
+  const highlightedLineSet = new Set(selectedHighlightedLines);
+  const hasHeader =
+    showHeader &&
+    Boolean(hasTabs || selectedFilename || selectedLanguage || copyable);
   const hasFloatingCopyButton = copyable && !hasHeader;
+
+  function handleTabChange(nextValue: string) {
+    if (activeTab === undefined) {
+      setUncontrolledTab(nextValue);
+    }
+
+    onTabChange?.(nextValue);
+  }
+
+  function handleTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    const currentIndex = snippetTabs.findIndex(
+      (tab) => tab.value === event.currentTarget.value,
+    );
+    let nextIndex = currentIndex;
+
+    if (event.key === "ArrowRight") {
+      nextIndex =
+        currentIndex === snippetTabs.length - 1 ? 0 : currentIndex + 1;
+    } else if (event.key === "ArrowLeft") {
+      nextIndex = currentIndex <= 0 ? snippetTabs.length - 1 : currentIndex - 1;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = snippetTabs.length - 1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+
+    const nextTab = snippetTabs[nextIndex];
+
+    if (!nextTab) {
+      return;
+    }
+
+    handleTabChange(nextTab.value);
+    window.requestAnimationFrame(() => {
+      document.getElementById(nextTab.tabId)?.focus();
+    });
+  }
 
   return (
     <figure
       data-slot="snippet"
-      className={cn(
-        "relative",
-        snippetVariants({ variant, shape }),
-        className,
-      )}
+      data-tab={hasTabs ? selectedTabValue : undefined}
+      className={cn("relative", snippetVariants({ variant, shape }), className)}
       {...props}
     >
       {hasHeader ? (
@@ -348,24 +446,62 @@ function Snippet({
             shape === "round" ? "px-5" : "px-3",
           )}
         >
-          <div className="flex min-w-0 items-center gap-2">
-            {filename ? (
-              <span className="truncate text-xs font-medium text-foreground">
-                {filename}
-              </span>
-            ) : null}
-            {language ? (
-              <span className="inline-flex h-4 items-center rounded-md bg-neutral-950/[0.04] px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-neutral-500 dark:bg-white/10 dark:text-neutral-400">
-                {normalizedLanguage}
-              </span>
-            ) : null}
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            {hasTabs ? (
+              <div
+                aria-label="Snippet options"
+                className="flex min-w-0 items-center gap-1 p-px overflow-x-auto"
+                role="tablist"
+              >
+                {snippetTabs.map((tab) => {
+                  const selected = tab.value === selectedTabValue;
+
+                  return (
+                    <button
+                      key={tab.value}
+                      aria-controls={tab.panelId}
+                      aria-selected={selected}
+                      className={cn(
+                        "inline-flex h-6 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-none transition-[background-color,color,box-shadow]",
+                        "focus-visible:ring-2 focus-visible:ring-current/25",
+                        selected
+                          ? "bg-white text-foreground shadow-sm ring-1 ring-neutral-200 dark:bg-white/10 dark:ring-white/10"
+                          : "text-neutral-500 hover:bg-neutral-950/[0.04] hover:text-foreground dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-white",
+                      )}
+                      id={tab.tabId}
+                      onClick={() => handleTabChange(tab.value)}
+                      onKeyDown={handleTabKeyDown}
+                      role="tab"
+                      tabIndex={selected ? 0 : -1}
+                      type="button"
+                      value={tab.value}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                {selectedFilename ? (
+                  <span className="truncate text-xs font-medium text-foreground">
+                    {selectedFilename}
+                  </span>
+                ) : null}
+                {selectedLanguage ? (
+                  <span className="inline-flex h-4 items-center rounded-md bg-neutral-950/[0.04] px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-neutral-500 dark:bg-white/10 dark:text-neutral-400">
+                    {normalizedLanguage}
+                  </span>
+                ) : null}
+              </>
+            )}
           </div>
 
           {copyable ? (
             <CodeCopyButton
               className={copyButtonClassName}
-              copiedLabel={copiedLabel}
-              copyLabel={copyLabel}
+              copiedLabel={selectedCopiedLabel}
+              copyLabel={selectedCopyLabel}
               placement="inline"
               value={value}
             />
@@ -374,7 +510,10 @@ function Snippet({
       ) : null}
 
       <pre
+        aria-labelledby={hasTabs ? selectedTab?.tabId : undefined}
         data-slot="snippet-pre"
+        id={hasTabs ? selectedTab?.panelId : undefined}
+        role={hasTabs ? "tabpanel" : undefined}
         className={cn(
           "overflow-x-auto p-4",
           hasFloatingCopyButton ? "pr-12" : "",
@@ -427,8 +566,8 @@ function Snippet({
       {hasFloatingCopyButton ? (
         <CodeCopyButton
           className={copyButtonClassName}
-          copiedLabel={copiedLabel}
-          copyLabel={copyLabel}
+          copiedLabel={selectedCopiedLabel}
+          copyLabel={selectedCopyLabel}
           value={value}
         />
       ) : null}
@@ -437,4 +576,10 @@ function Snippet({
 }
 
 export { Snippet, snippetVariants };
-export type { SnippetLanguage, SnippetProps, SnippetShape, SnippetVariant };
+export type {
+  SnippetLanguage,
+  SnippetProps,
+  SnippetShape,
+  SnippetTab,
+  SnippetVariant,
+};

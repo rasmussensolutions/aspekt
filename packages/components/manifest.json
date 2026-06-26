@@ -264,6 +264,52 @@
       ]
     },
     {
+      "name": "tabs",
+      "kind": "component",
+      "title": "Tabs",
+      "description": "Base UI tabs with Aspekt styling, variants, orientation, active indicators, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/tabs.tsx",
+          "target": "components/aspekt/tabs.tsx"
+        },
+        {
+          "path": "packages/components/src/components/sound.ts",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "navigation"
+      ]
+    },
+    {
+      "name": "table",
+      "kind": "component",
+      "title": "Table",
+      "description": "A TanStack Table-powered data table with Aspekt styling, sorting, density, empty states, and responsive overflow.",
+      "dependencies": [
+        "@tanstack/react-table",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/table.tsx",
+          "target": "components/aspekt/table.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "data-display"
+      ]
+    },
+    {
       "name": "code",
       "kind": "component",
       "title": "Code",
@@ -396,7 +442,7 @@
       "name": "sound-provider",
       "kind": "component",
       "title": "Sound Provider",
-      "description": "An optional provider and hook for global Aspekt UI sound settings.",
+      "description": "A provider and hook for opting into global Aspekt UI sound settings.",
       "dependencies": [],
       "files": [
         {
@@ -464,6 +510,14 @@
         {
           "path": "packages/components/src/components/popover.tsx",
           "target": "components/aspekt/popover.tsx"
+        },
+        {
+          "path": "packages/components/src/components/tabs.tsx",
+          "target": "components/aspekt/tabs.tsx"
+        },
+        {
+          "path": "packages/components/src/components/table.tsx",
+          "target": "components/aspekt/table.tsx"
         },
         {
           "path": "packages/components/src/components/snippet.tsx",

@@ -35,3 +35,26 @@
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 }
+
+@keyframes aspekt-button-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-0.1875rem);
+  }
+
+  40% {
+    transform: translateX(0.1875rem);
+  }
+
+  60% {
+    transform: translateX(-0.125rem);
+  }
+
+  80% {
+    transform: translateX(0.125rem);
+  }
+}

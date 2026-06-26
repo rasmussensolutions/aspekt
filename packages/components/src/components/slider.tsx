@@ -346,7 +346,7 @@ function getSliderSound(
   if (sound === false) return false;
 
   if (sound === undefined) {
-    return interaction === "commit" ? "slider.commit" : false;
+    return interaction === "commit" ? "commit" : false;
   }
 
   if (typeof sound === "string") {

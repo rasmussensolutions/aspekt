@@ -14,6 +14,7 @@ const buttonVariants = cva(
     "cursor-pointer active:scale-[0.97]",
     "disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100",
     "data-[loading]:cursor-not-allowed data-[loading]:active:scale-100",
+    "data-[status=fail]:motion-safe:animate-[aspekt-button-shake_420ms_cubic-bezier(0.36,0.07,0.19,0.97)_both]",
     "focus-visible:ring-2 focus-visible:ring-current/25",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   ],
@@ -184,31 +185,29 @@ type ButtonSize = "micro" | "tiny" | "small" | "medium" | "large";
 
 type ButtonShape = "square" | "round";
 
+type ButtonStatus = "success" | "fail";
+
 type ButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "color" | "prefix" | "suffix"
-> &
-  {
-    variant?: ButtonVariant | null;
-    color?: ButtonColor | null;
-    size?: ButtonSize | null;
-    shape?: ButtonShape | null;
-    loading?: boolean;
-    sound?: SoundName | false;
-    prefix?: React.ReactNode;
-    suffix?: React.ReactNode;
-  };
+> & {
+  variant?: ButtonVariant | null;
+  color?: ButtonColor | null;
+  size?: ButtonSize | null;
+  shape?: ButtonShape | null;
+  loading?: boolean;
+  status?: ButtonStatus | null;
+  statusDuration?: number | false | null;
+  onStatusClear?: () => void;
+  sound?: SoundName | false;
+  failSound?: SoundName | false;
+  prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
+};
 
 const ButtonShapeContext = React.createContext<ButtonShape | undefined>(
   undefined,
 );
-
-const buttonVariantSounds = {
-  solid: "button.solid",
-  soft: "button.soft",
-  ghost: "button.ghost",
-  outline: "button.outline",
-} satisfies Record<ButtonVariant, SoundName>;
 
 const buttonSpinnerSizes = {
   micro: "size-3",
@@ -272,6 +271,49 @@ function Spinner({ className }: { className?: string }) {
         />
       </svg>
     </span>
+  );
+}
+
+function ButtonStatusIcon({
+  className,
+  status,
+}: {
+  className?: string;
+  status: ButtonStatus;
+}) {
+  if (status === "success") {
+    return (
+      <svg
+        aria-hidden="true"
+        className={className}
+        viewBox="0 0 20 20"
+        fill="none"
+      >
+        <path
+          d="M4.5 10.25 8.25 14 15.5 6"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2.25"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 20 20"
+      fill="none"
+    >
+      <path
+        d="m6 6 8 8M14 6l-8 8"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2.25"
+      />
+    </svg>
   );
 }
 
@@ -365,7 +407,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     size,
     shape,
     loading = false,
+    status,
+    statusDuration = false,
+    onStatusClear,
     sound,
+    failSound = "error",
     prefix,
     suffix,
     onClick,
@@ -381,19 +427,77 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   const resolvedColor = color ?? "blue";
   const resolvedSize = size ?? "medium";
   const resolvedShape = shape ?? inheritedShape ?? "square";
+  const effectiveColor = status === "fail" ? "red" : resolvedColor;
 
   const isDisabled = Boolean(disabled);
   const isInteractionBlocked = isDisabled || loading;
   const hasLabel = Boolean(children);
   const hasPrefix = Boolean(prefix);
   const hasSuffix = Boolean(suffix);
-  const shouldLoadInSuffix = loading && !hasPrefix && hasSuffix;
-  const shouldLoadInPrefix = loading && !shouldLoadInSuffix;
-  const showPrefix = shouldLoadInPrefix || hasPrefix;
-  const showSuffix = shouldLoadInSuffix || hasSuffix;
+  const hasStatus = status === "success" || status === "fail";
+  const shouldStatusInSuffix = hasStatus && !hasPrefix && hasSuffix;
+  const shouldStatusInPrefix = hasStatus && !shouldStatusInSuffix;
+  const shouldLoadInSuffix = !hasStatus && loading && !hasPrefix && hasSuffix;
+  const shouldLoadInPrefix = !hasStatus && loading && !shouldLoadInSuffix;
+  const showPrefix = shouldStatusInPrefix || shouldLoadInPrefix || hasPrefix;
+  const showSuffix = shouldStatusInSuffix || shouldLoadInSuffix || hasSuffix;
+  const statusIcon = hasStatus ? (
+    <ButtonStatusIcon
+      className={buttonSpinnerSizes[resolvedSize]}
+      status={status}
+    />
+  ) : undefined;
 
-  const resolvedSound =
-    sound === undefined ? buttonVariantSounds[resolvedVariant] : sound;
+  const resolvedSound = sound === undefined ? "press" : sound;
+  const statusClearTimeoutRef = React.useRef<number | null>(null);
+  const previousStatusRef = React.useRef<ButtonStatus | null | undefined>(
+    status,
+  );
+
+  React.useEffect(() => {
+    return () => {
+      if (statusClearTimeoutRef.current) {
+        window.clearTimeout(statusClearTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (statusClearTimeoutRef.current) {
+      window.clearTimeout(statusClearTimeoutRef.current);
+      statusClearTimeoutRef.current = null;
+    }
+
+    if (!hasStatus || statusDuration === false || statusDuration == null) {
+      return;
+    }
+
+    statusClearTimeoutRef.current = window.setTimeout(() => {
+      statusClearTimeoutRef.current = null;
+      onStatusClear?.();
+    }, Math.max(0, statusDuration));
+
+    return () => {
+      if (statusClearTimeoutRef.current) {
+        window.clearTimeout(statusClearTimeoutRef.current);
+        statusClearTimeoutRef.current = null;
+      }
+    };
+  }, [hasStatus, onStatusClear, status, statusDuration]);
+
+  React.useEffect(() => {
+    const previousStatus = previousStatusRef.current;
+    previousStatusRef.current = status;
+
+    if (
+      previousStatus !== "fail" &&
+      status === "fail" &&
+      sound !== false &&
+      failSound
+    ) {
+      playSound(failSound);
+    }
+  }, [failSound, sound, status]);
 
   return (
     <button
@@ -401,11 +505,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       data-slot="button"
       data-loading={loading ? "" : undefined}
       data-disabled={isDisabled ? "" : undefined}
+      data-status={status ?? undefined}
       type={type}
       className={cn(
         buttonVariants({
           variant: resolvedVariant,
-          color: resolvedColor,
+          color: effectiveColor,
           size: resolvedSize,
           shape: resolvedShape,
           className,
@@ -434,9 +539,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
         show={showPrefix}
         gap={hasLabel ? buttonAffixGaps[resolvedSize] : "0px"}
         width={hasPrefix ? undefined : buttonPrefixSlotWidths[resolvedSize]}
-        replacing={shouldLoadInPrefix}
+        replacing={shouldStatusInPrefix || shouldLoadInPrefix}
         replacement={
-          shouldLoadInPrefix ? (
+          shouldStatusInPrefix ? (
+            statusIcon
+          ) : shouldLoadInPrefix ? (
             <Spinner className={buttonSpinnerSizes[resolvedSize]} />
           ) : undefined
         }
@@ -454,9 +561,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
         side="suffix"
         show={showSuffix}
         gap={hasLabel ? buttonAffixGaps[resolvedSize] : "0px"}
-        replacing={shouldLoadInSuffix}
+        replacing={shouldStatusInSuffix || shouldLoadInSuffix}
         replacement={
-          shouldLoadInSuffix ? (
+          shouldStatusInSuffix ? (
+            statusIcon
+          ) : shouldLoadInSuffix ? (
             <Spinner className={buttonSpinnerSizes[resolvedSize]} />
           ) : undefined
         }
@@ -473,5 +582,6 @@ export type {
   ButtonProps,
   ButtonShape,
   ButtonSize,
+  ButtonStatus,
   ButtonVariant,
 };

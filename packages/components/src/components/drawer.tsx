@@ -315,6 +315,7 @@ type DrawerButtonProps = Pick<
   | "shape"
   | "size"
   | "sound"
+  | "status"
   | "suffix"
   | "variant"
 >;
@@ -342,7 +343,7 @@ const drawerSwipeDirections = {
 >;
 
 function getDrawerSound(sound: DrawerSound | undefined, open: boolean) {
-  if (sound === undefined) return open ? "drawer.open" : "drawer.close";
+  if (sound === undefined) return open ? "open" : "close";
   if (sound === false) return false;
   return open ? sound.open : sound.close;
 }
@@ -499,6 +500,7 @@ const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerProps>(
       shape,
       size,
       sound = false,
+      status,
       suffix,
       variant,
       ...props
@@ -518,6 +520,7 @@ const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerProps>(
             shape={shape}
             size={size}
             sound={sound}
+            status={status}
             suffix={suffix}
             variant={variant}
           />
@@ -538,6 +541,7 @@ const DrawerClose = React.forwardRef<HTMLButtonElement, DrawerCloseProps>(
       shape,
       size,
       sound = false,
+      status,
       suffix,
       variant = "ghost",
       ...props
@@ -557,6 +561,7 @@ const DrawerClose = React.forwardRef<HTMLButtonElement, DrawerCloseProps>(
             shape={shape}
             size={size}
             sound={sound}
+            status={status}
             suffix={suffix}
             variant={variant}
           />

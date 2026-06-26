@@ -4,7 +4,7 @@ import { SoundProvider } from "@aspekt/components/sound-provider";
 
 export const metadata: Metadata = {
   title: "Aspekt UI",
-  description: "Registry docs for the Aspekt UI component library.",
+  description: "Precision-crafted React components for modern web apps.",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SoundProvider variant="pop" volume={10}>
+        <SoundProvider variant="pop" volume={1}>
           {children}
         </SoundProvider>
       </body>

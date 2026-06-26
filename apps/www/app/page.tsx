@@ -66,14 +66,25 @@ import { Slider } from "@aspekt/components/slider";
 import { Snippet } from "@aspekt/components/snippet";
 import { SoundProvider, useSound } from "@aspekt/components/sound-provider";
 import { Switch } from "@aspekt/components/switch";
+import {
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsRoot,
+  TabsTab,
+} from "@aspekt/components/tabs";
+import { Table, type TableColumnDef } from "@aspekt/components/table";
 import { Toggle } from "@aspekt/components/toggle";
 import {
   ArrowRightIcon,
+  ListIcon,
   MagnifyingGlassIcon,
   PlusCircleIcon,
   StackIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import * as React from "react";
+import Image from "next/image";
 
 type IntroPage = "getting-started" | "principles";
 type ComponentPreview =
@@ -87,6 +98,8 @@ type ComponentPreview =
   | "dialog"
   | "drawer"
   | "popover"
+  | "tabs"
+  | "table"
   | "snippet"
   | "sound-provider"
   | "heading"
@@ -98,6 +111,9 @@ type ComponentPreview =
   | "list";
 
 type DocsPage = IntroPage | ComponentPreview;
+type DocsAppProps = {
+  initialPage?: DocsPage;
+};
 type ButtonVariant = "solid" | "soft" | "ghost" | "outline";
 type ButtonSize = "micro" | "tiny" | "small" | "medium" | "large";
 type ButtonColor = "accent" | "blue" | "red" | "amber" | "neutral";
@@ -105,6 +121,10 @@ type ButtonShape = "square" | "round";
 type DialogSize = "small" | "medium" | "large";
 type DrawerSide = "top" | "right" | "bottom" | "left";
 type PopoverSide = "top" | "right" | "bottom" | "left";
+type TabsVariant = "line" | "soft" | "outline";
+type TabsOrientation = "horizontal" | "vertical";
+type TableVariant = "outline" | "soft" | "ghost";
+type TableSize = "compact" | "medium" | "large";
 type InputVariant = "outline" | "soft" | "ghost";
 type SelectVariant = "outline" | "soft" | "ghost";
 type CheckboxVariant = "solid" | "soft" | "outline";
@@ -146,6 +166,7 @@ type ListSpacing = "tight" | "normal" | "loose";
 type ListTone = "default" | "muted" | "subtle";
 type SnippetLanguageOption = "tsx" | "bash" | "json" | "css" | "html";
 type SnippetVariant = "outline" | "soft";
+type ButtonStatusOption = "none" | "success" | "fail";
 
 type ButtonSettings = {
   variant: ButtonVariant;
@@ -155,6 +176,7 @@ type ButtonSettings = {
   prefix: boolean;
   suffix: boolean;
   loading: boolean;
+  status: ButtonStatusOption;
   disabled: boolean;
 };
 
@@ -248,6 +270,27 @@ type PopoverSettings = {
   size: DialogSize;
 };
 
+type TabsSettings = {
+  variant: TabsVariant;
+  size: ButtonSize;
+  color: ButtonColor;
+  shape: ButtonShape;
+  orientation: TabsOrientation;
+  indicator: boolean;
+  activateOnFocus: boolean;
+};
+
+type TableSettings = {
+  variant: TableVariant;
+  size: TableSize;
+  shape: ButtonShape;
+  striped: boolean;
+  hoverable: boolean;
+  sortable: boolean;
+  stickyHeader: boolean;
+  showColumnBorders: boolean;
+};
+
 type HeadingSettings = {
   size: HeadingSize;
   tone: HeadingTone;
@@ -325,6 +368,8 @@ const componentIds = [
   "dialog",
   "drawer",
   "popover",
+  "tabs",
+  "table",
   "snippet",
   "heading",
   "text",
@@ -375,6 +420,8 @@ const navGroups = [
       { label: "Dialog", page: "dialog" },
       { label: "Drawer", page: "drawer" },
       { label: "Popover", page: "popover" },
+      { label: "Tabs", page: "tabs" },
+      { label: "Table", page: "table" },
       { label: "Snippet", page: "snippet" },
     ],
   },
@@ -393,6 +440,7 @@ const buttonOptions = {
   size: ["micro", "tiny", "small", "medium", "large"],
   color: ["accent", "blue", "red", "amber", "neutral"],
   shape: ["square", "round"],
+  status: ["none", "success", "fail"],
 } as const;
 
 const inputOptions = {
@@ -450,6 +498,20 @@ const popoverOptions = {
   shape: buttonOptions.shape,
   side: ["bottom", "right", "left", "top"],
   size: dialogOptions.size,
+} as const;
+
+const tabsOptions = {
+  variant: ["line", "soft", "outline"],
+  size: buttonOptions.size,
+  color: buttonOptions.color,
+  shape: buttonOptions.shape,
+  orientation: ["horizontal", "vertical"],
+} as const;
+
+const tableOptions = {
+  variant: ["outline", "soft", "ghost"],
+  size: ["compact", "medium", "large"],
+  shape: buttonOptions.shape,
 } as const;
 
 const headingOptions = {
@@ -550,6 +612,14 @@ const componentCopy = {
     title: "Popover",
     description: "is used to reveal anchored contextual content.",
   },
+  tabs: {
+    title: "Tabs",
+    description: "is used to switch between related panels.",
+  },
+  table: {
+    title: "Table",
+    description: "is used to scan, compare, and sort structured data.",
+  },
   snippet: {
     title: "Snippet",
     description: "is used to display formatted code examples.",
@@ -584,8 +654,7 @@ const componentCopy = {
   },
   "sound-provider": {
     title: "Sound Provider",
-    description:
-      "is an optional app-level controller for Aspekt UI interaction sound.",
+    description: "is the app-level opt-in for Aspekt UI interaction sound.",
   },
 } satisfies Record<
   ComponentPreview,
@@ -599,13 +668,20 @@ const componentImportExamples = {
   button: 'import { Button } from "@/components/aspekt/button";',
   checkbox: 'import { Checkbox } from "@/components/aspekt/checkbox";',
   input: 'import { Input } from "@/components/aspekt/input";',
-  select: 'import { SelectRoot, SelectTrigger } from "@/components/aspekt/select";',
+  select:
+    'import { SelectRoot, SelectTrigger } from "@/components/aspekt/select";',
   slider: 'import { Slider } from "@/components/aspekt/slider";',
   switch: 'import { Switch } from "@/components/aspekt/switch";',
   toggle: 'import { Toggle } from "@/components/aspekt/toggle";',
-  dialog: 'import { DialogRoot, DialogTrigger } from "@/components/aspekt/dialog";',
-  drawer: 'import { DrawerRoot, DrawerTrigger } from "@/components/aspekt/drawer";',
-  popover: 'import { PopoverRoot, PopoverTrigger } from "@/components/aspekt/popover";',
+  dialog:
+    'import { DialogRoot, DialogTrigger } from "@/components/aspekt/dialog";',
+  drawer:
+    'import { DrawerRoot, DrawerTrigger } from "@/components/aspekt/drawer";',
+  popover:
+    'import { PopoverRoot, PopoverTrigger } from "@/components/aspekt/popover";',
+  tabs: 'import { TabsRoot, TabsList, TabsTab, TabsPanel, TabsIndicator } from "@/components/aspekt/tabs";',
+  table:
+    'import { Table, type TableColumnDef } from "@/components/aspekt/table";',
   snippet: 'import { Snippet } from "@/components/aspekt/snippet";',
   heading: 'import { Heading } from "@/components/aspekt/heading";',
   text: 'import { Text } from "@/components/aspekt/text";',
@@ -619,7 +695,7 @@ const componentImportExamples = {
 } satisfies Record<ComponentPreview, string>;
 
 const componentUsageExamples = {
-  button: `<Button color="neutral" sound="success">
+  button: `<Button color="neutral" status="success" sound="success">
   Save changes
 </Button>`,
   checkbox: `<label>
@@ -722,11 +798,58 @@ const componentUsageExamples = {
     </PopoverPositioner>
   </PopoverPortal>
 </PopoverRoot>`,
+  tabs: `<TabsRoot defaultValue="overview">
+  <TabsList>
+    <TabsTab value="overview">Overview</TabsTab>
+    <TabsTab value="usage">Usage</TabsTab>
+    <TabsTab value="api">API</TabsTab>
+    <TabsIndicator />
+  </TabsList>
+  <TabsPanel value="overview">
+    Tabs group related content into focused panels.
+  </TabsPanel>
+  <TabsPanel value="usage">Use arrow keys to move between tabs.</TabsPanel>
+  <TabsPanel value="api">Pair each tab with a matching panel.</TabsPanel>
+</TabsRoot>`,
+  table: `type Invoice = {
+  customer: string;
+  status: "Paid" | "Pending" | "Overdue";
+  total: number;
+};
+
+const columns = [
+  { accessorKey: "customer", header: "Customer" },
+  { accessorKey: "status", header: "Status" },
+  {
+    accessorKey: "total",
+    header: "Total",
+    cell: ({ getValue }) =>
+      Intl.NumberFormat("en", {
+        style: "currency",
+        currency: "USD",
+      }).format(getValue<number>()),
+  },
+] satisfies TableColumnDef<Invoice>[];
+
+<Table
+  columns={columns}
+  data={invoices}
+  caption="Recent invoices"
+  striped
+/>`,
   snippet: `<Snippet
-  filename="example.tsx"
-  language="tsx"
-  code={'<Button>Save changes</Button>'}
-  showLineNumbers
+  tabs={[
+    {
+      label: "pnpm",
+      code: "pnpm dlx @aspekt/ui add button",
+      language: "bash",
+    },
+    {
+      label: "npm",
+      code: "npx @aspekt/ui add button",
+      language: "bash",
+    },
+  ]}
 />`,
   heading: `<Heading level={2} size="h3">
   Build interfaces with intention
@@ -782,6 +905,7 @@ const defaultButtonSettings = {
   prefix: false,
   suffix: false,
   loading: false,
+  status: "none",
   disabled: false,
 } satisfies ButtonSettings;
 
@@ -875,6 +999,27 @@ const defaultPopoverSettings = {
   size: "medium",
 } satisfies PopoverSettings;
 
+const defaultTabsSettings = {
+  variant: "soft",
+  size: "medium",
+  color: "blue",
+  shape: "square",
+  orientation: "horizontal",
+  indicator: true,
+  activateOnFocus: true,
+} satisfies TabsSettings;
+
+const defaultTableSettings = {
+  variant: "outline",
+  size: "medium",
+  shape: "square",
+  striped: false,
+  hoverable: true,
+  sortable: true,
+  stickyHeader: false,
+  showColumnBorders: false,
+} satisfies TableSettings;
+
 const defaultHeadingSettings = {
   size: "h1",
   tone: "default",
@@ -938,6 +1083,115 @@ const selectPreviewItems = [
   value: SelectPreviewValue;
 }[];
 
+type InvoiceStatus = "Paid" | "Pending" | "Overdue";
+
+type Invoice = {
+  id: string;
+  customer: string;
+  plan: string;
+  status: InvoiceStatus;
+  total: number;
+  issued: string;
+};
+
+const invoiceStatusClasses = {
+  Paid: "border-emerald-600/20 bg-emerald-600/10 text-emerald-700 dark:text-emerald-300",
+  Pending:
+    "border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-300",
+  Overdue: "border-red-600/20 bg-red-600/10 text-red-700 dark:text-red-300",
+} satisfies Record<InvoiceStatus, string>;
+
+const tablePreviewData = [
+  {
+    id: "INV-2418",
+    customer: "Northstar Labs",
+    plan: "Scale",
+    status: "Paid",
+    total: 1280,
+    issued: "Jun 12",
+  },
+  {
+    id: "INV-2419",
+    customer: "Aperture Works",
+    plan: "Team",
+    status: "Pending",
+    total: 640,
+    issued: "Jun 14",
+  },
+  {
+    id: "INV-2420",
+    customer: "Signal & Co.",
+    plan: "Enterprise",
+    status: "Overdue",
+    total: 3420,
+    issued: "Jun 16",
+  },
+  {
+    id: "INV-2421",
+    customer: "Fieldstone Studio",
+    plan: "Team",
+    status: "Paid",
+    total: 780,
+    issued: "Jun 18",
+  },
+] satisfies Invoice[];
+
+const currencyFormatter = new Intl.NumberFormat("en", {
+  currency: "USD",
+  style: "currency",
+});
+
+const tablePreviewColumns = [
+  {
+    accessorKey: "id",
+    header: "Invoice",
+    cell: ({ getValue }) => (
+      <span className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
+        {getValue<string>()}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "customer",
+    header: "Customer",
+  },
+  {
+    accessorKey: "plan",
+    header: "Plan",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ getValue }) => {
+      const status = getValue<InvoiceStatus>();
+
+      return (
+        <span
+          className={[
+            "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+            invoiceStatusClasses[status],
+          ].join(" ")}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "issued",
+    header: "Issued",
+  },
+  {
+    accessorKey: "total",
+    header: "Total",
+    cell: ({ getValue }) => (
+      <span className="font-medium">
+        {currencyFormatter.format(getValue<number>())}
+      </span>
+    ),
+  },
+] satisfies TableColumnDef<Invoice>[];
+
 const snippetExamples = {
   tsx: {
     filename: "save-button.tsx",
@@ -945,7 +1199,7 @@ const snippetExamples = {
 
 export function SaveButton() {
   return (
-    <Button color="neutral" sound="success">
+    <Button color="neutral" status="success" sound="success">
       Save changes
     </Button>
   );
@@ -953,8 +1207,8 @@ export function SaveButton() {
   },
   bash: {
     filename: "terminal",
-    code: `npx @aspekt/ui init
-npx @aspekt/ui add button`,
+    code: `pnpm dlx @aspekt/ui init
+pnpm dlx @aspekt/ui add button`,
   },
   json: {
     filename: "terminal",
@@ -989,6 +1243,52 @@ const snippetHighlightedLines = {
   html: [1],
 } satisfies Record<SnippetLanguageOption, readonly number[]>;
 
+const initCommandTabs = [
+  {
+    label: "pnpm",
+    code: "pnpm dlx @aspekt/ui init",
+    language: "bash",
+  },
+  {
+    label: "npm",
+    code: "npx @aspekt/ui init",
+    language: "bash",
+  },
+  {
+    label: "yarn",
+    code: "yarn dlx @aspekt/ui init",
+    language: "bash",
+  },
+  {
+    label: "bun",
+    code: "bunx @aspekt/ui init",
+    language: "bash",
+  },
+] as const;
+
+const addButtonCommandTabs = [
+  {
+    label: "pnpm",
+    code: "pnpm dlx @aspekt/ui add button",
+    language: "bash",
+  },
+  {
+    label: "npm",
+    code: "npx @aspekt/ui add button",
+    language: "bash",
+  },
+  {
+    label: "yarn",
+    code: "yarn dlx @aspekt/ui add button",
+    language: "bash",
+  },
+  {
+    label: "bun",
+    code: "bunx @aspekt/ui add button",
+    language: "bash",
+  },
+] as const;
+
 const headingLevelValues = {
   "1": 1,
   "2": 2,
@@ -1004,22 +1304,6 @@ const buttonColorDots = {
   red: "bg-red-600",
   amber: "bg-amber-500",
   neutral: "bg-neutral-950 dark:bg-white",
-} satisfies Record<ButtonColor, string>;
-
-const buttonShortcutSuffixBackgrounds = {
-  accent: "bg-primary/10",
-  blue: "bg-blue-600/10",
-  red: "bg-red-600/10",
-  amber: "bg-amber-500/10",
-  neutral: "bg-neutral-950/10 dark:bg-white/10",
-} satisfies Record<ButtonColor, string>;
-
-const solidButtonShortcutSuffixBackgrounds = {
-  accent: "bg-black/15",
-  blue: "bg-blue-700",
-  red: "bg-red-700",
-  amber: "bg-amber-600",
-  neutral: "bg-neutral-900 dark:bg-neutral-950/10",
 } satisfies Record<ButtonColor, string>;
 
 function areOverflowStatesEqual(
@@ -1127,6 +1411,191 @@ function ProgressiveOverflowFade({
   );
 }
 
+function LogoLockup({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={[
+        "flex items-center gap-2.5 select-none pointer-events-none",
+        className,
+      ].join(" ")}
+    >
+      <Image
+        src="/logo.png"
+        width={24}
+        height={24}
+        sizes="32px"
+        className="size-4.5"
+        alt="Aspekt logo"
+      />
+      <span className="rounded-full text-lg leading-none text-neutral-600 dark:border-white/30 dark:text-neutral-300">
+        Aspekt UI
+      </span>
+    </div>
+  );
+}
+
+function DocsNavigation({
+  activePage,
+  query = "",
+  onPageChange,
+}: {
+  activePage: DocsPage;
+  query?: string;
+  onPageChange: (page: DocsPage) => void;
+}) {
+  const filteredGroups = getFilteredNavGroups(query);
+
+  if (filteredGroups.length === 0) {
+    return (
+      <p className="text-sm text-neutral-500 dark:text-neutral-400">
+        No matches found.
+      </p>
+    );
+  }
+
+  return (
+    <nav className="flex flex-col gap-14" aria-label="Aspekt UI documentation">
+      {filteredGroups.map((group) => (
+        <div key={group.title} className="space-y-3">
+          <p className="text-lg tracking-tight font-normal text-neutral-500 dark:text-neutral-400">
+            {group.title}
+          </p>
+          <ul className="space-y-2">
+            {group.items.map((item) => (
+              <li key={item.label} className="ml-2">
+                <button
+                  type="button"
+                  aria-current={item.page === activePage ? "page" : undefined}
+                  onClick={() => onPageChange(item.page)}
+                  className={[
+                    "relative inline-flex text-left text-base leading-none outline-none transition-colors",
+                    item.page === activePage
+                      ? "font-medium text-foreground"
+                      : "text-neutral-400 hover:text-foreground focus-visible:text-foreground dark:text-neutral-400",
+                  ].join(" ")}
+                >
+                  {item.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function MobileNavbar({
+  onMenuOpen,
+}: {
+  onMenuOpen: () => void;
+}) {
+  return (
+    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-background/95 px-6 py-4 backdrop-blur sm:px-10 lg:hidden dark:border-white/15">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+        <LogoLockup />
+        <button
+          type="button"
+          aria-label="Open menu"
+          onClick={onMenuOpen}
+          className="inline-flex size-9 items-center justify-center rounded-lg text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/25 dark:text-neutral-400 dark:hover:bg-white/10"
+        >
+          <ListIcon className="size-5" weight="bold" />
+        </button>
+      </div>
+    </header>
+  );
+}
+
+function MobileMenu({
+  activePage,
+  open,
+  query,
+  onClose,
+  onPageChange,
+  onQueryChange,
+}: {
+  activePage: DocsPage;
+  open: boolean;
+  query: string;
+  onClose: () => void;
+  onPageChange: (page: DocsPage) => void;
+  onQueryChange: (query: string) => void;
+}) {
+  const { ref: menuScrollRef, overflow } = useScrollOverflow<HTMLDivElement>();
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose, open]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-background text-foreground lg:hidden">
+      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-neutral-200 px-6 py-4 sm:px-10 dark:border-white/15">
+        <LogoLockup />
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={onClose}
+          className="inline-flex size-9 items-center justify-center rounded-lg text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/25 dark:text-neutral-400 dark:hover:bg-white/10"
+        >
+          <XIcon className="size-5" weight="bold" />
+        </button>
+      </div>
+
+      <div className="shrink-0 border-b border-neutral-200 px-6 py-4 sm:px-10 dark:border-white/15">
+        <label className="relative block">
+          <span className="sr-only">Search documentation</span>
+          <MagnifyingGlassIcon
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400"
+            aria-hidden="true"
+          />
+          <input
+            autoFocus
+            type="search"
+            value={query}
+            onChange={(event) => onQueryChange(event.currentTarget.value)}
+            placeholder="Search documentation"
+            className="h-10 w-full rounded-lg border border-neutral-200 bg-transparent pl-9 pr-3 text-base text-foreground outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-900/10 dark:border-white/15 dark:placeholder:text-neutral-500 dark:focus:border-white/35 dark:focus:ring-white/10"
+          />
+        </label>
+      </div>
+
+      <div className="relative min-h-0 flex-1">
+        <div
+          ref={menuScrollRef}
+          className="h-full overflow-y-auto px-6 py-8 sm:px-10"
+        >
+          <DocsNavigation
+            activePage={activePage}
+            query={query}
+            onPageChange={onPageChange}
+          />
+        </div>
+        <ProgressiveOverflowFade edge="top" visible={overflow.top} />
+        <ProgressiveOverflowFade edge="bottom" visible={overflow.bottom} />
+      </div>
+    </div>
+  );
+}
+
 function Sidebar({
   activePage,
   onPageChange,
@@ -1138,50 +1607,13 @@ function Sidebar({
     useScrollOverflow<HTMLDivElement>();
 
   return (
-    <aside className="relative w-full shrink-0 lg:sticky lg:top-0 lg:h-screen lg:w-72">
+    <aside className="relative hidden w-full shrink-0 lg:sticky lg:top-0 lg:block lg:h-screen lg:w-72">
       <div
         ref={sidebarScrollRef}
         className="flex h-full flex-col px-6 py-8 sm:px-10 lg:overflow-y-auto lg:px-8 lg:py-18"
       >
-        <div className="mb-16 flex items-center gap-2 select-none pointer-events-none">
-          <span className="rounded-full text-lg leading-none text-neutral-600 dark:border-white/30 dark:text-neutral-300">
-            aspekt.systems
-          </span>
-        </div>
-
-        <nav
-          className="flex flex-col gap-14"
-          aria-label="Aspekt UI documentation"
-        >
-          {navGroups.map((group) => (
-            <div key={group.title} className="space-y-3">
-              <p className="text-lg tracking-tight font-normal text-neutral-500 dark:text-neutral-400">
-                {group.title}
-              </p>
-              <ul className="space-y-2">
-                {group.items.map((item) => (
-                  <li key={item.label} className="ml-2">
-                    <button
-                      type="button"
-                      aria-current={
-                        item.page === activePage ? "page" : undefined
-                      }
-                      onClick={() => onPageChange(item.page)}
-                      className={[
-                        "relative inline-flex text-left text-base leading-none outline-none transition-colors",
-                        item.page === activePage
-                          ? "font-medium text-foreground"
-                          : "text-neutral-400 hover:text-foreground focus-visible:text-foreground dark:text-neutral-400",
-                      ].join(" ")}
-                    >
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </nav>
+        <LogoLockup className="mb-16" />
+        <DocsNavigation activePage={activePage} onPageChange={onPageChange} />
       </div>
       <ProgressiveOverflowFade edge="top" visible={overflow.top} />
       <ProgressiveOverflowFade edge="bottom" visible={overflow.bottom} />
@@ -1189,20 +1621,38 @@ function Sidebar({
   );
 }
 
-function ValueList({ values }: { values: readonly string[] }) {
+function SegmentedControl<T extends string>({
+  values,
+  active,
+  onValueChange,
+}: {
+  values: readonly T[];
+  active: T;
+  onValueChange: (value: T) => void;
+}) {
   return (
-    <p className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
-      {values.map((value, index) => (
-        <React.Fragment key={value}>
-          {index > 0 && <span className="px-2 text-neutral-400">|</span>}
-          <span>{value}</span>
-        </React.Fragment>
+    <div className="inline-flex min-h-8 max-w-full items-center gap-1 rounded-lg bg-neutral-100 p-0.5 text-sm text-neutral-500 dark:bg-white/10 dark:text-neutral-400">
+      {values.map((value) => (
+        <button
+          key={value}
+          type="button"
+          aria-pressed={value === active}
+          onClick={() => onValueChange(value)}
+          className={[
+            "inline-flex h-7 min-w-8 items-center justify-center rounded-md px-2.5 font-medium transition-colors",
+            value === active
+              ? "bg-white text-neutral-950 shadow-sm dark:bg-white dark:text-neutral-950"
+              : "hover:text-neutral-950 dark:hover:text-white",
+          ].join(" ")}
+        >
+          {value}
+        </button>
       ))}
-    </p>
+    </div>
   );
 }
 
-function SegmentedControl<T extends string>({
+function ColorSwatchControl<T extends string>({
   values,
   active,
   dots,
@@ -1210,37 +1660,86 @@ function SegmentedControl<T extends string>({
 }: {
   values: readonly T[];
   active: T;
-  dots?: Partial<Record<T, string>>;
+  dots: Partial<Record<T, string>>;
   onValueChange: (value: T) => void;
 }) {
   return (
-    <div className="inline-flex min-h-9 max-w-full items-center gap-1 rounded-lg bg-neutral-100 p-1 text-sm text-neutral-500 dark:bg-white/10 dark:text-neutral-400">
+    <div className="inline-flex min-h-8 items-center gap-1 rounded-lg bg-neutral-100 p-0.5 dark:bg-white/10">
       {values.map((value) => (
         <button
           key={value}
           type="button"
-          aria-label={dots ? value : undefined}
+          aria-label={value}
           aria-pressed={value === active}
           onClick={() => onValueChange(value)}
           className={[
-            "inline-flex h-7 min-w-8 items-center justify-center rounded-md px-3 font-medium transition-colors",
+            "inline-flex size-7 items-center justify-center rounded-md transition-colors",
             value === active
-              ? "bg-white text-neutral-950 shadow-sm dark:bg-white dark:text-neutral-950"
-              : "hover:text-neutral-950 dark:hover:text-white",
-            dots ? "px-2" : "",
+              ? "bg-white shadow-sm dark:bg-white"
+              : "hover:bg-white/70 dark:hover:bg-white/10",
           ].join(" ")}
         >
-          {dots?.[value] ? (
-            <span
-              className={`size-2 rounded-full ${dots[value]}`}
-              aria-hidden="true"
-            />
-          ) : (
-            value
-          )}
+          <span
+            className={`size-2.5 rounded-full ${dots[value]}`}
+            aria-hidden="true"
+          />
         </button>
       ))}
     </div>
+  );
+}
+
+function ControlSelect<T extends string>({
+  label,
+  values,
+  active,
+  onValueChange,
+}: {
+  label: string;
+  values: readonly T[];
+  active: T;
+  onValueChange: (value: T) => void;
+}) {
+  const items = React.useMemo(
+    () => values.map((value) => ({ label: value, value })),
+    [values],
+  );
+
+  return (
+    <SelectRoot
+      value={active}
+      onValueChange={(nextValue) => {
+        if (nextValue) {
+          onValueChange(nextValue as T);
+        }
+      }}
+      items={items}
+      size="small"
+      shape="square"
+      sound={false}
+    >
+      <SelectTrigger
+        aria-label={`Select ${label}`}
+        className="w-36"
+        valueClassName="font-medium"
+        variant="soft"
+      />
+      <SelectPortal>
+        <SelectPositioner align="end">
+          <SelectPopup className="min-w-36">
+            <SelectScrollUpArrow />
+            <SelectList>
+              {items.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectList>
+            <SelectScrollDownArrow />
+          </SelectPopup>
+        </SelectPositioner>
+      </SelectPortal>
+    </SelectRoot>
   );
 }
 
@@ -1257,18 +1756,32 @@ function OptionRow<T extends string>({
   dots?: Partial<Record<T, string>>;
   onValueChange: (value: T) => void;
 }) {
+  const control = dots ? (
+    <ColorSwatchControl
+      values={values}
+      active={active}
+      dots={dots}
+      onValueChange={onValueChange}
+    />
+  ) : values.length > 3 ? (
+    <ControlSelect
+      label={label}
+      values={values}
+      active={active}
+      onValueChange={onValueChange}
+    />
+  ) : (
+    <SegmentedControl
+      values={values}
+      active={active}
+      onValueChange={onValueChange}
+    />
+  );
+
   return (
-    <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">{label}</h2>
-        <ValueList values={values} />
-      </div>
-      <SegmentedControl
-        values={values}
-        active={active}
-        dots={dots}
-        onValueChange={onValueChange}
-      />
+    <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
+      <h2 className="min-w-0 text-sm font-medium text-foreground">{label}</h2>
+      {control}
     </div>
   );
 }
@@ -1285,12 +1798,14 @@ function BooleanOptionRow({
   typeLabel?: string;
 }) {
   return (
-    <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">{label}</h2>
-        <p className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
-          {typeLabel}
-        </p>
+    <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
+      <div className="min-w-0">
+        <h2 className="text-sm font-medium text-foreground">{label}</h2>
+        {typeLabel !== "boolean" && (
+          <p className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
+            {typeLabel}
+          </p>
+        )}
       </div>
       <Switch
         checked={checked}
@@ -1298,134 +1813,9 @@ function BooleanOptionRow({
         aria-label={`Toggle ${label}`}
         color="accent"
         shape="square"
-        size="medium"
+        size="small"
         variant="solid"
       />
-    </div>
-  );
-}
-
-function ShowcaseButton(props: React.ComponentProps<typeof Button>) {
-  return <Button type="button" {...props} />;
-}
-
-function ButtonShortcutSuffix({
-  color,
-  variant,
-}: {
-  color: ButtonColor;
-  variant: ButtonVariant;
-}) {
-  const keyClassName = [
-    "inline-flex size-5 items-center justify-center rounded-md text-xs leading-none",
-    variant === "solid"
-      ? solidButtonShortcutSuffixBackgrounds[color]
-      : buttonShortcutSuffixBackgrounds[color],
-  ].join(" ");
-
-  return (
-    <span className="inline-flex items-center gap-0.5">
-      <span className={keyClassName}>⌘</span>
-      <span className={keyClassName}>K</span>
-    </span>
-  );
-}
-
-function ButtonShowcaseRow({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid w-max grid-cols-5 items-center gap-x-4 gap-y-3">
-      {children}
-    </div>
-  );
-}
-
-function ButtonColorShowcase({ color }: { color: ButtonColor }) {
-  const { ref: showcaseScrollRef, overflow } =
-    useScrollOverflow<HTMLDivElement>();
-
-  return (
-    <section className="relative border-t border-neutral-200 pt-8 first:border-t-0 first:pt-0 dark:border-white/15">
-      <div ref={showcaseScrollRef} className="overflow-x-auto">
-        <div className="grid w-max gap-4">
-          {buttonOptions.shape.map((shape) => (
-            <React.Fragment key={`${color}-${shape}`}>
-              {buttonOptions.variant.map((variant) => (
-                <ButtonShowcaseRow key={`${color}-${shape}-${variant}-compose`}>
-                  {buttonOptions.size.map((size) => (
-                    <ShowcaseButton
-                      key={`${color}-${shape}-${variant}-${size}-compose`}
-                      variant={variant}
-                      color={color}
-                      size={size}
-                      shape={shape}
-                    >
-                      Compose
-                    </ShowcaseButton>
-                  ))}
-                </ButtonShowcaseRow>
-              ))}
-
-              <div className="h-3" />
-
-              {buttonOptions.variant.map((variant) => (
-                <ButtonShowcaseRow key={`${color}-${shape}-${variant}-search`}>
-                  {buttonOptions.size.map((size) => (
-                    <ShowcaseButton
-                      key={`${color}-${shape}-${variant}-${size}-search`}
-                      variant={variant}
-                      color={color}
-                      size={size}
-                      shape={shape}
-                      prefix={<MagnifyingGlassIcon />}
-                      suffix={<PlusCircleIcon />}
-                    >
-                      Search
-                    </ShowcaseButton>
-                  ))}
-                </ButtonShowcaseRow>
-              ))}
-
-              <div className="h-3" />
-
-              {buttonOptions.variant.map((variant) => (
-                <ButtonShowcaseRow
-                  key={`${color}-${shape}-${variant}-shortcut`}
-                >
-                  {buttonOptions.size.map((size) => (
-                    <ShowcaseButton
-                      key={`${color}-${shape}-${variant}-${size}-shortcut`}
-                      variant={variant}
-                      color={color}
-                      size={size}
-                      shape={shape}
-                      prefix={<MagnifyingGlassIcon />}
-                      suffix={
-                        <ButtonShortcutSuffix color={color} variant={variant} />
-                      }
-                    >
-                      Search
-                    </ShowcaseButton>
-                  ))}
-                </ButtonShowcaseRow>
-              ))}
-
-              {shape === "square" && <div className="h-6" />}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-      <ProgressiveOverflowFade edge="left" visible={overflow.left} />
-      <ProgressiveOverflowFade edge="right" visible={overflow.right} />
-    </section>
-  );
-}
-
-function ButtonVariationShowcase() {
-  return (
-    <div className="mt-4 grid gap-10 border-t border-neutral-200 pt-10 dark:border-white/15">
-      {buttonOptions.color.map((color) => (
-        <ButtonColorShowcase key={color} color={color} />
-      ))}
     </div>
   );
 }
@@ -1439,194 +1829,12 @@ function ImportExample({
   const usageExample = componentUsageExamples[activeComponent];
 
   return (
-    <div className="mb-12 grid gap-2 ">
-      <div className="text-sm font-medium text-foreground">Usage</div>
+    <div className="grid gap-2">
       <Snippet code={importCommand} copyable={false} language="tsx" />
       <Snippet code={usageExample} language="tsx" showHeader={false} />
     </div>
   );
 }
-
-const soundProviderRootExample = `
-import { SoundProvider } from "@/components/aspekt/sound-provider";
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>
-        <SoundProvider enabled variant="pop" volume={0.8}>
-          {children}
-        </SoundProvider>
-      </body>
-    </html>
-  );
-}
-`;
-
-const useSoundExample = `
-import { useSound } from "@/components/aspekt/sound-provider";
-
-export function SoundSettings() {
-  const variants = ["soft", "click", "snap", "pop", "thock"] as const;
-  const { enabled, setEnabled, variant, setVariant, volume, setVolume, play } =
-    useSound();
-
-  return (
-    <div>
-      <button onClick={() => setEnabled(!enabled)}>
-        {enabled ? "Disable" : "Enable"} sound
-      </button>
-      <input
-        min={0}
-        max={1}
-        step={0.05}
-        type="range"
-        value={volume}
-        onChange={(event) => setVolume(Number(event.currentTarget.value))}
-      />
-      <button
-        onClick={() => {
-          const index = variants.indexOf(variant);
-          setVariant(variants[(index + 1) % variants.length]);
-        }}
-      >
-        Use next sound variant
-      </button>
-      <button onClick={() => play("success")}>Preview</button>
-    </div>
-  );
-}
-`;
-
-const dialogExample = `
-import { Button } from "@/components/aspekt/button";
-import {
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/aspekt/dialog";
-
-export function ExampleDialog() {
-  return (
-    <DialogRoot shape="round">
-      <DialogTrigger>Open dialog</DialogTrigger>
-      <DialogPortal>
-        <DialogOverlay />
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Publish component</DialogTitle>
-            <DialogDescription>
-              This will make the latest component changes available to your app.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose>Cancel</DialogClose>
-            <Button color="neutral">Publish</Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
-    </DialogRoot>
-  );
-}
-`;
-
-const drawerExample = `
-import { Button } from "@/components/aspekt/button";
-import {
-  DrawerBody,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerPortal,
-  DrawerRoot,
-  DrawerTitle,
-  DrawerTrigger,
-  DrawerViewport,
-} from "@/components/aspekt/drawer";
-
-export function ExampleDrawer() {
-  return (
-    <DrawerRoot backdrop={false} detached shape="round" side="right">
-      <DrawerTrigger>Open drawer</DrawerTrigger>
-      <DrawerPortal>
-        <DrawerOverlay />
-        <DrawerViewport>
-          <DrawerContent>
-            <DrawerBody>
-              <DrawerHeader>
-                <DrawerTitle>Component details</DrawerTitle>
-                <DrawerDescription>
-                  Review component details before saving changes.
-                </DrawerDescription>
-              </DrawerHeader>
-              <DrawerFooter>
-                <DrawerClose>Cancel</DrawerClose>
-                <Button color="neutral">Save</Button>
-              </DrawerFooter>
-            </DrawerBody>
-          </DrawerContent>
-        </DrawerViewport>
-      </DrawerPortal>
-    </DrawerRoot>
-  );
-}
-`;
-
-const popoverExample = `
-import { Button } from "@/components/aspekt/button";
-import {
-  PopoverArrow,
-  PopoverClose,
-  PopoverDescription,
-  PopoverFooter,
-  PopoverHeader,
-  PopoverPopup,
-  PopoverPortal,
-  PopoverPositioner,
-  PopoverRoot,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@/components/aspekt/popover";
-
-export function ExamplePopover() {
-  return (
-    <PopoverRoot shape="round">
-      <PopoverTrigger>Open popover</PopoverTrigger>
-      <PopoverPortal>
-        <PopoverPositioner side="bottom">
-          <PopoverPopup>
-            <PopoverArrow />
-            <PopoverHeader>
-              <PopoverTitle>Publish target</PopoverTitle>
-              <PopoverDescription>
-                Review the npm package before publishing.
-              </PopoverDescription>
-            </PopoverHeader>
-            <PopoverFooter>
-              <PopoverClose>Cancel</PopoverClose>
-              <Button color="neutral">Publish</Button>
-            </PopoverFooter>
-          </PopoverPopup>
-        </PopoverPositioner>
-      </PopoverPortal>
-    </PopoverRoot>
-  );
-}
-`;
 
 function isComponentPreview(value: string): value is ComponentPreview {
   return (componentIds as readonly string[]).includes(value);
@@ -1644,49 +1852,78 @@ function getDocsPageCopy(page: DocsPage) {
   return isComponentPreview(page) ? componentCopy[page] : introCopy[page];
 }
 
+function getPathForPage(page: DocsPage) {
+  return page === "getting-started" ? "/" : `/${page}`;
+}
+
+function getPageFromLocation() {
+  const pathname = window.location.pathname.replace(/^\/+|\/+$/g, "");
+
+  if (!pathname) return "getting-started";
+  if (isDocsPage(pathname)) return pathname;
+
+  const hash = window.location.hash.slice(1);
+  if (hash === "purpose") return "getting-started";
+  if (isDocsPage(hash)) return hash;
+
+  return null;
+}
+
+type NavigationGroup = {
+  title: string;
+  items: readonly { label: string; page: DocsPage }[];
+};
+
+function getFilteredNavGroups(query: string): NavigationGroup[] {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) return [...navGroups];
+
+  return navGroups
+    .map((group) => {
+      const groupMatches = group.title.toLowerCase().includes(normalizedQuery);
+      const items = group.items.filter((item) => {
+        const copy = getDocsPageCopy(item.page);
+
+        return (
+          groupMatches ||
+          item.label.toLowerCase().includes(normalizedQuery) ||
+          copy.title.toLowerCase().includes(normalizedQuery) ||
+          copy.description.toLowerCase().includes(normalizedQuery)
+        );
+      });
+
+      return { title: group.title, items };
+    })
+    .filter((group) => group.items.length > 0);
+}
+
 function SoundProviderControls() {
   const { enabled, variant, volume, setEnabled, setVariant, setVolume, play } =
     useSound();
 
   return (
     <div className="grid w-full max-w-md gap-6 px-6">
-      <div className="grid gap-3">
-        <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-3 dark:border-white/15">
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">enabled</h2>
-            <p className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
-              {String(enabled)}
-            </p>
-          </div>
-          <Switch
-            checked={enabled}
-            onCheckedChange={setEnabled}
-            aria-label="Toggle interaction sound"
-            color="accent"
-            shape="square"
-            size="small"
-            variant="soft"
-          />
-        </div>
+      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+        <BooleanOptionRow
+          label="enabled"
+          checked={enabled}
+          onCheckedChange={setEnabled}
+        />
 
-        <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-3 dark:border-white/15">
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">variant</h2>
-            <ValueList values={soundVariantOptions} />
-          </div>
-          <SegmentedControl
-            values={soundVariantOptions}
-            active={variant}
-            onValueChange={setVariant}
-          />
-        </div>
+        <OptionRow
+          label="variant"
+          values={soundVariantOptions}
+          active={variant}
+          onValueChange={setVariant}
+        />
 
-        <label className="grid gap-3 border-b border-neutral-200 pb-4 dark:border-white/15">
-          <span>
-            <span className="block text-sm font-semibold text-foreground">
+        <label className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
+          <span className="min-w-0">
+            <span className="block text-sm font-medium text-foreground">
               volume
             </span>
-            <span className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
+            <span className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
               {volume.toFixed(2)}
             </span>
           </span>
@@ -1697,7 +1934,7 @@ function SoundProviderControls() {
             step="0.05"
             value={volume}
             onChange={(event) => setVolume(Number(event.currentTarget.value))}
-            className="h-2 w-full cursor-pointer accent-orange-600"
+            className="h-2 w-36 cursor-pointer accent-orange-600"
           />
         </label>
       </div>
@@ -2060,40 +2297,6 @@ function SoundProviderPreview() {
   );
 }
 
-function SoundProviderDocumentation() {
-  return (
-    <div className="grid gap-10">
-      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
-        <h2 className="text-sm font-semibold text-foreground">optional</h2>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Aspekt UI sounds are enabled by default and components can play them
-          without a provider. Add SoundProvider when you want one global place
-          to disable sound, choose a sound variant, tune volume, or trigger
-          sounds from your own UI.
-        </p>
-      </section>
-
-      <section className="grid gap-3">
-        <h2 className="text-sm font-semibold text-foreground">wrap your app</h2>
-        <Snippet
-          code={soundProviderRootExample.trim()}
-          filename="app/layout.tsx"
-          language="tsx"
-        />
-      </section>
-
-      <section className="grid gap-3">
-        <h2 className="text-sm font-semibold text-foreground">useSound</h2>
-        <Snippet
-          code={useSoundExample.trim()}
-          filename="sound-settings.tsx"
-          language="tsx"
-        />
-      </section>
-    </div>
-  );
-}
-
 function DialogPreview({ settings }: { settings: DialogSettings }) {
   return (
     <DialogRoot shape={settings.shape}>
@@ -2242,6 +2445,83 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
   );
 }
 
+const tabsPreviewPanels = {
+  overview: {
+    title: "Overview",
+    body: "Tabs keep dense product surfaces scan-friendly by separating related content into predictable panels.",
+  },
+  usage: {
+    title: "Usage",
+    body: "Use a matching value on every tab and panel. Keyboard focus and ARIA relationships are handled by Base UI.",
+  },
+  api: {
+    title: "API",
+    body: "Control the visual language with variant, color, size, shape, orientation, and the optional active indicator.",
+  },
+} as const;
+
+function TabsPreview({ settings }: { settings: TabsSettings }) {
+  return (
+    <div className="w-full max-w-2xl px-6">
+      <TabsRoot
+        defaultValue="overview"
+        variant={settings.variant}
+        color={settings.color}
+        size={settings.size}
+        shape={settings.shape}
+        orientation={settings.orientation}
+        className={
+          settings.orientation === "vertical"
+            ? "min-h-48 grid-cols-[minmax(7rem,auto)_minmax(0,1fr)]"
+            : ""
+        }
+      >
+        <TabsList activateOnFocus={settings.activateOnFocus}>
+          <TabsTab value="overview" prefix={<StackIcon />}>
+            Overview
+          </TabsTab>
+          <TabsTab value="usage">Usage</TabsTab>
+          <TabsTab value="api">API</TabsTab>
+          {settings.indicator && <TabsIndicator />}
+        </TabsList>
+        {Object.entries(tabsPreviewPanels).map(([value, panel]) => (
+          <TabsPanel key={value} value={value}>
+            <div className="grid gap-2">
+              <h2 className="text-sm font-semibold text-foreground">
+                {panel.title}
+              </h2>
+              <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+                {panel.body}
+              </p>
+            </div>
+          </TabsPanel>
+        ))}
+      </TabsRoot>
+    </div>
+  );
+}
+
+function TablePreview({ settings }: { settings: TableSettings }) {
+  return (
+    <div className="w-full px-6">
+      <Table
+        caption="Recent invoices"
+        columns={tablePreviewColumns}
+        data={tablePreviewData}
+        defaultSorting={[{ id: "total", desc: true }]}
+        hoverable={settings.hoverable}
+        shape={settings.shape}
+        showColumnBorders={settings.showColumnBorders}
+        size={settings.size}
+        sortable={settings.sortable}
+        stickyHeader={settings.stickyHeader}
+        striped={settings.striped}
+        variant={settings.variant}
+      />
+    </div>
+  );
+}
+
 function SnippetPreview({ settings }: { settings: SnippetSettings }) {
   const example = snippetExamples[settings.language];
 
@@ -2258,129 +2538,6 @@ function SnippetPreview({ settings }: { settings: SnippetSettings }) {
         variant={settings.variant}
         wrap={settings.wrap}
       />
-    </div>
-  );
-}
-
-function DialogDocumentation() {
-  return (
-    <div className="grid gap-10">
-      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
-        <h2 className="text-sm font-semibold text-foreground">
-          base ui primitive
-        </h2>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Dialog is built on Base UI primitives and styled for Aspekt. It
-          includes portal rendering, backdrop dismissal, escape key dismissal,
-          focus management, and the same default interaction sound model as the
-          rest of Aspekt UI.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          DialogTrigger and DialogClose compose Aspekt Button, so button
-          variants, colors, sizes, loading state, affixes, and sound overrides
-          stay consistent with the rest of the library.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Pass shape to DialogRoot to control the dialog surface, DialogTrigger,
-          DialogClose, and Aspekt Buttons rendered inside the dialog. Individual
-          children can still override shape directly.
-        </p>
-      </section>
-
-      <section className="grid gap-3">
-        <h2 className="text-sm font-semibold text-foreground">usage</h2>
-        <Snippet
-          code={dialogExample.trim()}
-          filename="example-dialog.tsx"
-          language="tsx"
-        />
-      </section>
-    </div>
-  );
-}
-
-function DrawerDocumentation() {
-  return (
-    <div className="grid gap-10">
-      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
-        <h2 className="text-sm font-semibold text-foreground">
-          base ui primitive
-        </h2>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Drawer is built on Base UI primitives and styled for Aspekt. It
-          includes portal rendering, backdrop dismissal, escape key dismissal,
-          focus management, swipe-to-dismiss gestures, and the same interaction
-          sound model as the rest of Aspekt UI.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          DrawerViewport wraps the moving panel so Base UI can manage swipe
-          movement and touch scroll locking. DrawerBody maps to Base UI
-          Drawer.Content for selectable and scrollable drawer content.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Pass side, backdrop, detached, shape, and size to control the drawer
-          edge, dimming, spacing, and surface. DrawerTrigger and DrawerClose
-          compose Aspekt Button, so variants, sizes, loading state, affixes, and
-          sound overrides stay consistent.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Keep DrawerOverlay in the portal when you want outside-click
-          dismissal. Setting backdrop to false keeps that layer transparent
-          instead of rendering the dark dim.
-        </p>
-      </section>
-
-      <section className="grid gap-3">
-        <h2 className="text-sm font-semibold text-foreground">usage</h2>
-        <Snippet
-          code={drawerExample.trim()}
-          filename="example-drawer.tsx"
-          language="tsx"
-        />
-      </section>
-    </div>
-  );
-}
-
-function PopoverDocumentation() {
-  return (
-    <div className="grid gap-10">
-      <section className="grid gap-3 border-t border-neutral-200 pt-8 dark:border-white/15">
-        <h2 className="text-sm font-semibold text-foreground">
-          base ui primitive
-        </h2>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Popover is built on Base UI primitives and styled for Aspekt. It
-          includes anchored positioning, portal rendering, outside interaction
-          dismissal, escape key dismissal, optional modal behavior, and the same
-          interaction sound model as the rest of Aspekt UI.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          PopoverTrigger and PopoverClose compose Aspekt Button, so button
-          variants, colors, sizes, loading state, affixes, and sound overrides
-          stay consistent with Dialog, Drawer, and other actions.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Use PopoverPositioner for side, alignment, collision, and offset
-          behavior. PopoverPopup controls the surface size and shape, and
-          PopoverArrow can be included when the anchor relationship should be
-          explicit.
-        </p>
-        <p className="max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Set modal when the content needs focus trapping and outside pointer
-          blocking. In modal mode, include PopoverClose inside PopoverPopup so
-          keyboard and touch screen reader users have a clear escape path.
-        </p>
-      </section>
-
-      <section className="grid gap-3">
-        <h2 className="text-sm font-semibold text-foreground">usage</h2>
-        <Snippet
-          code={popoverExample.trim()}
-          filename="example-popover.tsx"
-          language="tsx"
-        />
-      </section>
     </div>
   );
 }
@@ -2451,10 +2608,10 @@ const principles = [
   {
     title: "Sound as feedback",
     body: [
-      "Sound is a first-class part of Aspekt, not an extra layer added at the end.",
-      "Aspekt components include sound feedback by default because interactions should be felt as well as seen. Presses, toggles, success states, errors, and state changes can all become clearer when they have a short, intentional audio cue.",
-      "Sound can be disabled, adjusted globally with SoundProvider, or tuned with different sound variants and volume. Components also support fine-grained sound control when a specific interaction needs different behavior.",
-      "Global control belongs in SoundProvider. Local control belongs on the component. Both should feel easy.",
+      "Sound is a first-class opt-in layer in Aspekt, not an accidental side effect.",
+      "Aspekt components can include sound feedback because interactions can be felt as well as seen. Presses, toggles, success states, errors, and state changes can all become clearer when they have a short, intentional audio cue.",
+      "Sound is silent until an app is wrapped in SoundProvider. Once enabled, it can be disabled globally, tuned with different sound variants and volume, or overridden per component when a specific interaction needs different behavior.",
+      "Global opt-in and control belong in SoundProvider. Local control belongs on the component. Both should feel easy.",
     ],
   },
   {
@@ -2503,11 +2660,7 @@ function GettingStartedDocumentation() {
           Run the CLI in a React and Tailwind project. It adds the Aspekt theme
           tokens and prepares your project for copied source components.
         </Text>
-        <Snippet
-          className="max-w-3xl"
-          code="npx @aspekt/ui init"
-          language="bash"
-        />
+        <Snippet className="max-w-3xl" tabs={initCommandTabs} />
       </section>
 
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
@@ -2518,11 +2671,7 @@ function GettingStartedDocumentation() {
           Add only the components you need. The CLI copies the component source
           into your project so you can edit it directly.
         </Text>
-        <Snippet
-          className="max-w-3xl"
-          code="npx @aspekt/ui add button"
-          language="bash"
-        />
+        <Snippet className="max-w-3xl" tabs={addButtonCommandTabs} />
       </section>
 
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
@@ -2577,12 +2726,12 @@ export function SaveButton() {
 
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
         <Heading level={2} size="h5" className="max-w-3xl">
-          Add global sound control when you need it
+          Opt into sound feedback
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Aspekt sound feedback is enabled by default. Add SoundProvider when
-          you want one global place to disable sound, change the sound variant,
-          or tune the volume across your app.
+          Aspekt stays silent unless you opt in. Add SoundProvider when you want
+          components to play sound, disable sound globally, change the sound
+          variant, or tune the volume across your app.
         </Text>
         <Snippet
           className="max-w-3xl"
@@ -2605,9 +2754,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           Override sound per component
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Use global settings for broad behavior, then override individual
-          components when a specific interaction needs to be quieter, louder, or
-          semantically different.
+          After SoundProvider is mounted, use global settings for broad
+          behavior, then override individual components when a specific
+          interaction needs to be quieter, louder, or semantically different.
         </Text>
         <Snippet
           className="max-w-3xl"
@@ -2616,7 +2765,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 export function Actions() {
   return (
     <div>
-      <Button sound="success">Publish</Button>
+      <Button status="success" sound="success">
+        Publish
+      </Button>
       <Button sound={false} variant="outline">
         Quiet action
       </Button>
@@ -2690,7 +2841,7 @@ function IntroDocumentation({ activePage }: { activePage: IntroPage }) {
   );
 }
 
-export default function Home() {
+export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [buttonSettings, setButtonSettings] = React.useState<ButtonSettings>(
     defaultButtonSettings,
   );
@@ -2719,6 +2870,10 @@ export default function Home() {
   const [popoverSettings, setPopoverSettings] = React.useState<PopoverSettings>(
     defaultPopoverSettings,
   );
+  const [tabsSettings, setTabsSettings] =
+    React.useState<TabsSettings>(defaultTabsSettings);
+  const [tableSettings, setTableSettings] =
+    React.useState<TableSettings>(defaultTableSettings);
   const [snippetSettings, setSnippetSettings] = React.useState<SnippetSettings>(
     defaultSnippetSettings,
   );
@@ -2740,8 +2895,9 @@ export default function Home() {
   const [inputValue, setInputValue] = React.useState("Search components");
   const [selectValue, setSelectValue] =
     React.useState<SelectPreviewValue>("react");
-  const [activePage, setActivePage] =
-    React.useState<DocsPage>("getting-started");
+  const [activePage, setActivePage] = React.useState<DocsPage>(initialPage);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mobileMenuSearch, setMobileMenuSearch] = React.useState("");
   const fakeLoadingTimeoutRef = React.useRef<number | null>(null);
   const { ref: previewScrollRef, overflow: previewOverflow } =
     useScrollOverflow<HTMLElement>();
@@ -2758,31 +2914,54 @@ export default function Home() {
   }, []);
 
   React.useEffect(() => {
-    function syncPageFromHash() {
-      const hash = window.location.hash.slice(1);
+    function syncPageFromLocation() {
+      const nextPage = getPageFromLocation();
 
-      if (hash === "purpose") {
-        setActivePage("getting-started");
-        window.history.replaceState(null, "", "#getting-started");
-        return;
+      if (nextPage) {
+        setActivePage(nextPage);
       }
 
-      if (isDocsPage(hash)) {
-        setActivePage(hash);
+      if (window.location.hash) {
+        const canonicalPage = nextPage ?? initialPage;
+        window.history.replaceState(null, "", getPathForPage(canonicalPage));
+        return;
       }
     }
 
-    syncPageFromHash();
-    window.addEventListener("hashchange", syncPageFromHash);
+    syncPageFromLocation();
+    window.addEventListener("popstate", syncPageFromLocation);
 
     return () => {
-      window.removeEventListener("hashchange", syncPageFromHash);
+      window.removeEventListener("popstate", syncPageFromLocation);
     };
-  }, []);
+  }, [initialPage]);
+
+  React.useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const desktopMediaQuery = window.matchMedia("(min-width: 1024px)");
+
+    function closeMenuOnDesktop(event: MediaQueryListEvent) {
+      if (event.matches) {
+        setMobileMenuOpen(false);
+      }
+    }
+
+    desktopMediaQuery.addEventListener("change", closeMenuOnDesktop);
+
+    return () => {
+      desktopMediaQuery.removeEventListener("change", closeMenuOnDesktop);
+    };
+  }, [mobileMenuOpen]);
 
   function navigateToPage(page: DocsPage) {
     setActivePage(page);
-    window.history.replaceState(null, "", `#${page}`);
+    window.history.pushState(null, "", getPathForPage(page));
+  }
+
+  function navigateToMobilePage(page: DocsPage) {
+    navigateToPage(page);
+    setMobileMenuOpen(false);
   }
 
   function setButtonLoading(loading: boolean) {
@@ -2795,7 +2974,11 @@ export default function Home() {
   }
 
   function triggerFakeLoading() {
-    setButtonSettings((settings) => ({ ...settings, loading: true }));
+    setButtonSettings((settings) => ({
+      ...settings,
+      loading: true,
+      status: "none",
+    }));
 
     if (fakeLoadingTimeoutRef.current) {
       window.clearTimeout(fakeLoadingTimeoutRef.current);
@@ -2803,19 +2986,33 @@ export default function Home() {
 
     fakeLoadingTimeoutRef.current = window.setTimeout(() => {
       fakeLoadingTimeoutRef.current = null;
-      setButtonSettings((settings) => ({ ...settings, loading: false }));
+      setButtonSettings((settings) => ({
+        ...settings,
+        loading: false,
+        status: "fail",
+      }));
     }, 2000);
   }
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <div className="mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)]">
+      <MobileNavbar onMenuOpen={() => setMobileMenuOpen(true)} />
+      <MobileMenu
+        activePage={activePage}
+        open={mobileMenuOpen}
+        query={mobileMenuSearch}
+        onClose={() => setMobileMenuOpen(false)}
+        onPageChange={navigateToMobilePage}
+        onQueryChange={setMobileMenuSearch}
+      />
+
+      <div className="mx-auto grid min-h-screen w-full max-w-6xl grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)]">
         <Sidebar activePage={activePage} onPageChange={navigateToPage} />
 
         <div className="relative min-w-0 overflow-hidden lg:h-screen">
           <section
             ref={previewScrollRef}
-            className="flex min-h-0 min-w-0 flex-col overflow-x-hidden px-6 pb-16 pt-4 sm:px-10 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-18"
+            className="flex min-h-0 min-w-0 flex-col overflow-x-hidden px-6 pb-16 pt-10 sm:px-10 sm:pt-12 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-18"
           >
             <div className="mb-14 ">
               <p className="max-w-xl text-lg text-neutral-500 dark:text-neutral-400">
@@ -2826,25 +3023,55 @@ export default function Home() {
 
             {activeComponent ? (
               <>
-                <div className="relative mb-12 flex min-h-80 items-center justify-center overflow-hidden rounded-lg bg-neutral-50 dark:bg-neutral-900/70 sm:min-h-96 lg:min-h-[30rem]">
+                <div className="relative mb-12 flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-neutral-50 dark:bg-neutral-900/70 sm:min-h-80 lg:min-h-80">
                   {activeComponent === "button" ? (
-                    <Button
-                      variant={buttonSettings.variant}
-                      color={buttonSettings.color}
-                      size={buttonSettings.size}
-                      shape={buttonSettings.shape}
-                      prefix={
-                        buttonSettings.prefix ? <PlusCircleIcon /> : undefined
-                      }
-                      suffix={
-                        buttonSettings.suffix ? <ArrowRightIcon /> : undefined
-                      }
-                      loading={buttonSettings.loading}
-                      disabled={buttonSettings.disabled}
-                      onClick={triggerFakeLoading}
-                    >
-                      Click me
-                    </Button>
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                      <Button
+                        variant={buttonSettings.variant}
+                        color={buttonSettings.color}
+                        size={buttonSettings.size}
+                        shape={buttonSettings.shape}
+                        prefix={
+                          buttonSettings.prefix ? <PlusCircleIcon /> : undefined
+                        }
+                        suffix={
+                          buttonSettings.suffix ? <ArrowRightIcon /> : undefined
+                        }
+                        disabled={buttonSettings.disabled}
+                      >
+                        Default button
+                      </Button>
+
+                      <Button
+                        variant={buttonSettings.variant}
+                        color={buttonSettings.color}
+                        size={buttonSettings.size}
+                        shape={buttonSettings.shape}
+                        prefix={
+                          buttonSettings.prefix ? <PlusCircleIcon /> : undefined
+                        }
+                        suffix={
+                          buttonSettings.suffix ? <ArrowRightIcon /> : undefined
+                        }
+                        loading={buttonSettings.loading}
+                        status={
+                          buttonSettings.status === "none"
+                            ? null
+                            : buttonSettings.status
+                        }
+                        statusDuration={2400}
+                        onStatusClear={() =>
+                          setButtonSettings((settings) => ({
+                            ...settings,
+                            status: "none",
+                          }))
+                        }
+                        disabled={buttonSettings.disabled}
+                        onClick={triggerFakeLoading}
+                      >
+                        Simulate failure
+                      </Button>
+                    </div>
                   ) : activeComponent === "checkbox" ? (
                     <CheckboxPreview
                       settings={checkboxSettings}
@@ -2923,6 +3150,10 @@ export default function Home() {
                     <DrawerPreview settings={drawerSettings} />
                   ) : activeComponent === "popover" ? (
                     <PopoverPreview settings={popoverSettings} />
+                  ) : activeComponent === "tabs" ? (
+                    <TabsPreview settings={tabsSettings} />
+                  ) : activeComponent === "table" ? (
+                    <TablePreview settings={tableSettings} />
                   ) : activeComponent === "snippet" ? (
                     <SnippetPreview settings={snippetSettings} />
                   ) : activeComponent === "heading" ? (
@@ -2944,1003 +3175,1441 @@ export default function Home() {
                   )}
                 </div>
 
-                <ImportExample activeComponent={activeComponent} />
+                <TabsRoot
+                  defaultValue="usage"
+                  variant="line"
+                  color="neutral"
+                  className="mb-12"
+                >
+                  <TabsList>
+                    <TabsTab value="usage">Usage</TabsTab>
+                    {activeComponent !== "sound-provider" && (
+                      <TabsTab value="controls">Controls</TabsTab>
+                    )}
+                    <TabsIndicator />
+                  </TabsList>
+                  <TabsPanel value="usage">
+                    <ImportExample activeComponent={activeComponent} />
+                  </TabsPanel>
+                  {activeComponent !== "sound-provider" && (
+                    <TabsPanel value="controls">
+                      {activeComponent === "button" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={buttonOptions.variant}
+                            active={buttonSettings.variant}
+                            onValueChange={(variant) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={buttonOptions.size}
+                            active={buttonSettings.size}
+                            onValueChange={(size) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="color"
+                            values={buttonOptions.color}
+                            active={buttonSettings.color}
+                            dots={buttonColorDots}
+                            onValueChange={(color) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                color,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={buttonOptions.shape}
+                            active={buttonSettings.shape}
+                            onValueChange={(shape) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="prefix"
+                            checked={buttonSettings.prefix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(prefix) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                prefix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="suffix"
+                            checked={buttonSettings.suffix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(suffix) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                suffix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="loading"
+                            checked={buttonSettings.loading}
+                            onCheckedChange={setButtonLoading}
+                          />
+
+                          <OptionRow
+                            label="status"
+                            values={buttonOptions.status}
+                            active={buttonSettings.status}
+                            onValueChange={(status) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                status,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="disabled"
+                            checked={buttonSettings.disabled}
+                            onCheckedChange={(disabled) =>
+                              setButtonSettings((settings) => ({
+                                ...settings,
+                                disabled,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "checkbox" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={checkboxOptions.variant}
+                            active={checkboxSettings.variant}
+                            onValueChange={(variant) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={checkboxOptions.size}
+                            active={checkboxSettings.size}
+                            onValueChange={(size) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="color"
+                            values={checkboxOptions.color}
+                            active={checkboxSettings.color}
+                            dots={buttonColorDots}
+                            onValueChange={(color) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                color,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={checkboxOptions.shape}
+                            active={checkboxSettings.shape}
+                            onValueChange={(shape) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="checked"
+                            checked={checkboxSettings.checked}
+                            onCheckedChange={(checked) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                checked,
+                                indeterminate: false,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="indeterminate"
+                            checked={checkboxSettings.indeterminate}
+                            onCheckedChange={(indeterminate) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                indeterminate,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="invalid"
+                            checked={checkboxSettings.invalid}
+                            onCheckedChange={(invalid) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                invalid,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="disabled"
+                            checked={checkboxSettings.disabled}
+                            onCheckedChange={(disabled) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                disabled,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="readOnly"
+                            checked={checkboxSettings.readOnly}
+                            onCheckedChange={(readOnly) =>
+                              setCheckboxSettings((settings) => ({
+                                ...settings,
+                                readOnly,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "input" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={inputOptions.variant}
+                            active={inputSettings.variant}
+                            onValueChange={(variant) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={inputOptions.size}
+                            active={inputSettings.size}
+                            onValueChange={(size) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={inputOptions.shape}
+                            active={inputSettings.shape}
+                            onValueChange={(shape) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="prefix"
+                            checked={inputSettings.prefix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(prefix) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                prefix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="suffix"
+                            checked={inputSettings.suffix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(suffix) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                suffix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="loading"
+                            checked={inputSettings.loading}
+                            onCheckedChange={(loading) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                loading,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="invalid"
+                            checked={inputSettings.invalid}
+                            onCheckedChange={(invalid) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                invalid,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="clearable"
+                            checked={inputSettings.clearable}
+                            onCheckedChange={(clearable) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                clearable,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="disabled"
+                            checked={inputSettings.disabled}
+                            onCheckedChange={(disabled) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                disabled,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="readOnly"
+                            checked={inputSettings.readOnly}
+                            onCheckedChange={(readOnly) =>
+                              setInputSettings((settings) => ({
+                                ...settings,
+                                readOnly,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "select" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={selectOptions.variant}
+                            active={selectSettings.variant}
+                            onValueChange={(variant) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={selectOptions.size}
+                            active={selectSettings.size}
+                            onValueChange={(size) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={selectOptions.shape}
+                            active={selectSettings.shape}
+                            onValueChange={(shape) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="prefix"
+                            checked={selectSettings.prefix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(prefix) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                prefix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="suffix"
+                            checked={selectSettings.suffix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(suffix) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                suffix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="invalid"
+                            checked={selectSettings.invalid}
+                            onCheckedChange={(invalid) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                invalid,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="disabled"
+                            checked={selectSettings.disabled}
+                            onCheckedChange={(disabled) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                disabled,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="readOnly"
+                            checked={selectSettings.readOnly}
+                            onCheckedChange={(readOnly) =>
+                              setSelectSettings((settings) => ({
+                                ...settings,
+                                readOnly,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "switch" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={switchOptions.variant}
+                            active={switchSettings.variant}
+                            onValueChange={(variant) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={switchOptions.size}
+                            active={switchSettings.size}
+                            onValueChange={(size) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="color"
+                            values={switchOptions.color}
+                            active={switchSettings.color}
+                            dots={buttonColorDots}
+                            onValueChange={(color) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                color,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={switchOptions.shape}
+                            active={switchSettings.shape}
+                            onValueChange={(shape) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="checked"
+                            checked={switchSettings.checked}
+                            onCheckedChange={(checked) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                checked,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="invalid"
+                            checked={switchSettings.invalid}
+                            onCheckedChange={(invalid) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                invalid,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="disabled"
+                            checked={switchSettings.disabled}
+                            onCheckedChange={(disabled) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                disabled,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="readOnly"
+                            checked={switchSettings.readOnly}
+                            onCheckedChange={(readOnly) =>
+                              setSwitchSettings((settings) => ({
+                                ...settings,
+                                readOnly,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "slider" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={sliderOptions.variant}
+                            active={sliderSettings.variant}
+                            onValueChange={(variant) =>
+                              setSliderSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={sliderOptions.size}
+                            active={sliderSettings.size}
+                            onValueChange={(size) =>
+                              setSliderSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="color"
+                            values={sliderOptions.color}
+                            active={sliderSettings.color}
+                            dots={buttonColorDots}
+                            onValueChange={(color) =>
+                              setSliderSettings((settings) => ({
+                                ...settings,
+                                color,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={sliderOptions.shape}
+                            active={sliderSettings.shape}
+                            onValueChange={(shape) =>
+                              setSliderSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="showValue"
+                            checked={sliderSettings.showValue}
+                            onCheckedChange={(showValue) =>
+                              setSliderSettings((settings) => ({
+                                ...settings,
+                                showValue,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="invalid"
+                            checked={sliderSettings.invalid}
+                            onCheckedChange={(invalid) =>
+                              setSliderSettings((settings) => ({
+                                ...settings,
+                                invalid,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="disabled"
+                            checked={sliderSettings.disabled}
+                            onCheckedChange={(disabled) =>
+                              setSliderSettings((settings) => ({
+                                ...settings,
+                                disabled,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "toggle" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={toggleOptions.variant}
+                            active={toggleSettings.variant}
+                            onValueChange={(variant) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={toggleOptions.size}
+                            active={toggleSettings.size}
+                            onValueChange={(size) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="color"
+                            values={toggleOptions.color}
+                            active={toggleSettings.color}
+                            dots={buttonColorDots}
+                            onValueChange={(color) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                color,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={toggleOptions.shape}
+                            active={toggleSettings.shape}
+                            onValueChange={(shape) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="prefix"
+                            checked={toggleSettings.prefix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(prefix) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                prefix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="suffix"
+                            checked={toggleSettings.suffix}
+                            typeLabel="ReactNode"
+                            onCheckedChange={(suffix) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                suffix,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="pressed"
+                            checked={toggleSettings.pressed}
+                            onCheckedChange={(pressed) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                pressed,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="disabled"
+                            checked={toggleSettings.disabled}
+                            onCheckedChange={(disabled) =>
+                              setToggleSettings((settings) => ({
+                                ...settings,
+                                disabled,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "dialog" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="shape"
+                            values={dialogOptions.shape}
+                            active={dialogSettings.shape}
+                            onValueChange={(shape) =>
+                              setDialogSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={dialogOptions.size}
+                            active={dialogSettings.size}
+                            onValueChange={(size) =>
+                              setDialogSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "drawer" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="side"
+                            values={drawerOptions.side}
+                            active={drawerSettings.side}
+                            onValueChange={(side) =>
+                              setDrawerSettings((settings) => ({
+                                ...settings,
+                                side,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={drawerOptions.shape}
+                            active={drawerSettings.shape}
+                            onValueChange={(shape) =>
+                              setDrawerSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="backdrop"
+                            checked={drawerSettings.backdrop}
+                            onCheckedChange={(backdrop) =>
+                              setDrawerSettings((settings) => ({
+                                ...settings,
+                                backdrop,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="detached"
+                            checked={drawerSettings.detached}
+                            onCheckedChange={(detached) =>
+                              setDrawerSettings((settings) => ({
+                                ...settings,
+                                detached,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={drawerOptions.size}
+                            active={drawerSettings.size}
+                            onValueChange={(size) =>
+                              setDrawerSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "popover" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="side"
+                            values={popoverOptions.side}
+                            active={popoverSettings.side}
+                            onValueChange={(side) =>
+                              setPopoverSettings((settings) => ({
+                                ...settings,
+                                side,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={popoverOptions.shape}
+                            active={popoverSettings.shape}
+                            onValueChange={(shape) =>
+                              setPopoverSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="modal"
+                            checked={popoverSettings.modal}
+                            onCheckedChange={(modal) =>
+                              setPopoverSettings((settings) => ({
+                                ...settings,
+                                modal,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="arrow"
+                            checked={popoverSettings.arrow}
+                            onCheckedChange={(arrow) =>
+                              setPopoverSettings((settings) => ({
+                                ...settings,
+                                arrow,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={popoverOptions.size}
+                            active={popoverSettings.size}
+                            onValueChange={(size) =>
+                              setPopoverSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "tabs" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={tabsOptions.variant}
+                            active={tabsSettings.variant}
+                            onValueChange={(variant) =>
+                              setTabsSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={tabsOptions.size}
+                            active={tabsSettings.size}
+                            onValueChange={(size) =>
+                              setTabsSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="color"
+                            values={tabsOptions.color}
+                            active={tabsSettings.color}
+                            dots={buttonColorDots}
+                            onValueChange={(color) =>
+                              setTabsSettings((settings) => ({
+                                ...settings,
+                                color,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={tabsOptions.shape}
+                            active={tabsSettings.shape}
+                            onValueChange={(shape) =>
+                              setTabsSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="orientation"
+                            values={tabsOptions.orientation}
+                            active={tabsSettings.orientation}
+                            onValueChange={(orientation) =>
+                              setTabsSettings((settings) => ({
+                                ...settings,
+                                orientation,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="indicator"
+                            checked={tabsSettings.indicator}
+                            onCheckedChange={(indicator) =>
+                              setTabsSettings((settings) => ({
+                                ...settings,
+                                indicator,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="activateOnFocus"
+                            checked={tabsSettings.activateOnFocus}
+                            onCheckedChange={(activateOnFocus) =>
+                              setTabsSettings((settings) => ({
+                                ...settings,
+                                activateOnFocus,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "table" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={tableOptions.variant}
+                            active={tableSettings.variant}
+                            onValueChange={(variant) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={tableOptions.size}
+                            active={tableSettings.size}
+                            onValueChange={(size) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={tableOptions.shape}
+                            active={tableSettings.shape}
+                            onValueChange={(shape) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="striped"
+                            checked={tableSettings.striped}
+                            onCheckedChange={(striped) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                striped,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="hoverable"
+                            checked={tableSettings.hoverable}
+                            onCheckedChange={(hoverable) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                hoverable,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="sortable"
+                            checked={tableSettings.sortable}
+                            onCheckedChange={(sortable) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                sortable,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="stickyHeader"
+                            checked={tableSettings.stickyHeader}
+                            onCheckedChange={(stickyHeader) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                stickyHeader,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="showColumnBorders"
+                            checked={tableSettings.showColumnBorders}
+                            onCheckedChange={(showColumnBorders) =>
+                              setTableSettings((settings) => ({
+                                ...settings,
+                                showColumnBorders,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "snippet" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="language"
+                            values={snippetOptions.language}
+                            active={snippetSettings.language}
+                            onValueChange={(language) =>
+                              setSnippetSettings((settings) => ({
+                                ...settings,
+                                language,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="variant"
+                            values={snippetOptions.variant}
+                            active={snippetSettings.variant}
+                            onValueChange={(variant) =>
+                              setSnippetSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={snippetOptions.shape}
+                            active={snippetSettings.shape}
+                            onValueChange={(shape) =>
+                              setSnippetSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="filename"
+                            checked={snippetSettings.filename}
+                            onCheckedChange={(filename) =>
+                              setSnippetSettings((settings) => ({
+                                ...settings,
+                                filename,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="copyable"
+                            checked={snippetSettings.copyable}
+                            onCheckedChange={(copyable) =>
+                              setSnippetSettings((settings) => ({
+                                ...settings,
+                                copyable,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="showLineNumbers"
+                            checked={snippetSettings.showLineNumbers}
+                            onCheckedChange={(showLineNumbers) =>
+                              setSnippetSettings((settings) => ({
+                                ...settings,
+                                showLineNumbers,
+                              }))
+                            }
+                          />
+
+                          <BooleanOptionRow
+                            label="wrap"
+                            checked={snippetSettings.wrap}
+                            onCheckedChange={(wrap) =>
+                              setSnippetSettings((settings) => ({
+                                ...settings,
+                                wrap,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "heading" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="size"
+                            values={headingOptions.size}
+                            active={headingSettings.size}
+                            onValueChange={(size) =>
+                              setHeadingSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="tone"
+                            values={headingOptions.tone}
+                            active={headingSettings.tone}
+                            onValueChange={(tone) =>
+                              setHeadingSettings((settings) => ({
+                                ...settings,
+                                tone,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="level"
+                            values={headingOptions.level}
+                            active={headingSettings.level}
+                            onValueChange={(level) =>
+                              setHeadingSettings((settings) => ({
+                                ...settings,
+                                level,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "text" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="size"
+                            values={textOptions.size}
+                            active={textSettings.size}
+                            onValueChange={(size) =>
+                              setTextSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="tone"
+                            values={textOptions.tone}
+                            active={textSettings.tone}
+                            onValueChange={(tone) =>
+                              setTextSettings((settings) => ({
+                                ...settings,
+                                tone,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="weight"
+                            values={textOptions.weight}
+                            active={textSettings.weight}
+                            onValueChange={(weight) =>
+                              setTextSettings((settings) => ({
+                                ...settings,
+                                weight,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="as"
+                            values={textOptions.as}
+                            active={textSettings.as}
+                            onValueChange={(as) =>
+                              setTextSettings((settings) => ({
+                                ...settings,
+                                as,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "code" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <BooleanOptionRow
+                            label="copyable"
+                            checked={codeSettings.copyable}
+                            onCheckedChange={(copyable) =>
+                              setCodeSettings((settings) => ({
+                                ...settings,
+                                copyable,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="variant"
+                            values={codeOptions.variant}
+                            active={codeSettings.variant}
+                            onValueChange={(variant) =>
+                              setCodeSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="tone"
+                            values={codeOptions.tone}
+                            active={codeSettings.tone}
+                            onValueChange={(tone) =>
+                              setCodeSettings((settings) => ({
+                                ...settings,
+                                tone,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "kbd" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={kbdOptions.variant}
+                            active={kbdSettings.variant}
+                            onValueChange={(variant) =>
+                              setKbdSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={kbdOptions.size}
+                            active={kbdSettings.size}
+                            onValueChange={(size) =>
+                              setKbdSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="shape"
+                            values={kbdOptions.shape}
+                            active={kbdSettings.shape}
+                            onValueChange={(shape) =>
+                              setKbdSettings((settings) => ({
+                                ...settings,
+                                shape,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "prose" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="size"
+                            values={proseOptions.size}
+                            active={proseSettings.size}
+                            onValueChange={(size) =>
+                              setProseSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="tone"
+                            values={proseOptions.tone}
+                            active={proseSettings.tone}
+                            onValueChange={(tone) =>
+                              setProseSettings((settings) => ({
+                                ...settings,
+                                tone,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "blockquote" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="size"
+                            values={blockquoteOptions.size}
+                            active={blockquoteSettings.size}
+                            onValueChange={(size) =>
+                              setBlockquoteSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="tone"
+                            values={blockquoteOptions.tone}
+                            active={blockquoteSettings.tone}
+                            onValueChange={(tone) =>
+                              setBlockquoteSettings((settings) => ({
+                                ...settings,
+                                tone,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {activeComponent === "list" && (
+                        <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                          <OptionRow
+                            label="variant"
+                            values={listOptions.variant}
+                            active={listSettings.variant}
+                            onValueChange={(variant) =>
+                              setListSettings((settings) => ({
+                                ...settings,
+                                variant,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="size"
+                            values={listOptions.size}
+                            active={listSettings.size}
+                            onValueChange={(size) =>
+                              setListSettings((settings) => ({
+                                ...settings,
+                                size,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="spacing"
+                            values={listOptions.spacing}
+                            active={listSettings.spacing}
+                            onValueChange={(spacing) =>
+                              setListSettings((settings) => ({
+                                ...settings,
+                                spacing,
+                              }))
+                            }
+                          />
+
+                          <OptionRow
+                            label="tone"
+                            values={listOptions.tone}
+                            active={listSettings.tone}
+                            onValueChange={(tone) =>
+                              setListSettings((settings) => ({
+                                ...settings,
+                                tone,
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
+                    </TabsPanel>
+                  )}
+                </TabsRoot>
               </>
             ) : (
               activeIntroPage && (
                 <IntroDocumentation activePage={activeIntroPage} />
               )
-            )}
-
-            {activeComponent === "button" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={buttonOptions.variant}
-                  active={buttonSettings.variant}
-                  onValueChange={(variant) =>
-                    setButtonSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={buttonOptions.size}
-                  active={buttonSettings.size}
-                  onValueChange={(size) =>
-                    setButtonSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="color"
-                  values={buttonOptions.color}
-                  active={buttonSettings.color}
-                  dots={buttonColorDots}
-                  onValueChange={(color) =>
-                    setButtonSettings((settings) => ({ ...settings, color }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={buttonOptions.shape}
-                  active={buttonSettings.shape}
-                  onValueChange={(shape) =>
-                    setButtonSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="prefix"
-                  checked={buttonSettings.prefix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(prefix) =>
-                    setButtonSettings((settings) => ({ ...settings, prefix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="suffix"
-                  checked={buttonSettings.suffix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(suffix) =>
-                    setButtonSettings((settings) => ({ ...settings, suffix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="loading"
-                  checked={buttonSettings.loading}
-                  onCheckedChange={setButtonLoading}
-                />
-
-                <BooleanOptionRow
-                  label="disabled"
-                  checked={buttonSettings.disabled}
-                  onCheckedChange={(disabled) =>
-                    setButtonSettings((settings) => ({ ...settings, disabled }))
-                  }
-                />
-
-                <ButtonVariationShowcase />
-              </div>
-            )}
-
-            {activeComponent === "checkbox" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={checkboxOptions.variant}
-                  active={checkboxSettings.variant}
-                  onValueChange={(variant) =>
-                    setCheckboxSettings((settings) => ({
-                      ...settings,
-                      variant,
-                    }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={checkboxOptions.size}
-                  active={checkboxSettings.size}
-                  onValueChange={(size) =>
-                    setCheckboxSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="color"
-                  values={checkboxOptions.color}
-                  active={checkboxSettings.color}
-                  dots={buttonColorDots}
-                  onValueChange={(color) =>
-                    setCheckboxSettings((settings) => ({ ...settings, color }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={checkboxOptions.shape}
-                  active={checkboxSettings.shape}
-                  onValueChange={(shape) =>
-                    setCheckboxSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="checked"
-                  checked={checkboxSettings.checked}
-                  onCheckedChange={(checked) =>
-                    setCheckboxSettings((settings) => ({
-                      ...settings,
-                      checked,
-                      indeterminate: false,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="indeterminate"
-                  checked={checkboxSettings.indeterminate}
-                  onCheckedChange={(indeterminate) =>
-                    setCheckboxSettings((settings) => ({
-                      ...settings,
-                      indeterminate,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="invalid"
-                  checked={checkboxSettings.invalid}
-                  onCheckedChange={(invalid) =>
-                    setCheckboxSettings((settings) => ({
-                      ...settings,
-                      invalid,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="disabled"
-                  checked={checkboxSettings.disabled}
-                  onCheckedChange={(disabled) =>
-                    setCheckboxSettings((settings) => ({
-                      ...settings,
-                      disabled,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="readOnly"
-                  checked={checkboxSettings.readOnly}
-                  onCheckedChange={(readOnly) =>
-                    setCheckboxSettings((settings) => ({
-                      ...settings,
-                      readOnly,
-                    }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "input" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={inputOptions.variant}
-                  active={inputSettings.variant}
-                  onValueChange={(variant) =>
-                    setInputSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={inputOptions.size}
-                  active={inputSettings.size}
-                  onValueChange={(size) =>
-                    setInputSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={inputOptions.shape}
-                  active={inputSettings.shape}
-                  onValueChange={(shape) =>
-                    setInputSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="prefix"
-                  checked={inputSettings.prefix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(prefix) =>
-                    setInputSettings((settings) => ({ ...settings, prefix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="suffix"
-                  checked={inputSettings.suffix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(suffix) =>
-                    setInputSettings((settings) => ({ ...settings, suffix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="loading"
-                  checked={inputSettings.loading}
-                  onCheckedChange={(loading) =>
-                    setInputSettings((settings) => ({ ...settings, loading }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="invalid"
-                  checked={inputSettings.invalid}
-                  onCheckedChange={(invalid) =>
-                    setInputSettings((settings) => ({ ...settings, invalid }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="clearable"
-                  checked={inputSettings.clearable}
-                  onCheckedChange={(clearable) =>
-                    setInputSettings((settings) => ({ ...settings, clearable }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="disabled"
-                  checked={inputSettings.disabled}
-                  onCheckedChange={(disabled) =>
-                    setInputSettings((settings) => ({ ...settings, disabled }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="readOnly"
-                  checked={inputSettings.readOnly}
-                  onCheckedChange={(readOnly) =>
-                    setInputSettings((settings) => ({ ...settings, readOnly }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "select" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={selectOptions.variant}
-                  active={selectSettings.variant}
-                  onValueChange={(variant) =>
-                    setSelectSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={selectOptions.size}
-                  active={selectSettings.size}
-                  onValueChange={(size) =>
-                    setSelectSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={selectOptions.shape}
-                  active={selectSettings.shape}
-                  onValueChange={(shape) =>
-                    setSelectSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="prefix"
-                  checked={selectSettings.prefix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(prefix) =>
-                    setSelectSettings((settings) => ({ ...settings, prefix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="suffix"
-                  checked={selectSettings.suffix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(suffix) =>
-                    setSelectSettings((settings) => ({ ...settings, suffix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="invalid"
-                  checked={selectSettings.invalid}
-                  onCheckedChange={(invalid) =>
-                    setSelectSettings((settings) => ({ ...settings, invalid }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="disabled"
-                  checked={selectSettings.disabled}
-                  onCheckedChange={(disabled) =>
-                    setSelectSettings((settings) => ({ ...settings, disabled }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="readOnly"
-                  checked={selectSettings.readOnly}
-                  onCheckedChange={(readOnly) =>
-                    setSelectSettings((settings) => ({ ...settings, readOnly }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "switch" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={switchOptions.variant}
-                  active={switchSettings.variant}
-                  onValueChange={(variant) =>
-                    setSwitchSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={switchOptions.size}
-                  active={switchSettings.size}
-                  onValueChange={(size) =>
-                    setSwitchSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="color"
-                  values={switchOptions.color}
-                  active={switchSettings.color}
-                  dots={buttonColorDots}
-                  onValueChange={(color) =>
-                    setSwitchSettings((settings) => ({ ...settings, color }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={switchOptions.shape}
-                  active={switchSettings.shape}
-                  onValueChange={(shape) =>
-                    setSwitchSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="checked"
-                  checked={switchSettings.checked}
-                  onCheckedChange={(checked) =>
-                    setSwitchSettings((settings) => ({ ...settings, checked }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="invalid"
-                  checked={switchSettings.invalid}
-                  onCheckedChange={(invalid) =>
-                    setSwitchSettings((settings) => ({ ...settings, invalid }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="disabled"
-                  checked={switchSettings.disabled}
-                  onCheckedChange={(disabled) =>
-                    setSwitchSettings((settings) => ({
-                      ...settings,
-                      disabled,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="readOnly"
-                  checked={switchSettings.readOnly}
-                  onCheckedChange={(readOnly) =>
-                    setSwitchSettings((settings) => ({
-                      ...settings,
-                      readOnly,
-                    }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "slider" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={sliderOptions.variant}
-                  active={sliderSettings.variant}
-                  onValueChange={(variant) =>
-                    setSliderSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={sliderOptions.size}
-                  active={sliderSettings.size}
-                  onValueChange={(size) =>
-                    setSliderSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="color"
-                  values={sliderOptions.color}
-                  active={sliderSettings.color}
-                  dots={buttonColorDots}
-                  onValueChange={(color) =>
-                    setSliderSettings((settings) => ({ ...settings, color }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={sliderOptions.shape}
-                  active={sliderSettings.shape}
-                  onValueChange={(shape) =>
-                    setSliderSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="showValue"
-                  checked={sliderSettings.showValue}
-                  onCheckedChange={(showValue) =>
-                    setSliderSettings((settings) => ({
-                      ...settings,
-                      showValue,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="invalid"
-                  checked={sliderSettings.invalid}
-                  onCheckedChange={(invalid) =>
-                    setSliderSettings((settings) => ({ ...settings, invalid }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="disabled"
-                  checked={sliderSettings.disabled}
-                  onCheckedChange={(disabled) =>
-                    setSliderSettings((settings) => ({
-                      ...settings,
-                      disabled,
-                    }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "toggle" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={toggleOptions.variant}
-                  active={toggleSettings.variant}
-                  onValueChange={(variant) =>
-                    setToggleSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={toggleOptions.size}
-                  active={toggleSettings.size}
-                  onValueChange={(size) =>
-                    setToggleSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="color"
-                  values={toggleOptions.color}
-                  active={toggleSettings.color}
-                  dots={buttonColorDots}
-                  onValueChange={(color) =>
-                    setToggleSettings((settings) => ({ ...settings, color }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={toggleOptions.shape}
-                  active={toggleSettings.shape}
-                  onValueChange={(shape) =>
-                    setToggleSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="prefix"
-                  checked={toggleSettings.prefix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(prefix) =>
-                    setToggleSettings((settings) => ({ ...settings, prefix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="suffix"
-                  checked={toggleSettings.suffix}
-                  typeLabel="ReactNode"
-                  onCheckedChange={(suffix) =>
-                    setToggleSettings((settings) => ({ ...settings, suffix }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="pressed"
-                  checked={toggleSettings.pressed}
-                  onCheckedChange={(pressed) =>
-                    setToggleSettings((settings) => ({ ...settings, pressed }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="disabled"
-                  checked={toggleSettings.disabled}
-                  onCheckedChange={(disabled) =>
-                    setToggleSettings((settings) => ({ ...settings, disabled }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "dialog" && (
-              <div className="mb-12 grid gap-8">
-                <OptionRow
-                  label="shape"
-                  values={dialogOptions.shape}
-                  active={dialogSettings.shape}
-                  onValueChange={(shape) =>
-                    setDialogSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={dialogOptions.size}
-                  active={dialogSettings.size}
-                  onValueChange={(size) =>
-                    setDialogSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "drawer" && (
-              <div className="mb-12 grid gap-8">
-                <OptionRow
-                  label="side"
-                  values={drawerOptions.side}
-                  active={drawerSettings.side}
-                  onValueChange={(side) =>
-                    setDrawerSettings((settings) => ({ ...settings, side }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={drawerOptions.shape}
-                  active={drawerSettings.shape}
-                  onValueChange={(shape) =>
-                    setDrawerSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="backdrop"
-                  checked={drawerSettings.backdrop}
-                  onCheckedChange={(backdrop) =>
-                    setDrawerSettings((settings) => ({
-                      ...settings,
-                      backdrop,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="detached"
-                  checked={drawerSettings.detached}
-                  onCheckedChange={(detached) =>
-                    setDrawerSettings((settings) => ({
-                      ...settings,
-                      detached,
-                    }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={drawerOptions.size}
-                  active={drawerSettings.size}
-                  onValueChange={(size) =>
-                    setDrawerSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "popover" && (
-              <div className="mb-12 grid gap-8">
-                <OptionRow
-                  label="side"
-                  values={popoverOptions.side}
-                  active={popoverSettings.side}
-                  onValueChange={(side) =>
-                    setPopoverSettings((settings) => ({ ...settings, side }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={popoverOptions.shape}
-                  active={popoverSettings.shape}
-                  onValueChange={(shape) =>
-                    setPopoverSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="modal"
-                  checked={popoverSettings.modal}
-                  onCheckedChange={(modal) =>
-                    setPopoverSettings((settings) => ({ ...settings, modal }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="arrow"
-                  checked={popoverSettings.arrow}
-                  onCheckedChange={(arrow) =>
-                    setPopoverSettings((settings) => ({ ...settings, arrow }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={popoverOptions.size}
-                  active={popoverSettings.size}
-                  onValueChange={(size) =>
-                    setPopoverSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "snippet" && (
-              <div className="mb-12 grid gap-8">
-                <OptionRow
-                  label="language"
-                  values={snippetOptions.language}
-                  active={snippetSettings.language}
-                  onValueChange={(language) =>
-                    setSnippetSettings((settings) => ({
-                      ...settings,
-                      language,
-                    }))
-                  }
-                />
-
-                <OptionRow
-                  label="variant"
-                  values={snippetOptions.variant}
-                  active={snippetSettings.variant}
-                  onValueChange={(variant) =>
-                    setSnippetSettings((settings) => ({
-                      ...settings,
-                      variant,
-                    }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={snippetOptions.shape}
-                  active={snippetSettings.shape}
-                  onValueChange={(shape) =>
-                    setSnippetSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="filename"
-                  checked={snippetSettings.filename}
-                  onCheckedChange={(filename) =>
-                    setSnippetSettings((settings) => ({
-                      ...settings,
-                      filename,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="copyable"
-                  checked={snippetSettings.copyable}
-                  onCheckedChange={(copyable) =>
-                    setSnippetSettings((settings) => ({
-                      ...settings,
-                      copyable,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="showLineNumbers"
-                  checked={snippetSettings.showLineNumbers}
-                  onCheckedChange={(showLineNumbers) =>
-                    setSnippetSettings((settings) => ({
-                      ...settings,
-                      showLineNumbers,
-                    }))
-                  }
-                />
-
-                <BooleanOptionRow
-                  label="wrap"
-                  checked={snippetSettings.wrap}
-                  onCheckedChange={(wrap) =>
-                    setSnippetSettings((settings) => ({ ...settings, wrap }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "heading" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="size"
-                  values={headingOptions.size}
-                  active={headingSettings.size}
-                  onValueChange={(size) =>
-                    setHeadingSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="tone"
-                  values={headingOptions.tone}
-                  active={headingSettings.tone}
-                  onValueChange={(tone) =>
-                    setHeadingSettings((settings) => ({ ...settings, tone }))
-                  }
-                />
-
-                <OptionRow
-                  label="level"
-                  values={headingOptions.level}
-                  active={headingSettings.level}
-                  onValueChange={(level) =>
-                    setHeadingSettings((settings) => ({ ...settings, level }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "text" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="size"
-                  values={textOptions.size}
-                  active={textSettings.size}
-                  onValueChange={(size) =>
-                    setTextSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="tone"
-                  values={textOptions.tone}
-                  active={textSettings.tone}
-                  onValueChange={(tone) =>
-                    setTextSettings((settings) => ({ ...settings, tone }))
-                  }
-                />
-
-                <OptionRow
-                  label="weight"
-                  values={textOptions.weight}
-                  active={textSettings.weight}
-                  onValueChange={(weight) =>
-                    setTextSettings((settings) => ({ ...settings, weight }))
-                  }
-                />
-
-                <OptionRow
-                  label="as"
-                  values={textOptions.as}
-                  active={textSettings.as}
-                  onValueChange={(as) =>
-                    setTextSettings((settings) => ({ ...settings, as }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "code" && (
-              <div className="grid gap-8">
-                <BooleanOptionRow
-                  label="copyable"
-                  checked={codeSettings.copyable}
-                  onCheckedChange={(copyable) =>
-                    setCodeSettings((settings) => ({
-                      ...settings,
-                      copyable,
-                    }))
-                  }
-                />
-
-                <OptionRow
-                  label="variant"
-                  values={codeOptions.variant}
-                  active={codeSettings.variant}
-                  onValueChange={(variant) =>
-                    setCodeSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="tone"
-                  values={codeOptions.tone}
-                  active={codeSettings.tone}
-                  onValueChange={(tone) =>
-                    setCodeSettings((settings) => ({ ...settings, tone }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "kbd" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={kbdOptions.variant}
-                  active={kbdSettings.variant}
-                  onValueChange={(variant) =>
-                    setKbdSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={kbdOptions.size}
-                  active={kbdSettings.size}
-                  onValueChange={(size) =>
-                    setKbdSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="shape"
-                  values={kbdOptions.shape}
-                  active={kbdSettings.shape}
-                  onValueChange={(shape) =>
-                    setKbdSettings((settings) => ({ ...settings, shape }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "prose" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="size"
-                  values={proseOptions.size}
-                  active={proseSettings.size}
-                  onValueChange={(size) =>
-                    setProseSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="tone"
-                  values={proseOptions.tone}
-                  active={proseSettings.tone}
-                  onValueChange={(tone) =>
-                    setProseSettings((settings) => ({ ...settings, tone }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "blockquote" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="size"
-                  values={blockquoteOptions.size}
-                  active={blockquoteSettings.size}
-                  onValueChange={(size) =>
-                    setBlockquoteSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="tone"
-                  values={blockquoteOptions.tone}
-                  active={blockquoteSettings.tone}
-                  onValueChange={(tone) =>
-                    setBlockquoteSettings((settings) => ({ ...settings, tone }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "list" && (
-              <div className="grid gap-8">
-                <OptionRow
-                  label="variant"
-                  values={listOptions.variant}
-                  active={listSettings.variant}
-                  onValueChange={(variant) =>
-                    setListSettings((settings) => ({ ...settings, variant }))
-                  }
-                />
-
-                <OptionRow
-                  label="size"
-                  values={listOptions.size}
-                  active={listSettings.size}
-                  onValueChange={(size) =>
-                    setListSettings((settings) => ({ ...settings, size }))
-                  }
-                />
-
-                <OptionRow
-                  label="spacing"
-                  values={listOptions.spacing}
-                  active={listSettings.spacing}
-                  onValueChange={(spacing) =>
-                    setListSettings((settings) => ({ ...settings, spacing }))
-                  }
-                />
-
-                <OptionRow
-                  label="tone"
-                  values={listOptions.tone}
-                  active={listSettings.tone}
-                  onValueChange={(tone) =>
-                    setListSettings((settings) => ({ ...settings, tone }))
-                  }
-                />
-              </div>
-            )}
-
-            {activeComponent === "dialog" && <DialogDocumentation />}
-
-            {activeComponent === "drawer" && <DrawerDocumentation />}
-
-            {activeComponent === "popover" && <PopoverDocumentation />}
-
-            {activeComponent === "sound-provider" && (
-              <SoundProviderDocumentation />
             )}
           </section>
           <ProgressiveOverflowFade edge="top" visible={previewOverflow.top} />
@@ -3952,4 +4621,8 @@ export default function Home() {
       </div>
     </main>
   );
+}
+
+export default function Home() {
+  return <DocsApp initialPage="getting-started" />;
 }

@@ -3,9 +3,9 @@
   "private": true,
   "packageManager": "pnpm@11.2.2",
   "scripts": {
-    "dev": "pnpm --filter @aspekt/components build && pnpm --dir apps/www dev",
+    "dev": "pnpm --dir apps/www dev",
     "build": "pnpm cli:sync && pnpm --dir apps/www build",
-    "docs:dev": "pnpm --filter @aspekt/components build && pnpm --dir apps/www dev",
+    "docs:dev": "pnpm --dir apps/www dev",
     "docs:build": "pnpm --dir apps/www build",
     "cli:sync": "pnpm --filter @aspekt/ui templates:sync",
     "cli:pack:dry-run": "pnpm --filter @aspekt/ui pack:dry-run",

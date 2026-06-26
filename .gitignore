@@ -23,6 +23,7 @@ packages/ui/templates/
 .env.*
 !.env.example
 .vercel/
+COMPONENT_WORKFLOW.md
 
 # Logs and OS files
 *.log

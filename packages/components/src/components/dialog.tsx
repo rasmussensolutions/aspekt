@@ -111,6 +111,7 @@ type DialogButtonProps = Pick<
   | "shape"
   | "size"
   | "sound"
+  | "status"
   | "suffix"
   | "variant"
 >;
@@ -128,7 +129,7 @@ type DialogCloseProps = Omit<
   DialogButtonProps;
 
 function getDialogSound(sound: DialogSound | undefined, open: boolean) {
-  if (sound === undefined) return open ? "dialog.open" : "dialog.close";
+  if (sound === undefined) return open ? "open" : "close";
   if (sound === false) return false;
   return open ? sound.open : sound.close;
 }
@@ -219,6 +220,7 @@ const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
       shape,
       size,
       sound = false,
+      status,
       suffix,
       variant,
       ...props
@@ -238,6 +240,7 @@ const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
             shape={shape}
             size={size}
             sound={sound}
+            status={status}
             suffix={suffix}
             variant={variant}
           />
@@ -258,6 +261,7 @@ const DialogClose = React.forwardRef<HTMLButtonElement, DialogCloseProps>(
       shape,
       size,
       sound = false,
+      status,
       suffix,
       variant = "ghost",
       ...props
@@ -277,6 +281,7 @@ const DialogClose = React.forwardRef<HTMLButtonElement, DialogCloseProps>(
             shape={shape}
             size={size}
             sound={sound}
+            status={status}
             suffix={suffix}
             variant={variant}
           />

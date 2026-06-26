@@ -8,6 +8,8 @@ import {
   soundVariants,
   type SoundVariant,
   playSound,
+  registerSoundProvider,
+  unregisterSoundProvider,
 } from "./sound";
 
 type SoundProviderProps = {
@@ -38,6 +40,14 @@ export function SoundProvider({
   const [enabledState, setEnabledState] = React.useState(enabled);
   const [variantState, setVariantState] = React.useState(variant);
   const [volumeState, setVolumeState] = React.useState(volume);
+
+  React.useEffect(() => {
+    registerSoundProvider();
+
+    return () => {
+      unregisterSoundProvider();
+    };
+  }, []);
 
   React.useEffect(() => {
     configureSounds({
@@ -95,15 +105,16 @@ export function useSound() {
   if (context) return context;
 
   const settings = getSoundSettings();
+  const noop = () => {};
 
   return {
     enabled: settings.enabled,
     variant: settings.variant,
     volume: settings.volume,
-    play: playSound,
-    setEnabled: (enabled) => configureSounds({ enabled }),
-    setVariant: (variant) => configureSounds({ variant }),
-    setVolume: (volume) => configureSounds({ volume }),
+    play: noop,
+    setEnabled: noop,
+    setVariant: noop,
+    setVolume: noop,
   } satisfies SoundContextValue;
 }
 

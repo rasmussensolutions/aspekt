@@ -128,6 +128,7 @@ type PopoverButtonProps = Pick<
   | "shape"
   | "size"
   | "sound"
+  | "status"
   | "suffix"
   | "variant"
 >;
@@ -145,7 +146,7 @@ type PopoverCloseProps = Omit<
   PopoverButtonProps;
 
 function getPopoverSound(sound: PopoverSound | undefined, open: boolean) {
-  if (sound === undefined) return open ? "popover.open" : "popover.close";
+  if (sound === undefined) return open ? "open" : "close";
   if (sound === false) return false;
   return open ? sound.open : sound.close;
 }
@@ -293,6 +294,7 @@ const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
       shape,
       size,
       sound = false,
+      status,
       suffix,
       variant,
       ...props
@@ -312,6 +314,7 @@ const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
             shape={shape}
             size={size}
             sound={sound}
+            status={status}
             suffix={suffix}
             variant={variant}
           />
@@ -332,6 +335,7 @@ const PopoverClose = React.forwardRef<HTMLButtonElement, PopoverCloseProps>(
       shape,
       size,
       sound = false,
+      status,
       suffix,
       variant = "ghost",
       ...props
@@ -351,6 +355,7 @@ const PopoverClose = React.forwardRef<HTMLButtonElement, PopoverCloseProps>(
             shape={shape}
             size={size}
             sound={sound}
+            status={status}
             suffix={suffix}
             variant={variant}
           />

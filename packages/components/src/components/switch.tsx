@@ -251,7 +251,7 @@ function getSwitchSound(sound: SwitchSound | undefined, checked: boolean) {
   if (sound === false) return false;
 
   if (sound === undefined) {
-    return checked ? "switch.on" : "switch.off";
+    return checked ? "on" : "off";
   }
 
   if (typeof sound === "string") return sound;

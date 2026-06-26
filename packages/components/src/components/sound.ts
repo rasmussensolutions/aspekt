@@ -1,28 +1,14 @@
 export type SoundName =
-  | "button.solid"
-  | "button.soft"
-  | "button.ghost"
-  | "button.outline"
-  | "button.destructive"
-  | "dialog.open"
-  | "dialog.close"
-  | "drawer.open"
-  | "drawer.close"
-  | "popover.open"
-  | "popover.close"
-  | "input.focus"
-  | "input.unfocus"
-  | "input.clear"
-  | "select.open"
-  | "select.close"
-  | "select.change"
-  | "slider.commit"
-  | "toggle.on"
-  | "toggle.off"
-  | "switch.on"
-  | "switch.off"
-  | "checkbox.check"
-  | "checkbox.uncheck"
+  | "press"
+  | "open"
+  | "close"
+  | "focus"
+  | "blur"
+  | "clear"
+  | "change"
+  | "commit"
+  | "on"
+  | "off"
   | "success"
   | "error";
 
@@ -37,7 +23,7 @@ type SoundSettings = {
 };
 
 const settings: SoundSettings = {
-  enabled: true,
+  enabled: false,
   variant: "pop",
   volume: 1,
 };
@@ -45,6 +31,7 @@ const settings: SoundSettings = {
 const outputVolumeBoost = 4;
 
 let audioContext: AudioContext | null = null;
+let soundProviderCount = 0;
 
 function isMobileDevice() {
   if (typeof window === "undefined") return false;
@@ -282,46 +269,12 @@ function playThock({
   });
 }
 
-const softSounds: Record<SoundName, () => void> = {
-  "button.solid": playButtonSolidSound,
+type SoundMap = Record<SoundName, () => void>;
 
-  "button.soft": () => {
-    playTone({
-      frequency: 520,
-      duration: 0.05,
-      volume: 0.018 * settings.volume,
-      type: "sine",
-    });
-  },
+const softSounds: SoundMap = {
+  press: playButtonSolidSound,
 
-  "button.ghost": () => {
-    playTone({
-      frequency: 760,
-      duration: 0.025,
-      volume: 0.012 * settings.volume,
-      type: "sine",
-    });
-  },
-
-  "button.outline": () => {
-    playTone({
-      frequency: 620,
-      duration: 0.035,
-      volume: 0.02 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "button.destructive": () => {
-    playTone({
-      frequency: 220,
-      duration: 0.065,
-      volume: 0.025 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "dialog.open": () => {
+  open: () => {
     playTone({
       frequency: 360,
       endFrequency: 520,
@@ -331,7 +284,7 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "dialog.close": () => {
+  close: () => {
     playTone({
       frequency: 420,
       endFrequency: 260,
@@ -341,49 +294,9 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "drawer.open": () => {
-    playTone({
-      frequency: 320,
-      endFrequency: 500,
-      duration: 0.075,
-      volume: 0.018 * settings.volume,
-      type: "triangle",
-    });
-  },
+  focus: playButtonSolidSound,
 
-  "drawer.close": () => {
-    playTone({
-      frequency: 400,
-      endFrequency: 240,
-      duration: 0.065,
-      volume: 0.014 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "popover.open": () => {
-    playTone({
-      frequency: 440,
-      endFrequency: 560,
-      duration: 0.052,
-      volume: 0.014 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "popover.close": () => {
-    playTone({
-      frequency: 360,
-      endFrequency: 260,
-      duration: 0.044,
-      volume: 0.011 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "input.focus": playButtonSolidSound,
-
-  "input.unfocus": () => {
+  blur: () => {
     playTone({
       frequency: 300,
       endFrequency: 240,
@@ -393,7 +306,7 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "input.clear": () => {
+  clear: () => {
     playTone({
       frequency: 640,
       endFrequency: 420,
@@ -403,27 +316,7 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "select.open": () => {
-    playTone({
-      frequency: 460,
-      endFrequency: 620,
-      duration: 0.055,
-      volume: 0.016 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "select.close": () => {
-    playTone({
-      frequency: 360,
-      endFrequency: 280,
-      duration: 0.045,
-      volume: 0.012 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "select.change": () => {
+  change: () => {
     playTone({
       frequency: 680,
       duration: 0.032,
@@ -432,7 +325,7 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "slider.commit": () => {
+  commit: () => {
     playTone({
       frequency: 620,
       duration: 0.034,
@@ -441,7 +334,7 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "toggle.on": () => {
+  on: () => {
     playTone({
       frequency: 520,
       endFrequency: 700,
@@ -451,52 +344,12 @@ const softSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "toggle.off": () => {
+  off: () => {
     playTone({
       frequency: 420,
       endFrequency: 280,
       duration: 0.045,
       volume: 0.013 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "switch.on": () => {
-    playTone({
-      frequency: 500,
-      endFrequency: 680,
-      duration: 0.048,
-      volume: 0.016 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "switch.off": () => {
-    playTone({
-      frequency: 390,
-      endFrequency: 250,
-      duration: 0.043,
-      volume: 0.012 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "checkbox.check": () => {
-    playTone({
-      frequency: 560,
-      endFrequency: 720,
-      duration: 0.045,
-      volume: 0.015 * settings.volume,
-      type: "triangle",
-    });
-  },
-
-  "checkbox.uncheck": () => {
-    playTone({
-      frequency: 420,
-      endFrequency: 260,
-      duration: 0.04,
-      volume: 0.011 * settings.volume,
       type: "triangle",
     });
   },
@@ -510,17 +363,20 @@ const softSounds: Record<SoundName, () => void> = {
   },
 
   error: () => {
-    playTone({
-      frequency: 180,
-      duration: 0.08,
-      volume: 0.026 * settings.volume,
-      type: "triangle",
-    });
+    blip(392, 0.021 * settings.volume);
+
+    window.setTimeout(() => {
+      blip(311, 0.021 * settings.volume);
+    }, 48);
+
+    window.setTimeout(() => {
+      blip(247, 0.018 * settings.volume);
+    }, 96);
   },
 };
 
-const clickSounds: Record<SoundName, () => void> = {
-  "button.solid": () => {
+const clickSounds: SoundMap = {
+  press: () => {
     playTactileClick({
       brightness: 0.62,
       duration: 0.012,
@@ -528,39 +384,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "button.soft": () => {
-    playTactileClick({
-      brightness: 0.48,
-      duration: 0.01,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "button.ghost": () => {
-    playTactileClick({
-      brightness: 0.78,
-      duration: 0.008,
-      volume: 0.006 * settings.volume,
-    });
-  },
-
-  "button.outline": () => {
-    playTactileClick({
-      brightness: 0.58,
-      duration: 0.011,
-      volume: 0.009 * settings.volume,
-    });
-  },
-
-  "button.destructive": () => {
-    playTactileClick({
-      brightness: 0.32,
-      duration: 0.015,
-      volume: 0.013 * settings.volume,
-    });
-  },
-
-  "dialog.open": () => {
+  open: () => {
     playTactileClick({
       brightness: 0.54,
       duration: 0.014,
@@ -568,7 +392,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "dialog.close": () => {
+  close: () => {
     playTactileClick({
       brightness: 0.4,
       duration: 0.012,
@@ -576,39 +400,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "drawer.open": () => {
-    playTactileClick({
-      brightness: 0.52,
-      duration: 0.014,
-      volume: 0.01 * settings.volume,
-    });
-  },
-
-  "drawer.close": () => {
-    playTactileClick({
-      brightness: 0.36,
-      duration: 0.012,
-      volume: 0.009 * settings.volume,
-    });
-  },
-
-  "popover.open": () => {
-    playTactileClick({
-      brightness: 0.56,
-      duration: 0.01,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "popover.close": () => {
-    playTactileClick({
-      brightness: 0.38,
-      duration: 0.009,
-      volume: 0.007 * settings.volume,
-    });
-  },
-
-  "input.focus": () => {
+  focus: () => {
     playTactileClick({
       brightness: 0.62,
       duration: 0.01,
@@ -616,7 +408,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "input.unfocus": () => {
+  blur: () => {
     playTactileClick({
       brightness: 0.36,
       duration: 0.011,
@@ -624,7 +416,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "input.clear": () => {
+  clear: () => {
     playTactileClick({
       brightness: 0.86,
       duration: 0.007,
@@ -632,23 +424,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "select.open": () => {
-    playTactileClick({
-      brightness: 0.5,
-      duration: 0.011,
-      volume: 0.009 * settings.volume,
-    });
-  },
-
-  "select.close": () => {
-    playTactileClick({
-      brightness: 0.38,
-      duration: 0.01,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "select.change": () => {
+  change: () => {
     playTactileClick({
       brightness: 0.78,
       duration: 0.008,
@@ -656,7 +432,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "slider.commit": () => {
+  commit: () => {
     playTactileClick({
       brightness: 0.62,
       duration: 0.008,
@@ -664,7 +440,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "toggle.on": () => {
+  on: () => {
     playTactileClick({
       brightness: 0.7,
       duration: 0.01,
@@ -672,7 +448,7 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "toggle.off": () => {
+  off: () => {
     playTactileClick({
       brightness: 0.42,
       duration: 0.01,
@@ -680,44 +456,13 @@ const clickSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "switch.on": () => {
-    playTactileClick({
-      brightness: 0.66,
-      duration: 0.01,
-      volume: 0.0085 * settings.volume,
-    });
-  },
-
-  "switch.off": () => {
-    playTactileClick({
-      brightness: 0.4,
-      duration: 0.01,
-      volume: 0.007 * settings.volume,
-    });
-  },
-
-  "checkbox.check": () => {
-    playTactileClick({
-      brightness: 0.74,
-      duration: 0.009,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "checkbox.uncheck": () => {
-    playTactileClick({
-      brightness: 0.44,
-      duration: 0.009,
-      volume: 0.0065 * settings.volume,
-    });
-  },
-
   success: () => {
     playTactileClick({
       brightness: 0.52,
       duration: 0.01,
       volume: 0.008 * settings.volume,
     });
+    blip(520, 0.006 * settings.volume);
 
     playTactileClick({
       brightness: 0.78,
@@ -725,26 +470,39 @@ const clickSounds: Record<SoundName, () => void> = {
       duration: 0.008,
       volume: 0.008 * settings.volume,
     });
+
+    window.setTimeout(() => {
+      blip(780, 0.006 * settings.volume);
+    }, 42);
   },
 
   error: () => {
     playTactileClick({
-      brightness: 0.26,
-      duration: 0.015,
+      brightness: 0.34,
+      duration: 0.014,
       volume: 0.013 * settings.volume,
     });
+    blip(392, 0.007 * settings.volume);
 
     playTactileClick({
-      brightness: 0.22,
-      delay: 0.026,
+      brightness: 0.18,
+      delay: 0.042,
       duration: 0.013,
-      volume: 0.01 * settings.volume,
+      volume: 0.0105 * settings.volume,
     });
+
+    window.setTimeout(() => {
+      blip(311, 0.007 * settings.volume);
+    }, 42);
+
+    window.setTimeout(() => {
+      blip(247, 0.006 * settings.volume);
+    }, 84);
   },
 };
 
-const snapSounds: Record<SoundName, () => void> = {
-  "button.solid": () => {
+const snapSounds: SoundMap = {
+  press: () => {
     playSnap({
       brightness: 0.94,
       duration: 0.006,
@@ -752,39 +510,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "button.soft": () => {
-    playSnap({
-      brightness: 0.82,
-      duration: 0.005,
-      volume: 0.007 * settings.volume,
-    });
-  },
-
-  "button.ghost": () => {
-    playSnap({
-      brightness: 1,
-      duration: 0.004,
-      volume: 0.0055 * settings.volume,
-    });
-  },
-
-  "button.outline": () => {
-    playSnap({
-      brightness: 0.9,
-      duration: 0.005,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "button.destructive": () => {
-    playSnap({
-      brightness: 0.62,
-      duration: 0.008,
-      volume: 0.011 * settings.volume,
-    });
-  },
-
-  "dialog.open": () => {
+  open: () => {
     playSnap({
       brightness: 0.86,
       duration: 0.007,
@@ -792,7 +518,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "dialog.close": () => {
+  close: () => {
     playSnap({
       brightness: 0.7,
       duration: 0.006,
@@ -800,39 +526,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "drawer.open": () => {
-    playSnap({
-      brightness: 0.84,
-      duration: 0.007,
-      volume: 0.0085 * settings.volume,
-    });
-  },
-
-  "drawer.close": () => {
-    playSnap({
-      brightness: 0.64,
-      duration: 0.006,
-      volume: 0.0075 * settings.volume,
-    });
-  },
-
-  "popover.open": () => {
-    playSnap({
-      brightness: 0.84,
-      duration: 0.005,
-      volume: 0.0068 * settings.volume,
-    });
-  },
-
-  "popover.close": () => {
-    playSnap({
-      brightness: 0.62,
-      duration: 0.004,
-      volume: 0.0058 * settings.volume,
-    });
-  },
-
-  "input.focus": () => {
+  focus: () => {
     playSnap({
       brightness: 0.92,
       duration: 0.005,
@@ -840,7 +534,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "input.unfocus": () => {
+  blur: () => {
     playSnap({
       brightness: 0.64,
       duration: 0.006,
@@ -848,7 +542,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "input.clear": () => {
+  clear: () => {
     playSnap({
       brightness: 1,
       duration: 0.004,
@@ -856,23 +550,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "select.open": () => {
-    playSnap({
-      brightness: 0.82,
-      duration: 0.006,
-      volume: 0.0075 * settings.volume,
-    });
-  },
-
-  "select.close": () => {
-    playSnap({
-      brightness: 0.66,
-      duration: 0.005,
-      volume: 0.0065 * settings.volume,
-    });
-  },
-
-  "select.change": () => {
+  change: () => {
     playSnap({
       brightness: 0.98,
       duration: 0.004,
@@ -880,7 +558,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "slider.commit": () => {
+  commit: () => {
     playSnap({
       brightness: 0.78,
       duration: 0.004,
@@ -888,7 +566,7 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "toggle.on": () => {
+  on: () => {
     playSnap({
       brightness: 0.9,
       duration: 0.005,
@@ -896,43 +574,11 @@ const snapSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "toggle.off": () => {
+  off: () => {
     playSnap({
       brightness: 0.66,
       duration: 0.005,
       volume: 0.006 * settings.volume,
-    });
-  },
-
-  "switch.on": () => {
-    playSnap({
-      brightness: 0.88,
-      duration: 0.005,
-      volume: 0.0065 * settings.volume,
-    });
-  },
-
-  "switch.off": () => {
-    playSnap({
-      brightness: 0.62,
-      duration: 0.005,
-      volume: 0.0055 * settings.volume,
-    });
-  },
-
-  "checkbox.check": () => {
-    playSnap({
-      brightness: 0.94,
-      duration: 0.004,
-      volume: 0.0065 * settings.volume,
-    });
-  },
-
-  "checkbox.uncheck": () => {
-    playSnap({
-      brightness: 0.68,
-      duration: 0.004,
-      volume: 0.0055 * settings.volume,
     });
   },
 
@@ -942,6 +588,7 @@ const snapSounds: Record<SoundName, () => void> = {
       duration: 0.005,
       volume: 0.0065 * settings.volume,
     });
+    blip(520, 0.005 * settings.volume);
 
     playSnap({
       brightness: 1,
@@ -949,26 +596,39 @@ const snapSounds: Record<SoundName, () => void> = {
       duration: 0.004,
       volume: 0.0065 * settings.volume,
     });
+
+    window.setTimeout(() => {
+      blip(780, 0.005 * settings.volume);
+    }, 34);
   },
 
   error: () => {
     playSnap({
-      brightness: 0.48,
-      duration: 0.008,
+      brightness: 0.52,
+      duration: 0.007,
       volume: 0.0105 * settings.volume,
     });
+    blip(392, 0.006 * settings.volume);
 
     playSnap({
-      brightness: 0.36,
-      delay: 0.023,
+      brightness: 0.24,
+      delay: 0.036,
       duration: 0.007,
-      volume: 0.008 * settings.volume,
+      volume: 0.009 * settings.volume,
     });
+
+    window.setTimeout(() => {
+      blip(311, 0.006 * settings.volume);
+    }, 34);
+
+    window.setTimeout(() => {
+      blip(247, 0.005 * settings.volume);
+    }, 68);
   },
 };
 
-const popSounds: Record<SoundName, () => void> = {
-  "button.solid": () => {
+const popSounds: SoundMap = {
+  press: () => {
     playPop({
       frequency: 260,
       endFrequency: 130,
@@ -976,508 +636,287 @@ const popSounds: Record<SoundName, () => void> = {
     });
   },
 
-  "button.soft": () => {
+  open: () => {
     playPop({
-      frequency: 220,
-      endFrequency: 130,
-      duration: 0.036,
-      volume: 0.014 * settings.volume,
-    });
-  },
-
-  "button.ghost": () => {
-    playPop({
-      frequency: 340,
-      endFrequency: 180,
-      duration: 0.026,
-      volume: 0.011 * settings.volume,
-    });
-  },
-
-  "button.outline": () => {
-    playPop({
-      frequency: 250,
-      endFrequency: 140,
-      duration: 0.034,
+      frequency: 360,
+      endFrequency: 540,
+      duration: 0.052,
       volume: 0.016 * settings.volume,
-    });
-  },
-
-  "button.destructive": () => {
-    playPop({
-      frequency: 150,
-      endFrequency: 90,
-      duration: 0.05,
-      volume: 0.023 * settings.volume,
       type: "triangle",
     });
   },
 
-  "dialog.open": () => {
+  close: () => {
     playPop({
-      frequency: 210,
-      endFrequency: 320,
+      frequency: 260,
+      endFrequency: 150,
       duration: 0.044,
-      volume: 0.016 * settings.volume,
-    });
-  },
-
-  "dialog.close": () => {
-    playPop({
-      frequency: 210,
-      endFrequency: 120,
-      duration: 0.04,
       volume: 0.014 * settings.volume,
+      type: "triangle",
     });
   },
 
-  "drawer.open": () => {
+  focus: () => {
     playPop({
-      frequency: 190,
-      endFrequency: 310,
-      duration: 0.046,
-      volume: 0.016 * settings.volume,
-    });
-  },
-
-  "drawer.close": () => {
-    playPop({
-      frequency: 200,
-      endFrequency: 110,
-      duration: 0.04,
-      volume: 0.014 * settings.volume,
-    });
-  },
-
-  "popover.open": () => {
-    playPop({
-      frequency: 220,
-      endFrequency: 300,
-      duration: 0.034,
-      volume: 0.012 * settings.volume,
-    });
-  },
-
-  "popover.close": () => {
-    playPop({
-      frequency: 190,
-      endFrequency: 120,
-      duration: 0.03,
-      volume: 0.01 * settings.volume,
-    });
-  },
-
-  "input.focus": () => {
-    playPop({
-      frequency: 250,
-      endFrequency: 140,
-      duration: 0.034,
+      frequency: 300,
+      endFrequency: 160,
+      duration: 0.036,
       volume: 0.015 * settings.volume,
     });
   },
 
-  "input.unfocus": () => {
-    playPop({
-      frequency: 180,
-      endFrequency: 110,
-      duration: 0.038,
-      volume: 0.012 * settings.volume,
-    });
-  },
-
-  "input.clear": () => {
-    playPop({
-      frequency: 380,
-      endFrequency: 190,
-      duration: 0.022,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "select.open": () => {
+  blur: () => {
     playPop({
       frequency: 220,
-      endFrequency: 300,
-      duration: 0.036,
-      volume: 0.014 * settings.volume,
-    });
-  },
-
-  "select.close": () => {
-    playPop({
-      frequency: 200,
       endFrequency: 120,
       duration: 0.034,
       volume: 0.012 * settings.volume,
     });
   },
 
-  "select.change": () => {
+  clear: () => {
     playPop({
-      frequency: 320,
-      endFrequency: 170,
-      duration: 0.024,
+      frequency: 420,
+      endFrequency: 220,
+      duration: 0.03,
       volume: 0.01 * settings.volume,
     });
   },
 
-  "slider.commit": () => {
+  change: () => {
     playPop({
-      frequency: 190,
-      endFrequency: 240,
+      frequency: 520,
+      endFrequency: 280,
       duration: 0.026,
-      volume: 0.01 * settings.volume,
+      volume: 0.012 * settings.volume,
     });
   },
 
-  "toggle.on": () => {
+  commit: () => {
     playPop({
-      frequency: 220,
-      endFrequency: 320,
-      duration: 0.036,
-      volume: 0.014 * settings.volume,
-    });
-  },
-
-  "toggle.off": () => {
-    playPop({
-      frequency: 220,
-      endFrequency: 120,
-      duration: 0.032,
+      frequency: 400,
+      endFrequency: 190,
+      duration: 0.03,
       volume: 0.011 * settings.volume,
     });
   },
 
-  "switch.on": () => {
+  on: () => {
     playPop({
-      frequency: 210,
-      endFrequency: 300,
-      duration: 0.034,
-      volume: 0.013 * settings.volume,
+      frequency: 360,
+      endFrequency: 760,
+      duration: 0.045,
+      volume: 0.016 * settings.volume,
+      type: "triangle",
     });
   },
 
-  "switch.off": () => {
+  off: () => {
     playPop({
-      frequency: 205,
-      endFrequency: 110,
-      duration: 0.031,
-      volume: 0.01 * settings.volume,
-    });
-  },
-
-  "checkbox.check": () => {
-    playPop({
-      frequency: 240,
-      endFrequency: 340,
-      duration: 0.032,
+      frequency: 340,
+      endFrequency: 150,
+      duration: 0.036,
       volume: 0.012 * settings.volume,
-    });
-  },
-
-  "checkbox.uncheck": () => {
-    playPop({
-      frequency: 210,
-      endFrequency: 110,
-      duration: 0.03,
-      volume: 0.009 * settings.volume,
     });
   },
 
   success: () => {
     playPop({
-      frequency: 240,
-      endFrequency: 150,
-      duration: 0.032,
-      volume: 0.012 * settings.volume,
+      frequency: 360,
+      endFrequency: 620,
+      duration: 0.04,
+      volume: 0.014 * settings.volume,
+      type: "triangle",
     });
 
     window.setTimeout(() => {
       playPop({
-        frequency: 340,
-        endFrequency: 220,
-        duration: 0.032,
+        frequency: 520,
+        endFrequency: 860,
+        duration: 0.038,
         volume: 0.012 * settings.volume,
+        type: "triangle",
       });
-    }, 46);
+    }, 48);
   },
 
   error: () => {
     playPop({
-      frequency: 130,
-      endFrequency: 82,
-      duration: 0.052,
+      frequency: 210,
+      endFrequency: 110,
+      duration: 0.04,
       volume: 0.022 * settings.volume,
       type: "triangle",
     });
+
+    window.setTimeout(() => {
+      playPop({
+        frequency: 150,
+        endFrequency: 80,
+        duration: 0.045,
+        volume: 0.018 * settings.volume,
+        type: "triangle",
+      });
+    }, 52);
   },
 };
 
-const thockSounds: Record<SoundName, () => void> = {
-  "button.solid": () => {
+const thockSounds: SoundMap = {
+  press: () => {
     playThock({
-      frequency: 145,
-      endFrequency: 94,
-      volume: 0.012 * settings.volume,
+      frequency: 180,
+      endFrequency: 92,
+      volume: 0.018 * settings.volume,
     });
   },
 
-  "button.soft": () => {
+  open: () => {
+    playThock({
+      brightness: 0.2,
+      frequency: 220,
+      endFrequency: 145,
+      duration: 0.038,
+      volume: 0.016 * settings.volume,
+    });
+  },
+
+  close: () => {
     playThock({
       brightness: 0.14,
-      frequency: 165,
-      endFrequency: 110,
-      duration: 0.028,
-      volume: 0.009 * settings.volume,
-    });
-  },
-
-  "button.ghost": () => {
-    playThock({
-      brightness: 0.24,
-      frequency: 205,
-      endFrequency: 140,
-      duration: 0.024,
-      volume: 0.007 * settings.volume,
-    });
-  },
-
-  "button.outline": () => {
-    playThock({
-      frequency: 155,
-      endFrequency: 100,
-      duration: 0.03,
-      volume: 0.01 * settings.volume,
-    });
-  },
-
-  "button.destructive": () => {
-    playThock({
-      brightness: 0.08,
-      frequency: 98,
-      endFrequency: 68,
-      duration: 0.04,
+      frequency: 170,
+      endFrequency: 92,
+      duration: 0.034,
       volume: 0.014 * settings.volume,
     });
   },
 
-  "dialog.open": () => {
-    playThock({
-      frequency: 135,
-      endFrequency: 190,
-      duration: 0.034,
-      volume: 0.011 * settings.volume,
-    });
-  },
-
-  "dialog.close": () => {
-    playThock({
-      brightness: 0.12,
-      frequency: 135,
-      endFrequency: 84,
-      duration: 0.032,
-      volume: 0.01 * settings.volume,
-    });
-  },
-
-  "drawer.open": () => {
-    playThock({
-      frequency: 128,
-      endFrequency: 185,
-      duration: 0.036,
-      volume: 0.011 * settings.volume,
-    });
-  },
-
-  "drawer.close": () => {
-    playThock({
-      brightness: 0.1,
-      frequency: 128,
-      endFrequency: 78,
-      duration: 0.032,
-      volume: 0.01 * settings.volume,
-    });
-  },
-
-  "popover.open": () => {
-    playThock({
-      brightness: 0.17,
-      frequency: 148,
-      endFrequency: 190,
-      duration: 0.028,
-      volume: 0.0085 * settings.volume,
-    });
-  },
-
-  "popover.close": () => {
-    playThock({
-      brightness: 0.1,
-      frequency: 128,
-      endFrequency: 84,
-      duration: 0.026,
-      volume: 0.0075 * settings.volume,
-    });
-  },
-
-  "input.focus": () => {
-    playThock({
-      frequency: 165,
-      endFrequency: 105,
-      duration: 0.028,
-      volume: 0.009 * settings.volume,
-    });
-  },
-
-  "input.unfocus": () => {
-    playThock({
-      brightness: 0.12,
-      frequency: 125,
-      endFrequency: 82,
-      duration: 0.03,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "input.clear": () => {
-    playThock({
-      brightness: 0.28,
-      frequency: 215,
-      endFrequency: 135,
-      duration: 0.022,
-      volume: 0.006 * settings.volume,
-    });
-  },
-
-  "select.open": () => {
-    playThock({
-      frequency: 150,
-      endFrequency: 195,
-      duration: 0.03,
-      volume: 0.009 * settings.volume,
-    });
-  },
-
-  "select.close": () => {
-    playThock({
-      brightness: 0.12,
-      frequency: 132,
-      endFrequency: 88,
-      duration: 0.028,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "select.change": () => {
-    playThock({
-      brightness: 0.22,
-      frequency: 185,
-      endFrequency: 120,
-      duration: 0.024,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "slider.commit": () => {
-    playThock({
-      brightness: 0.16,
-      frequency: 132,
-      endFrequency: 152,
-      duration: 0.026,
-      volume: 0.0075 * settings.volume,
-    });
-  },
-
-  "toggle.on": () => {
+  focus: () => {
     playThock({
       brightness: 0.2,
+      frequency: 190,
+      endFrequency: 100,
+      duration: 0.03,
+      volume: 0.014 * settings.volume,
+    });
+  },
+
+  blur: () => {
+    playThock({
+      brightness: 0.12,
       frequency: 150,
-      endFrequency: 205,
-      duration: 0.028,
-      volume: 0.009 * settings.volume,
-    });
-  },
-
-  "toggle.off": () => {
-    playThock({
-      brightness: 0.12,
-      frequency: 140,
-      endFrequency: 86,
-      duration: 0.028,
-      volume: 0.0075 * settings.volume,
-    });
-  },
-
-  "switch.on": () => {
-    playThock({
-      brightness: 0.18,
-      frequency: 148,
-      endFrequency: 198,
-      duration: 0.027,
-      volume: 0.0085 * settings.volume,
-    });
-  },
-
-  "switch.off": () => {
-    playThock({
-      brightness: 0.11,
-      frequency: 134,
-      endFrequency: 80,
-      duration: 0.027,
-      volume: 0.007 * settings.volume,
-    });
-  },
-
-  "checkbox.check": () => {
-    playThock({
-      brightness: 0.22,
-      frequency: 155,
-      endFrequency: 210,
-      duration: 0.026,
-      volume: 0.008 * settings.volume,
-    });
-  },
-
-  "checkbox.uncheck": () => {
-    playThock({
-      brightness: 0.12,
-      frequency: 135,
       endFrequency: 82,
+      duration: 0.03,
+      volume: 0.012 * settings.volume,
+    });
+  },
+
+  clear: () => {
+    playThock({
+      brightness: 0.28,
+      frequency: 240,
+      endFrequency: 128,
+      duration: 0.024,
+      volume: 0.01 * settings.volume,
+    });
+  },
+
+  change: () => {
+    playThock({
+      brightness: 0.26,
+      frequency: 260,
+      endFrequency: 142,
+      duration: 0.024,
+      volume: 0.011 * settings.volume,
+    });
+  },
+
+  commit: () => {
+    playThock({
+      brightness: 0.2,
+      frequency: 220,
+      endFrequency: 112,
       duration: 0.026,
-      volume: 0.0065 * settings.volume,
+      volume: 0.01 * settings.volume,
+    });
+  },
+
+  on: () => {
+    playThock({
+      brightness: 0.24,
+      frequency: 220,
+      endFrequency: 160,
+      duration: 0.034,
+      volume: 0.014 * settings.volume,
+    });
+  },
+
+  off: () => {
+    playThock({
+      brightness: 0.12,
+      frequency: 150,
+      endFrequency: 78,
+      duration: 0.03,
+      volume: 0.011 * settings.volume,
     });
   },
 
   success: () => {
     playThock({
-      frequency: 155,
-      endFrequency: 105,
-      duration: 0.026,
-      volume: 0.008 * settings.volume,
+      brightness: 0.2,
+      frequency: 220,
+      endFrequency: 150,
+      duration: 0.03,
+      volume: 0.012 * settings.volume,
     });
+    blip(440, 0.005 * settings.volume);
 
     window.setTimeout(() => {
       playThock({
-        brightness: 0.22,
-        frequency: 205,
-        endFrequency: 135,
-        duration: 0.024,
-        volume: 0.008 * settings.volume,
+        brightness: 0.3,
+        frequency: 300,
+        endFrequency: 190,
+        duration: 0.032,
+        volume: 0.012 * settings.volume,
       });
-    }, 40);
+    }, 48);
+
+    window.setTimeout(() => {
+      blip(660, 0.005 * settings.volume);
+    }, 54);
   },
 
   error: () => {
     playThock({
-      brightness: 0.08,
-      frequency: 92,
-      endFrequency: 62,
-      duration: 0.042,
+      brightness: 0.1,
+      frequency: 118,
+      endFrequency: 82,
+      duration: 0.03,
       volume: 0.014 * settings.volume,
     });
+    blip(330, 0.006 * settings.volume);
+
+    window.setTimeout(() => {
+      playThock({
+        brightness: 0.06,
+        frequency: 82,
+        endFrequency: 52,
+        duration: 0.04,
+        volume: 0.012 * settings.volume,
+      });
+    }, 54);
+
+    window.setTimeout(() => {
+      blip(247, 0.006 * settings.volume);
+    }, 48);
+
+    window.setTimeout(() => {
+      blip(196, 0.005 * settings.volume);
+    }, 96);
   },
 };
 
 export function playSound(sound: SoundName) {
+  if (soundProviderCount === 0) return;
   if (isMobileDevice()) return;
   const sounds =
     {
@@ -1524,5 +963,17 @@ export function setSoundVariant(variant: SoundVariant) {
 }
 
 export function getSoundSettings() {
-  return { ...settings };
+  return { ...settings, enabled: soundProviderCount > 0 && settings.enabled };
+}
+
+export function registerSoundProvider() {
+  soundProviderCount += 1;
+}
+
+export function unregisterSoundProvider() {
+  soundProviderCount = Math.max(0, soundProviderCount - 1);
+
+  if (soundProviderCount === 0) {
+    settings.enabled = false;
+  }
 }

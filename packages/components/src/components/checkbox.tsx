@@ -167,8 +167,8 @@ type CheckboxSound =
   | SoundName
   | false
   | {
-      check?: SoundName | false;
-      uncheck?: SoundName | false;
+      off?: SoundName | false;
+      on?: SoundName | false;
     };
 
 type CheckboxProps = Omit<
@@ -190,12 +190,12 @@ function getCheckboxSound(sound: CheckboxSound | undefined, checked: boolean) {
   if (sound === false) return false;
 
   if (sound === undefined) {
-    return checked ? "checkbox.check" : "checkbox.uncheck";
+    return checked ? "on" : "off";
   }
 
   if (typeof sound === "string") return sound;
 
-  return checked ? sound.check : sound.uncheck;
+  return checked ? sound.on : sound.off;
 }
 
 function CheckIcon() {

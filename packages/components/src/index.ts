@@ -18,5 +18,7 @@ export * from "./components/snippet";
 export * from "./components/sound";
 export * from "./components/sound-provider";
 export * from "./components/switch";
+export * from "./components/tabs";
+export * from "./components/table";
 export * from "./components/text";
 export * from "./components/toggle";

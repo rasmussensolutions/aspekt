@@ -213,8 +213,8 @@ function getSelectSound(
   if (sound === false) return false;
 
   if (sound === undefined) {
-    if (event === "open") return "select.open";
-    if (event === "change") return "select.change";
+    if (event === "open") return "open";
+    if (event === "change") return "change";
     return false;
   }
 
