@@ -477,17 +477,20 @@ const SelectPositioner = React.forwardRef<
 const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(
   function SelectPopup({ className, shape, ...props }, ref) {
     const inheritedShape = React.useContext(SelectShapeContext);
+    const resolvedShape = shape ?? inheritedShape;
 
     return (
-      <SelectPrimitive.Popup
-        ref={ref}
-        data-slot="select-popup"
-        className={cn(
-          selectPopupVariants({ shape: shape ?? inheritedShape }),
-          className,
-        )}
-        {...props}
-      />
+      <SelectShapeContext.Provider value={resolvedShape}>
+        <SelectPrimitive.Popup
+          ref={ref}
+          data-slot="select-popup"
+          className={cn(
+            selectPopupVariants({ shape: resolvedShape }),
+            className,
+          )}
+          {...props}
+        />
+      </SelectShapeContext.Provider>
     );
   },
 );
@@ -543,12 +546,15 @@ const SelectItemText = React.forwardRef<HTMLDivElement, SelectItemTextProps>(
 
 const SelectItem = React.forwardRef<HTMLElement, SelectItemProps>(
   function SelectItem({ children, className, indicator, ...props }, ref) {
+    const inheritedShape = React.useContext(SelectShapeContext);
+
     return (
       <SelectPrimitive.Item
         ref={ref}
         data-slot="select-item"
         className={cn(
-          "grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none select-none",
+          "grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 px-2.5 py-1.5 text-sm outline-none select-none",
+          inheritedShape === "round" ? "rounded-full" : "rounded-md",
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           "data-[highlighted]:bg-foreground data-[highlighted]:text-background",
           className,

@@ -9,6 +9,8 @@ export type SoundName =
   | "commit"
   | "on"
   | "off"
+  | "appear"
+  | "warning"
   | "success"
   | "error";
 
@@ -16,22 +18,95 @@ export const soundVariants = ["soft", "click", "snap", "pop", "thock"] as const;
 
 export type SoundVariant = (typeof soundVariants)[number];
 
+export const soundDepths = ["interactions", "cues", "feedback"] as const;
+
+export type SoundDepth = (typeof soundDepths)[number];
+
+export type SoundDepthSettings = Record<SoundDepth, boolean>;
+
+export type SoundDepthInput =
+  | readonly SoundDepth[]
+  | Partial<SoundDepthSettings>;
+
+export type SoundPlayOptions = {
+  depth?: SoundDepth;
+};
+
 type SoundSettings = {
   enabled: boolean;
   variant: SoundVariant;
   volume: number;
+  depths: SoundDepthSettings;
 };
+
+type SoundConfigureOptions = Partial<Omit<SoundSettings, "depths">> & {
+  depths?: SoundDepthInput;
+};
+
+const defaultSoundDepthSettings = {
+  interactions: true,
+  cues: true,
+  feedback: false,
+} satisfies SoundDepthSettings;
+
+const soundDepthByName = {
+  press: "interactions",
+  open: "interactions",
+  close: "interactions",
+  focus: "interactions",
+  blur: "interactions",
+  clear: "interactions",
+  change: "interactions",
+  commit: "interactions",
+  on: "interactions",
+  off: "interactions",
+  appear: "cues",
+  warning: "cues",
+  success: "cues",
+  error: "cues",
+} satisfies Record<SoundName, SoundDepth>;
 
 const settings: SoundSettings = {
   enabled: false,
   variant: "pop",
   volume: 1,
+  depths: { ...defaultSoundDepthSettings },
 };
 
 const outputVolumeBoost = 4;
 
 let audioContext: AudioContext | null = null;
 let soundProviderCount = 0;
+
+export function getSoundDepthSettings(depths?: SoundDepthInput) {
+  const nextDepths: SoundDepthSettings = { ...defaultSoundDepthSettings };
+
+  if (!depths) return nextDepths;
+
+  if (Array.isArray(depths)) {
+    const subscribedDepths = new Set(depths);
+
+    return soundDepths.reduce(
+      (next, depth) => ({
+        ...next,
+        [depth]: subscribedDepths.has(depth),
+      }),
+      {} as SoundDepthSettings,
+    );
+  }
+
+  const depthOverrides = depths as Partial<SoundDepthSettings>;
+
+  for (const depth of soundDepths) {
+    const enabled = depthOverrides[depth];
+
+    if (typeof enabled === "boolean") {
+      nextDepths[depth] = enabled;
+    }
+  }
+
+  return nextDepths;
+}
 
 function isMobileDevice() {
   if (typeof window === "undefined") return false;
@@ -354,24 +429,103 @@ const softSounds: SoundMap = {
     });
   },
 
-  success: () => {
-    blip(520, 0.022 * settings.volume);
+  appear: () => {
+    playTone({
+      frequency: 440,
+      endFrequency: 493.88,
+      duration: 0.075,
+      volume: 0.009 * settings.volume,
+      type: "sine",
+      envelope: "swell",
+    });
 
     window.setTimeout(() => {
-      blip(780, 0.022 * settings.volume);
-    }, 55);
+      playTone({
+        frequency: 587.33,
+        endFrequency: 659.25,
+        duration: 0.09,
+        volume: 0.01 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 62);
+  },
+
+  warning: () => {
+    playTone({
+      frequency: 440,
+      endFrequency: 415.3,
+      duration: 0.09,
+      volume: 0.01 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 523.25,
+        endFrequency: 466.16,
+        duration: 0.11,
+        volume: 0.011 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 76);
+  },
+
+  success: () => {
+    playTone({
+      frequency: 523.25,
+      endFrequency: 587.33,
+      duration: 0.085,
+      volume: 0.01 * settings.volume,
+      type: "sine",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 659.25,
+        endFrequency: 783.99,
+        duration: 0.105,
+        volume: 0.012 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 72);
   },
 
   error: () => {
-    blip(392, 0.021 * settings.volume);
+    playTone({
+      frequency: 392,
+      endFrequency: 349.23,
+      duration: 0.09,
+      volume: 0.011 * settings.volume,
+      type: "sine",
+      envelope: "swell",
+    });
 
     window.setTimeout(() => {
-      blip(311, 0.021 * settings.volume);
-    }, 48);
+      playTone({
+        frequency: 311.13,
+        endFrequency: 261.63,
+        duration: 0.12,
+        volume: 0.012 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 78);
 
     window.setTimeout(() => {
-      blip(247, 0.018 * settings.volume);
-    }, 96);
+      playTone({
+        frequency: 233.08,
+        endFrequency: 196,
+        duration: 0.1,
+        volume: 0.009 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 148);
   },
 };
 
@@ -456,48 +610,103 @@ const clickSounds: SoundMap = {
     });
   },
 
-  success: () => {
-    playTactileClick({
-      brightness: 0.52,
-      duration: 0.01,
-      volume: 0.008 * settings.volume,
-    });
-    blip(520, 0.006 * settings.volume);
-
-    playTactileClick({
-      brightness: 0.78,
-      delay: 0.032,
-      duration: 0.008,
-      volume: 0.008 * settings.volume,
+  appear: () => {
+    playTone({
+      frequency: 440,
+      endFrequency: 554.37,
+      duration: 0.062,
+      volume: 0.006 * settings.volume,
+      type: "square",
+      envelope: "swell",
     });
 
     window.setTimeout(() => {
-      blip(780, 0.006 * settings.volume);
-    }, 42);
+      playTone({
+        frequency: 554.37,
+        endFrequency: 659.25,
+        duration: 0.072,
+        volume: 0.006 * settings.volume,
+        type: "triangle",
+        envelope: "swell",
+      });
+    }, 52);
+  },
+
+  warning: () => {
+    playTone({
+      frequency: 415.3,
+      endFrequency: 392,
+      duration: 0.074,
+      volume: 0.007 * settings.volume,
+      type: "square",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 554.37,
+        endFrequency: 493.88,
+        duration: 0.088,
+        volume: 0.006 * settings.volume,
+        type: "triangle",
+        envelope: "swell",
+      });
+    }, 62);
+  },
+
+  success: () => {
+    playTone({
+      frequency: 493.88,
+      endFrequency: 659.25,
+      duration: 0.072,
+      volume: 0.008 * settings.volume,
+      type: "square",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 659.25,
+        endFrequency: 987.77,
+        duration: 0.086,
+        volume: 0.006 * settings.volume,
+        type: "triangle",
+        envelope: "swell",
+      });
+    }, 58);
   },
 
   error: () => {
-    playTactileClick({
-      brightness: 0.34,
-      duration: 0.014,
-      volume: 0.013 * settings.volume,
-    });
-    blip(392, 0.007 * settings.volume);
-
-    playTactileClick({
-      brightness: 0.18,
-      delay: 0.042,
-      duration: 0.013,
-      volume: 0.0105 * settings.volume,
+    playTone({
+      frequency: 370,
+      endFrequency: 311.13,
+      duration: 0.082,
+      volume: 0.007 * settings.volume,
+      type: "square",
+      envelope: "swell",
     });
 
     window.setTimeout(() => {
-      blip(311, 0.007 * settings.volume);
-    }, 42);
+      playTone({
+        frequency: 293.66,
+        endFrequency: 246.94,
+        duration: 0.102,
+        volume: 0.008 * settings.volume,
+        type: "triangle",
+        envelope: "swell",
+      });
+    }, 68);
 
     window.setTimeout(() => {
-      blip(247, 0.006 * settings.volume);
-    }, 84);
+      playTone({
+        frequency: 220,
+        endFrequency: 185,
+        duration: 0.09,
+        volume: 0.006 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 138);
   },
 };
 
@@ -582,48 +791,103 @@ const snapSounds: SoundMap = {
     });
   },
 
-  success: () => {
-    playSnap({
-      brightness: 0.82,
-      duration: 0.005,
-      volume: 0.0065 * settings.volume,
-    });
-    blip(520, 0.005 * settings.volume);
-
-    playSnap({
-      brightness: 1,
-      delay: 0.026,
-      duration: 0.004,
-      volume: 0.0065 * settings.volume,
+  appear: () => {
+    playTone({
+      frequency: 783.99,
+      endFrequency: 880,
+      duration: 0.052,
+      volume: 0.005 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
     });
 
     window.setTimeout(() => {
-      blip(780, 0.005 * settings.volume);
-    }, 34);
+      playTone({
+        frequency: 987.77,
+        endFrequency: 1174.66,
+        duration: 0.06,
+        volume: 0.0045 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 44);
+  },
+
+  warning: () => {
+    playTone({
+      frequency: 587.33,
+      endFrequency: 523.25,
+      duration: 0.062,
+      volume: 0.006 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 698.46,
+        endFrequency: 622.25,
+        duration: 0.074,
+        volume: 0.005 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 52);
+  },
+
+  success: () => {
+    playTone({
+      frequency: 659.25,
+      endFrequency: 783.99,
+      duration: 0.058,
+      volume: 0.006 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 880,
+        endFrequency: 1174.66,
+        duration: 0.066,
+        volume: 0.005 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 48);
   },
 
   error: () => {
-    playSnap({
-      brightness: 0.52,
-      duration: 0.007,
-      volume: 0.0105 * settings.volume,
-    });
-    blip(392, 0.006 * settings.volume);
-
-    playSnap({
-      brightness: 0.24,
-      delay: 0.036,
-      duration: 0.007,
-      volume: 0.009 * settings.volume,
+    playTone({
+      frequency: 466.16,
+      endFrequency: 392,
+      duration: 0.068,
+      volume: 0.006 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
     });
 
     window.setTimeout(() => {
-      blip(311, 0.006 * settings.volume);
-    }, 34);
+      playTone({
+        frequency: 349.23,
+        endFrequency: 293.66,
+        duration: 0.082,
+        volume: 0.007 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 58);
 
     window.setTimeout(() => {
-      blip(247, 0.005 * settings.volume);
-    }, 68);
+      playTone({
+        frequency: 261.63,
+        endFrequency: 220,
+        duration: 0.072,
+        volume: 0.005 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 116);
   },
 };
 
@@ -720,44 +984,92 @@ const popSounds: SoundMap = {
     });
   },
 
-  success: () => {
-    playPop({
-      frequency: 360,
-      endFrequency: 620,
-      duration: 0.04,
-      volume: 0.014 * settings.volume,
-      type: "triangle",
+  appear: () => {
+    playTone({
+      frequency: 330,
+      endFrequency: 440,
+      duration: 0.08,
+      volume: 0.008 * settings.volume,
+      type: "sine",
+      envelope: "swell",
     });
 
     window.setTimeout(() => {
-      playPop({
+      playTone({
+        frequency: 440,
+        endFrequency: 587.33,
+        duration: 0.095,
+        volume: 0.009 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 68);
+  },
+
+  warning: () => {
+    playTone({
+      frequency: 466.16,
+      endFrequency: 392,
+      duration: 0.085,
+      volume: 0.009 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 587.33,
+        endFrequency: 493.88,
+        duration: 0.095,
+        volume: 0.008 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 72);
+  },
+
+  success: () => {
+    playTone({
+      frequency: 360,
+      endFrequency: 620,
+      duration: 0.09,
+      volume: 0.009 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
         frequency: 520,
         endFrequency: 860,
-        duration: 0.038,
-        volume: 0.012 * settings.volume,
-        type: "triangle",
+        duration: 0.1,
+        volume: 0.011 * settings.volume,
+        type: "sine",
+        envelope: "swell",
       });
-    }, 48);
+    }, 72);
   },
 
   error: () => {
-    playPop({
-      frequency: 210,
-      endFrequency: 110,
-      duration: 0.04,
-      volume: 0.022 * settings.volume,
-      type: "triangle",
+    playTone({
+      frequency: 392,
+      endFrequency: 330,
+      duration: 0.08,
+      volume: 0.009 * settings.volume,
+      type: "sine",
+      envelope: "swell",
     });
 
     window.setTimeout(() => {
-      playPop({
-        frequency: 150,
-        endFrequency: 80,
-        duration: 0.045,
-        volume: 0.018 * settings.volume,
-        type: "triangle",
+      playTone({
+        frequency: 277,
+        endFrequency: 220,
+        duration: 0.095,
+        volume: 0.011 * settings.volume,
+        type: "sine",
+        envelope: "swell",
       });
-    }, 52);
+    }, 72);
   },
 };
 
@@ -860,64 +1172,115 @@ const thockSounds: SoundMap = {
     });
   },
 
-  success: () => {
-    playThock({
-      brightness: 0.2,
+  appear: () => {
+    playTone({
       frequency: 220,
-      endFrequency: 150,
-      duration: 0.03,
-      volume: 0.012 * settings.volume,
+      endFrequency: 261.63,
+      duration: 0.1,
+      volume: 0.01 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
     });
-    blip(440, 0.005 * settings.volume);
 
     window.setTimeout(() => {
-      playThock({
-        brightness: 0.3,
-        frequency: 300,
-        endFrequency: 190,
-        duration: 0.032,
-        volume: 0.012 * settings.volume,
+      playTone({
+        frequency: 329.63,
+        endFrequency: 392,
+        duration: 0.11,
+        volume: 0.009 * settings.volume,
+        type: "sine",
+        envelope: "swell",
       });
-    }, 48);
+    }, 84);
+  },
+
+  warning: () => {
+    playTone({
+      frequency: 220,
+      endFrequency: 196,
+      duration: 0.105,
+      volume: 0.011 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
+    });
 
     window.setTimeout(() => {
-      blip(660, 0.005 * settings.volume);
-    }, 54);
+      playTone({
+        frequency: 277.18,
+        endFrequency: 246.94,
+        duration: 0.12,
+        volume: 0.009 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 86);
+  },
+
+  success: () => {
+    playTone({
+      frequency: 261.63,
+      endFrequency: 329.63,
+      duration: 0.105,
+      volume: 0.011 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
+    });
+
+    window.setTimeout(() => {
+      playTone({
+        frequency: 392,
+        endFrequency: 523.25,
+        duration: 0.12,
+        volume: 0.01 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 88);
   },
 
   error: () => {
-    playThock({
-      brightness: 0.1,
-      frequency: 118,
-      endFrequency: 82,
-      duration: 0.03,
-      volume: 0.014 * settings.volume,
+    playTone({
+      frequency: 246.94,
+      endFrequency: 207.65,
+      duration: 0.11,
+      volume: 0.012 * settings.volume,
+      type: "triangle",
+      envelope: "swell",
     });
-    blip(330, 0.006 * settings.volume);
 
     window.setTimeout(() => {
-      playThock({
-        brightness: 0.06,
-        frequency: 82,
-        endFrequency: 52,
-        duration: 0.04,
-        volume: 0.012 * settings.volume,
+      playTone({
+        frequency: 196,
+        endFrequency: 164.81,
+        duration: 0.13,
+        volume: 0.011 * settings.volume,
+        type: "sine",
+        envelope: "swell",
       });
-    }, 54);
+    }, 86);
 
     window.setTimeout(() => {
-      blip(247, 0.006 * settings.volume);
-    }, 48);
-
-    window.setTimeout(() => {
-      blip(196, 0.005 * settings.volume);
-    }, 96);
+      playTone({
+        frequency: 146.83,
+        endFrequency: 123.47,
+        duration: 0.105,
+        volume: 0.008 * settings.volume,
+        type: "sine",
+        envelope: "swell",
+      });
+    }, 164);
   },
 };
 
-export function playSound(sound: SoundName) {
+export function playSound(sound: SoundName, options: SoundPlayOptions = {}) {
   if (soundProviderCount === 0) return;
+  if (!settings.enabled) return;
   if (isMobileDevice()) return;
+
+  const depth = options.depth ?? soundDepthByName[sound];
+
+  if (!settings.depths[depth]) return;
+
   const sounds =
     {
       soft: softSounds,
@@ -929,7 +1292,7 @@ export function playSound(sound: SoundName) {
   sounds[sound]?.();
 }
 
-export function configureSounds(options: Partial<SoundSettings>) {
+export function configureSounds(options: SoundConfigureOptions) {
   if (typeof options.enabled === "boolean") {
     settings.enabled = options.enabled;
   }
@@ -943,6 +1306,10 @@ export function configureSounds(options: Partial<SoundSettings>) {
 
   if (typeof options.volume === "number") {
     settings.volume = Math.max(0, Math.min(options.volume, 1));
+  }
+
+  if (options.depths) {
+    settings.depths = getSoundDepthSettings(options.depths);
   }
 }
 
@@ -962,8 +1329,20 @@ export function setSoundVariant(variant: SoundVariant) {
   settings.variant = variant;
 }
 
+export function setSoundDepths(depths: SoundDepthInput) {
+  settings.depths = getSoundDepthSettings(depths);
+}
+
+export function setSoundDepthEnabled(depth: SoundDepth, enabled: boolean) {
+  settings.depths[depth] = enabled;
+}
+
 export function getSoundSettings() {
-  return { ...settings, enabled: soundProviderCount > 0 && settings.enabled };
+  return {
+    ...settings,
+    depths: { ...settings.depths },
+    enabled: soundProviderCount > 0 && settings.enabled,
+  };
 }
 
 export function registerSoundProvider() {

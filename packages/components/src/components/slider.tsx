@@ -206,6 +206,11 @@ const emptySliderElasticState = {
 
 const sliderElasticLimit = 6;
 const sliderElasticResistance = 0.12;
+const sliderFeedbackMinIntervalMs = 58;
+
+type SliderFeedbackThumbState = {
+  feedbackTime: number;
+};
 
 type SliderSound =
   | SoundName
@@ -345,7 +350,7 @@ function getSliderSound(
   if (sound === false) return false;
 
   if (sound === undefined) {
-    return interaction === "commit" ? "commit" : false;
+    return interaction === "commit" ? "commit" : "change";
   }
 
   if (typeof sound === "string") {
@@ -353,6 +358,27 @@ function getSliderSound(
   }
 
   return sound[interaction];
+}
+
+function shouldPlaySliderFeedbackSound({
+  activeThumbIndex,
+  state,
+}: {
+  activeThumbIndex: number;
+  state: React.MutableRefObject<SliderFeedbackThumbState[]>;
+}) {
+  const now =
+    typeof performance === "undefined" ? Date.now() : performance.now();
+  const thumbState = state.current[activeThumbIndex];
+  const canPlay =
+    !thumbState ||
+    now - thumbState.feedbackTime >= sliderFeedbackMinIntervalMs;
+
+  state.current[activeThumbIndex] = {
+    feedbackTime: canPlay ? now : thumbState?.feedbackTime ?? 0,
+  };
+
+  return canPlay;
 }
 
 const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
@@ -367,6 +393,8 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
     invalid = false,
     label,
     labelClassName,
+    max = 100,
+    min = 0,
     onValueChange,
     onValueCommitted,
     orientation = "horizontal",
@@ -374,6 +402,7 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
     showValue = false,
     size,
     sound,
+    step = 1,
     thumbClassName,
     thumbLabel,
     thumbLabels,
@@ -390,6 +419,7 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
   const values = getSliderValues(value ?? defaultValue);
   const thumbCount = Math.max(1, values.length);
   const activeThumbIndexRef = React.useRef(0);
+  const feedbackStateRef = React.useRef<SliderFeedbackThumbState[]>([]);
   const [elasticState, setElasticState] =
     React.useState<SliderElasticState>(emptySliderElasticState);
   const defaultThumbLabel =
@@ -471,8 +501,14 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
 
       const resolvedSound = getSliderSound(sound, "change");
 
-      if (resolvedSound) {
-        playSound(resolvedSound);
+      if (
+        resolvedSound &&
+        shouldPlaySliderFeedbackSound({
+          activeThumbIndex: eventDetails.activeThumbIndex,
+          state: feedbackStateRef,
+        })
+      ) {
+        playSound(resolvedSound, { depth: "feedback" });
       }
 
       onValueChange?.(nextValue, eventDetails);
@@ -484,6 +520,8 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
     NonNullable<SliderRootProps["onValueCommitted"]>
   >(
     (nextValue, eventDetails) => {
+      feedbackStateRef.current = [];
+
       const resolvedSound = getSliderSound(sound, "commit");
 
       if (resolvedSound) {
@@ -505,6 +543,9 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
       className={cn(sliderRootVariants({ size, className }))}
       disabled={disabled}
       orientation={orientation}
+      min={min}
+      max={max}
+      step={step}
       value={value}
       defaultValue={defaultValue}
       onValueChange={handleValueChange}

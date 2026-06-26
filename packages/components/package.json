@@ -29,6 +29,10 @@
       "types": "./src/checkbox.ts",
       "import": "./src/checkbox.ts"
     },
+    "./combobox": {
+      "types": "./src/combobox.ts",
+      "import": "./src/combobox.ts"
+    },
     "./code": {
       "types": "./src/code.ts",
       "import": "./src/code.ts"
@@ -101,6 +105,10 @@
       "types": "./src/text.ts",
       "import": "./src/text.ts"
     },
+    "./toast": {
+      "types": "./src/toast.ts",
+      "import": "./src/toast.ts"
+    },
     "./sound": {
       "types": "./src/sound.ts",
       "import": "./src/sound.ts"
@@ -120,6 +128,9 @@
       ],
       "checkbox": [
         "src/checkbox.ts"
+      ],
+      "combobox": [
+        "src/combobox.ts"
       ],
       "code": [
         "src/code.ts"
@@ -174,6 +185,9 @@
       ],
       "text": [
         "src/text.ts"
+      ],
+      "toast": [
+        "src/toast.ts"
       ],
       "toggle": [
         "src/toggle.ts"

@@ -5,6 +5,19 @@ import { Checkbox } from "@aspekt/components-source/checkbox";
 import { Code } from "@aspekt/components-source/code";
 import { Blockquote } from "@aspekt/components-source/blockquote";
 import {
+  ComboboxClear,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxInputGroup,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxPortal,
+  ComboboxPositioner,
+  ComboboxRoot,
+  ComboboxTrigger,
+} from "@aspekt/components-source/combobox";
+import {
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -66,6 +79,8 @@ import { Slider } from "@aspekt/components-source/slider";
 import { Snippet } from "@aspekt/components-source/snippet";
 import {
   SoundProvider,
+  soundDepths,
+  type SoundDepth,
   useSound,
 } from "@aspekt/components-source/sound-provider";
 import { Switch } from "@aspekt/components-source/switch";
@@ -78,6 +93,12 @@ import {
 } from "@aspekt/components-source/tabs";
 import { Table, type TableColumnDef } from "@aspekt/components-source/table";
 import { Toggle } from "@aspekt/components-source/toggle";
+import {
+  toast,
+  toastPositions,
+  Toaster,
+  type ToastPosition,
+} from "@aspekt/components-source/toast";
 import {
   ArrowRightIcon,
   ListIcon,
@@ -96,12 +117,14 @@ type ComponentPreview =
   | "checkbox"
   | "input"
   | "select"
+  | "combobox"
   | "slider"
   | "switch"
   | "toggle"
   | "dialog"
   | "drawer"
   | "popover"
+  | "toast"
   | "tabs"
   | "table"
   | "snippet"
@@ -135,10 +158,14 @@ type TableVariant = "outline" | "soft" | "ghost";
 type TableSize = "compact" | "medium" | "large";
 type InputVariant = "outline" | "soft" | "ghost";
 type SelectVariant = "outline" | "soft" | "ghost";
+type ComboboxVariant = "outline" | "soft" | "ghost";
 type CheckboxVariant = "solid" | "soft" | "outline";
 type SliderVariant = "solid" | "soft" | "outline";
 type SwitchVariant = "solid" | "soft" | "outline";
 type SelectPreviewValue = "react" | "next" | "svelte" | "vue" | "astro";
+type ComboboxPreviewValue = "React" | "Next.js" | "Svelte" | "Vue" | "Astro";
+type ToastMaxToasts = "1" | "3" | "6" | "9";
+type ToastType = "default" | "success" | "error" | "warning" | "info";
 type HeadingSize = "display" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 type HeadingTone = "default" | "muted" | "subtle" | "accent";
 type HeadingLevelOption = "1" | "2" | "3" | "4" | "5" | "6";
@@ -212,6 +239,17 @@ type SelectSettings = {
   readOnly: boolean;
 };
 
+type ComboboxSettings = {
+  variant: ComboboxVariant;
+  size: ButtonSize;
+  shape: ButtonShape;
+  prefix: boolean;
+  clearable: boolean;
+  invalid: boolean;
+  disabled: boolean;
+  readOnly: boolean;
+};
+
 type CheckboxSettings = {
   variant: CheckboxVariant;
   size: ButtonSize;
@@ -276,6 +314,15 @@ type PopoverSettings = {
   shape: ButtonShape;
   side: PopoverSide;
   size: DialogSize;
+};
+
+type ToastSettings = {
+  action: boolean;
+  colorful: boolean;
+  maxToasts: ToastMaxToasts;
+  position: ToastPosition;
+  shape: ButtonShape;
+  type: ToastType;
 };
 
 type TabsSettings = {
@@ -380,12 +427,14 @@ const componentIds = [
   "checkbox",
   "input",
   "select",
+  "combobox",
   "slider",
   "switch",
   "toggle",
   "dialog",
   "drawer",
   "popover",
+  "toast",
   "tabs",
   "table",
   "snippet",
@@ -402,12 +451,14 @@ const docsComponentIds = [
   "checkbox",
   "input",
   "select",
+  "combobox",
   "slider",
   "switch",
   "toggle",
   "dialog",
   "drawer",
   "popover",
+  "toast",
   "tabs",
   "table",
   "snippet",
@@ -441,6 +492,7 @@ const navGroups = [
       { label: "Checkbox", page: "checkbox" },
       { label: "Input", page: "input" },
       { label: "Select", page: "select" },
+      { label: "Combobox", page: "combobox" },
       { label: "Slider", page: "slider" },
       { label: "Switch", page: "switch" },
       { label: "Toggle", page: "toggle" },
@@ -452,6 +504,7 @@ const navGroups = [
       { label: "Dialog", page: "dialog" },
       { label: "Drawer", page: "drawer" },
       { label: "Popover", page: "popover" },
+      { label: "Toast", page: "toast" },
       { label: "Tabs", page: "tabs" },
       { label: "Table", page: "table" },
       { label: "Snippet", page: "snippet" },
@@ -478,6 +531,12 @@ const inputOptions = {
 
 const selectOptions = {
   variant: ["outline", "soft", "ghost"],
+  size: buttonOptions.size,
+  shape: buttonOptions.shape,
+} as const;
+
+const comboboxOptions = {
+  variant: inputOptions.variant,
   size: buttonOptions.size,
   shape: buttonOptions.shape,
 } as const;
@@ -525,6 +584,13 @@ const popoverOptions = {
   shape: buttonOptions.shape,
   side: ["bottom", "right", "left", "top"],
   size: dialogOptions.size,
+} as const;
+
+const toastOptions = {
+  maxToasts: ["1", "3", "6", "9"],
+  position: toastPositions,
+  shape: buttonOptions.shape,
+  type: ["default", "success", "error", "warning", "info"],
 } as const;
 
 const tabsOptions = {
@@ -598,6 +664,32 @@ const snippetOptions = {
 
 const soundVariantOptions = ["soft", "click", "snap", "pop", "thock"] as const;
 
+const sliderFeedbackSound = { change: "change", commit: false } as const;
+
+const soundDepthCopy = {
+  interactions: {
+    label: "interactions",
+    description:
+      "direct input sounds such as pressing a button, focusing a field, opening a layer, or toggling a control.",
+  },
+  cues: {
+    label: "cues",
+    description:
+      "semantic result sounds such as success and error, even when they are triggered from component state.",
+  },
+  feedback: {
+    label: "feedback",
+    description:
+      "continuous control response. Today this powers Slider value changes with adaptive ticks that stay detailed on small ranges and sparse on dense ones.",
+  },
+} satisfies Record<
+  SoundDepth,
+  {
+    label: string;
+    description: string;
+  }
+>;
+
 const componentCopy = {
   button: {
     title: "Button",
@@ -614,6 +706,10 @@ const componentCopy = {
   select: {
     title: "Select",
     description: "is used to choose one value from a menu.",
+  },
+  combobox: {
+    title: "Combobox",
+    description: "is used to search and choose from suggested values.",
   },
   slider: {
     title: "Slider",
@@ -638,6 +734,10 @@ const componentCopy = {
   popover: {
     title: "Popover",
     description: "is used to reveal anchored contextual content.",
+  },
+  toast: {
+    title: "Toast",
+    description: "is used to display brief status messages.",
   },
   tabs: {
     title: "Tabs",
@@ -693,6 +793,8 @@ const componentImportExamples = {
   input: 'import { Input } from "@/components/aspekt/input";',
   select:
     'import { SelectRoot, SelectTrigger } from "@/components/aspekt/select";',
+  combobox:
+    'import { ComboboxRoot, ComboboxInput } from "@/components/aspekt/combobox";',
   slider: 'import { Slider } from "@/components/aspekt/slider";',
   switch: 'import { Switch } from "@/components/aspekt/switch";',
   toggle: 'import { Toggle } from "@/components/aspekt/toggle";',
@@ -702,6 +804,7 @@ const componentImportExamples = {
     'import { DrawerRoot, DrawerTrigger } from "@/components/aspekt/drawer";',
   popover:
     'import { PopoverRoot, PopoverTrigger } from "@/components/aspekt/popover";',
+  toast: 'import { toast, Toaster } from "@/components/aspekt/toast";',
   tabs: 'import { TabsRoot, TabsList, TabsTab, TabsPanel, TabsIndicator } from "@/components/aspekt/tabs";',
   table:
     'import { Table, type TableColumnDef } from "@/components/aspekt/table";',
@@ -749,6 +852,29 @@ const componentUsageExamples = {
     </SelectPositioner>
   </SelectPortal>
 </SelectRoot>`,
+  combobox: `const items = ["React", "Next.js", "Svelte", "Vue", "Astro"];
+
+<ComboboxRoot items={items} defaultValue="React">
+  <ComboboxInputGroup>
+    <ComboboxInput placeholder="Search frameworks" />
+    <ComboboxClear />
+    <ComboboxTrigger />
+  </ComboboxInputGroup>
+  <ComboboxPortal>
+    <ComboboxPositioner>
+      <ComboboxPopup>
+        <ComboboxList>
+          {(item: string) => (
+            <ComboboxItem key={item} value={item}>
+              {item}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+        <ComboboxEmpty>No results</ComboboxEmpty>
+      </ComboboxPopup>
+    </ComboboxPositioner>
+  </ComboboxPortal>
+</ComboboxRoot>`,
   slider: `<Slider
   aria-label="Volume"
   label="Volume"
@@ -819,6 +945,17 @@ const componentUsageExamples = {
     </PopoverPositioner>
   </PopoverPortal>
 </PopoverRoot>`,
+  toast: `async function publishRelease(releaseId: string) {
+  try {
+    await publishReleaseById(releaseId);
+  } catch {
+    toast.error("Publish failed", {
+      description: "Check the build output before trying again.",
+    });
+  }
+}
+
+<Toaster colorful maxToasts={6} position="bottom-right" />`,
   tabs: `<TabsRoot defaultValue="overview">
   <TabsList>
     <TabsTab value="overview">Overview</TabsTab>
@@ -975,6 +1112,17 @@ const defaultSelectSettings = {
   readOnly: false,
 } satisfies SelectSettings;
 
+const defaultComboboxSettings = {
+  variant: "outline",
+  size: "medium",
+  shape: "square",
+  prefix: true,
+  clearable: true,
+  invalid: false,
+  disabled: false,
+  readOnly: false,
+} satisfies ComboboxSettings;
+
 const defaultCheckboxSettings = {
   variant: "outline",
   size: "medium",
@@ -1040,6 +1188,15 @@ const defaultPopoverSettings = {
   side: "bottom",
   size: "medium",
 } satisfies PopoverSettings;
+
+const defaultToastSettings = {
+  action: true,
+  colorful: true,
+  maxToasts: "6",
+  position: "bottom-right",
+  shape: "square",
+  type: "default",
+} satisfies ToastSettings;
 
 const defaultTabsSettings = {
   variant: "soft",
@@ -1124,6 +1281,14 @@ const selectPreviewItems = [
   label: string;
   value: SelectPreviewValue;
 }[];
+
+const comboboxPreviewItems = [
+  "React",
+  "Next.js",
+  "Svelte",
+  "Vue",
+  "Astro",
+] as const satisfies readonly ComboboxPreviewValue[];
 
 type InvoiceStatus = "Paid" | "Pending" | "Overdue";
 
@@ -1760,7 +1925,7 @@ function ControlSelect<T extends string>({
         aria-label={`Select ${label}`}
         className="w-36"
         valueClassName="font-medium"
-        variant="soft"
+        variant="outline"
       />
       <SelectPortal>
         <SelectPositioner align="end">
@@ -1944,8 +2109,18 @@ function getFilteredNavGroups(query: string): NavigationGroup[] {
 }
 
 function SoundProviderControls() {
-  const { enabled, variant, volume, setEnabled, setVariant, setVolume, play } =
-    useSound();
+  const {
+    depths,
+    enabled,
+    variant,
+    volume,
+    setDepthEnabled,
+    setEnabled,
+    setVariant,
+    setVolume,
+    play,
+  } = useSound();
+  const [feedbackValue, setFeedbackValue] = React.useState(40);
 
   return (
     <div className="grid w-full max-w-md gap-6 px-6">
@@ -1962,6 +2137,16 @@ function SoundProviderControls() {
           active={variant}
           onValueChange={setVariant}
         />
+
+        {soundDepths.map((depth) => (
+          <BooleanOptionRow
+            key={depth}
+            label={depth}
+            checked={depths[depth]}
+            onCheckedChange={(checked) => setDepthEnabled(depth, checked)}
+            typeLabel="depth"
+          />
+        ))}
 
         <label className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
           <span className="min-w-0">
@@ -1980,6 +2165,35 @@ function SoundProviderControls() {
             value={volume}
             onChange={(event) => setVolume(Number(event.currentTarget.value))}
             className="h-2 w-36 cursor-pointer accent-orange-600"
+          />
+        </label>
+
+        <label className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
+          <span className="min-w-0">
+            <span className="block text-sm font-medium text-foreground">
+              slider feedback
+            </span>
+            <span className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
+              {feedbackValue}
+            </span>
+          </span>
+          <Slider
+            aria-label="Slider feedback"
+            className="w-36"
+            color="accent"
+            max={100}
+            min={0}
+            onValueChange={(value) => {
+              if (typeof value === "number") {
+                setFeedbackValue(value);
+              }
+            }}
+            shape="round"
+            size="small"
+            sound={sliderFeedbackSound}
+            step={1}
+            value={feedbackValue}
+            variant="soft"
           />
         </label>
       </div>
@@ -2334,9 +2548,67 @@ function SelectPreview({
   );
 }
 
+function ComboboxPreview({
+  settings,
+  value,
+  onValueChange,
+}: {
+  settings: ComboboxSettings;
+  value: ComboboxPreviewValue;
+  onValueChange: (value: ComboboxPreviewValue) => void;
+}) {
+  return (
+    <ComboboxRoot<ComboboxPreviewValue>
+      value={value}
+      onValueChange={(nextValue) => {
+        if (nextValue) {
+          onValueChange(nextValue);
+        }
+      }}
+      items={comboboxPreviewItems}
+      size={settings.size}
+      shape={settings.shape}
+      disabled={settings.disabled}
+      readOnly={settings.readOnly}
+      autoHighlight
+    >
+      <div className="w-full max-w-xs px-6">
+        <ComboboxInputGroup
+          variant={settings.variant}
+          size={settings.size}
+          shape={settings.shape}
+          invalid={settings.invalid}
+          prefix={settings.prefix ? <MagnifyingGlassIcon /> : undefined}
+        >
+          <ComboboxInput
+            aria-label="Preview combobox"
+            placeholder="Search frameworks"
+          />
+          {settings.clearable && <ComboboxClear />}
+          <ComboboxTrigger />
+        </ComboboxInputGroup>
+      </div>
+      <ComboboxPortal>
+        <ComboboxPositioner>
+          <ComboboxPopup>
+            <ComboboxList>
+              {(item: ComboboxPreviewValue) => (
+                <ComboboxItem key={item} value={item}>
+                  {item}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+            <ComboboxEmpty>No frameworks found</ComboboxEmpty>
+          </ComboboxPopup>
+        </ComboboxPositioner>
+      </ComboboxPortal>
+    </ComboboxRoot>
+  );
+}
+
 function SoundProviderPreview() {
   return (
-    <SoundProvider enabled variant="pop" volume={0.8}>
+    <SoundProvider enabled depths={soundDepths} variant="pop" volume={0.8}>
       <SoundProviderControls />
     </SoundProvider>
   );
@@ -2487,6 +2759,96 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
         </PopoverPositioner>
       </PopoverPortal>
     </PopoverRoot>
+  );
+}
+
+const toastPreviewCopy = {
+  default: {
+    title: "Queued",
+    description: "Your export is waiting for the next publish window.",
+  },
+  success: {
+    title: "Saved",
+    description: "Your changes are now live in the component library.",
+  },
+  error: {
+    title: "Publish failed",
+    description: "Check the build output before trying again.",
+  },
+  warning: {
+    title: "Review changes",
+    description: "Some settings affect every installed component.",
+  },
+  info: {
+    title: "Heads up",
+    description: "A new component preview is ready to inspect.",
+  },
+} satisfies Record<ToastType, { title: string; description: string }>;
+
+function ToastPreview({ settings }: { settings: ToastSettings }) {
+  const maxToasts = Number(settings.maxToasts);
+
+  return (
+    <>
+      <Toaster
+        colorful={settings.colorful}
+        limit={maxToasts}
+        maxToasts={maxToasts}
+        position={settings.position}
+        shape={settings.shape}
+        timeout={0}
+      />
+      <ToastPreviewContent settings={settings} />
+    </>
+  );
+}
+
+function ToastPreviewContent({ settings }: { settings: ToastSettings }) {
+  const copy = toastPreviewCopy[settings.type];
+  const type = settings.type === "default" ? undefined : settings.type;
+  const toastIds = React.useRef(new Set<string>());
+  const toastIdCounter = React.useRef(0);
+  const actionProps = React.useMemo(
+    () => (settings.action ? { children: "Undo" } : undefined),
+    [settings.action],
+  );
+  const showToast = React.useCallback(() => {
+    toastIdCounter.current += 1;
+    const id = `preview-toast-${toastIdCounter.current}`;
+    toastIds.current.add(id);
+
+    toast({
+      id,
+      title: copy.title,
+      description: copy.description,
+      type,
+      timeout: 0,
+      actionProps,
+      onRemove: () => {
+        toastIds.current.delete(id);
+      },
+    });
+  }, [actionProps, copy.description, copy.title, type]);
+
+  React.useEffect(() => {
+    const ids = toastIds.current;
+
+    return () => {
+      ids.forEach((id) => toast.close(id));
+      ids.clear();
+    };
+  }, []);
+
+  return (
+    <div className="relative flex min-h-80 w-full items-center justify-center px-6 py-10">
+      <Button
+        type="button"
+        color="neutral"
+        onClick={showToast}
+      >
+        Show toast
+      </Button>
+    </div>
   );
 }
 
@@ -2775,8 +3137,8 @@ export function SaveButton() {
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
           Aspekt stays silent unless you opt in. Add SoundProvider when you want
-          components to play sound, disable sound globally, change the sound
-          variant, or tune the volume across your app.
+          components to play sound, subscribe to specific sound depths, change
+          the sound variant, or tune the volume across your app.
         </Text>
         <Snippet
           className="max-w-3xl"
@@ -2784,7 +3146,12 @@ export function SaveButton() {
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
-    <SoundProvider enabled variant="pop" volume={0.8}>
+    <SoundProvider
+      enabled
+      depths={["interactions", "cues"]}
+      variant="pop"
+      volume={0.8}
+    >
       {children}
     </SoundProvider>
   );
@@ -2963,6 +3330,16 @@ const colorTokenGroups = [
         description: "Dangerous or destructive actions.",
       },
       {
+        name: "--destructive-surface",
+        className: "bg-destructive-surface",
+        description: "Soft destructive surfaces for status components.",
+      },
+      {
+        name: "--destructive-border",
+        className: "bg-destructive-border",
+        description: "Lower-chroma destructive borders and outlines.",
+      },
+      {
         name: "--destructive-foreground",
         className: "bg-destructive-foreground",
         description: "Text and icons placed on destructive surfaces.",
@@ -2978,6 +3355,16 @@ const colorTokenGroups = [
         description: "Successful states and positive confirmations.",
       },
       {
+        name: "--success-surface",
+        className: "bg-success-surface",
+        description: "Soft success surfaces for status components.",
+      },
+      {
+        name: "--success-border",
+        className: "bg-success-border",
+        description: "Lower-chroma success borders and outlines.",
+      },
+      {
         name: "--success-foreground",
         className: "bg-success-foreground",
         description: "Text and icons placed on success surfaces.",
@@ -2988,6 +3375,16 @@ const colorTokenGroups = [
         description: "Cautionary states that need attention.",
       },
       {
+        name: "--warning-surface",
+        className: "bg-warning-surface",
+        description: "Soft warning surfaces for status components.",
+      },
+      {
+        name: "--warning-border",
+        className: "bg-warning-border",
+        description: "Lower-chroma warning borders and outlines.",
+      },
+      {
         name: "--warning-foreground",
         className: "bg-warning-foreground",
         description: "Text and icons placed on warning surfaces.",
@@ -2996,6 +3393,16 @@ const colorTokenGroups = [
         name: "--info",
         className: "bg-info",
         description: "Informational states and neutral notices.",
+      },
+      {
+        name: "--info-surface",
+        className: "bg-info-surface",
+        description: "Soft info surfaces for status components.",
+      },
+      {
+        name: "--info-border",
+        className: "bg-info-border",
+        description: "Lower-chroma info borders and outlines.",
       },
       {
         name: "--info-foreground",
@@ -3504,8 +3911,8 @@ function SonificationDocumentation() {
           <Text size="base" tone="muted" className="max-w-3xl">
             Sonification is Aspekt&apos;s optional layer for short, intentional
             audio feedback. It can make presses, toggles, confirmations, and
-            errors feel more immediate without requiring every component to make
-            noise by default.
+            errors feel more immediate while letting apps subscribe to the sound
+            depths that match their product.
           </Text>
         </div>
 
@@ -3517,6 +3924,7 @@ function SonificationDocumentation() {
       <TabsRoot defaultValue="usage" variant="line" color="neutral">
         <TabsList>
           <TabsTab value="usage">Usage</TabsTab>
+          <TabsTab value="depths">Depths</TabsTab>
           <TabsTab value="principles">Principles</TabsTab>
           <TabsIndicator />
         </TabsList>
@@ -3524,8 +3932,12 @@ function SonificationDocumentation() {
           <div className="grid gap-4">
             <Text size="base" tone="muted" className="max-w-3xl">
               Sound is silent until your app opts in with SoundProvider. After
-              that, global settings can enable, disable, tune, or change the
-              sound variant across every Aspekt component that supports sound.
+              that, global settings can enable, disable, tune, change the sound
+              variant, or subscribe to specific sound depths across every Aspekt
+              component that supports sound. By default, SoundProvider
+              subscribes to interactions and cues. Add feedback when continuous
+              controls should make sound while they move; Slider feedback adapts
+              to the range so dense controls do not become noisy.
             </Text>
             <Snippet
               className="max-w-3xl"
@@ -3533,7 +3945,12 @@ function SonificationDocumentation() {
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
-    <SoundProvider enabled variant="pop" volume={0.8}>
+    <SoundProvider
+      enabled
+      depths={["interactions", "cues", "feedback"]}
+      variant="pop"
+      volume={0.8}
+    >
       {children}
     </SoundProvider>
   );
@@ -3562,12 +3979,49 @@ export function Actions() {
             />
           </div>
         </TabsPanel>
+        <TabsPanel value="depths">
+          <div className="grid gap-4">
+            <Text size="base" tone="muted" className="max-w-3xl">
+              Depths split sound into independent subscriptions. Keep the whole
+              system enabled, then choose which categories are allowed to play
+              for the current product, surface, or user preference.
+            </Text>
+            <List
+              variant="disc"
+              spacing="normal"
+              tone="muted"
+              className="max-w-3xl"
+            >
+              {soundDepths.map((depth) => (
+                <ListItem key={depth}>
+                  <Code>{soundDepthCopy[depth].label}</Code> covers{" "}
+                  {soundDepthCopy[depth].description}
+                </ListItem>
+              ))}
+            </List>
+            <Snippet
+              className="max-w-3xl"
+              code={`<SoundProvider
+  depths={{
+    interactions: true,
+    cues: true,
+    feedback: false,
+  }}
+>
+  {children}
+</SoundProvider>`}
+              filename="app-providers.tsx"
+              language="tsx"
+            />
+          </div>
+        </TabsPanel>
         <TabsPanel value="principles">
           <div className="grid gap-4">
             <Text size="base" tone="muted" className="max-w-3xl">
               Sonification should support state, not decorate the interface.
               Short sounds work best when they confirm an action, signal a
-              result, or make a repeated control feel more tactile.
+              result, or make a repeated control feel more tactile without
+              playing every possible high-resolution value change.
             </Text>
             <List
               variant="disc"
@@ -3576,6 +4030,9 @@ export function Actions() {
               className="max-w-3xl"
             >
               <ListItem>Opt in globally with SoundProvider.</ListItem>
+              <ListItem>
+                Subscribe only to the depths that make the interface clearer.
+              </ListItem>
               <ListItem>Keep defaults quiet and predictable.</ListItem>
               <ListItem>
                 Override individual components when context matters.
@@ -3631,6 +4088,8 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [selectSettings, setSelectSettings] = React.useState<SelectSettings>(
     defaultSelectSettings,
   );
+  const [comboboxSettings, setComboboxSettings] =
+    React.useState<ComboboxSettings>(defaultComboboxSettings);
   const [toggleSettings, setToggleSettings] = React.useState<ToggleSettings>(
     defaultToggleSettings,
   );
@@ -3643,6 +4102,8 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [popoverSettings, setPopoverSettings] = React.useState<PopoverSettings>(
     defaultPopoverSettings,
   );
+  const [toastSettings, setToastSettings] =
+    React.useState<ToastSettings>(defaultToastSettings);
   const [tabsSettings, setTabsSettings] =
     React.useState<TabsSettings>(defaultTabsSettings);
   const [tableSettings, setTableSettings] =
@@ -3670,6 +4131,8 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [inputValue, setInputValue] = React.useState("Search components");
   const [selectValue, setSelectValue] =
     React.useState<SelectPreviewValue>("react");
+  const [comboboxValue, setComboboxValue] =
+    React.useState<ComboboxPreviewValue>("React");
   const [activePage, setActivePage] = React.useState<DocsPage>(initialPage);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [mobileMenuSearch, setMobileMenuSearch] = React.useState("");
@@ -3890,6 +4353,12 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                       value={selectValue}
                       onValueChange={setSelectValue}
                     />
+                  ) : activeComponent === "combobox" ? (
+                    <ComboboxPreview
+                      settings={comboboxSettings}
+                      value={comboboxValue}
+                      onValueChange={setComboboxValue}
+                    />
                   ) : activeComponent === "slider" ? (
                     <SliderPreview
                       settings={sliderSettings}
@@ -3926,6 +4395,8 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     <DrawerPreview settings={drawerSettings} />
                   ) : activeComponent === "popover" ? (
                     <PopoverPreview settings={popoverSettings} />
+                  ) : activeComponent === "toast" ? (
+                    <ToastPreview settings={toastSettings} />
                   ) : activeComponent === "tabs" ? (
                     <TabsPreview settings={tabsSettings} />
                   ) : activeComponent === "table" ? (
@@ -4395,6 +4866,102 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                       </div>
                     )}
 
+                    {activeComponent === "combobox" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="variant"
+                          values={comboboxOptions.variant}
+                          active={comboboxSettings.variant}
+                          onValueChange={(variant) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              variant,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="size"
+                          values={comboboxOptions.size}
+                          active={comboboxSettings.size}
+                          onValueChange={(size) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              size,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="shape"
+                          values={comboboxOptions.shape}
+                          active={comboboxSettings.shape}
+                          onValueChange={(shape) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              shape,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="prefix"
+                          checked={comboboxSettings.prefix}
+                          typeLabel="ReactNode"
+                          onCheckedChange={(prefix) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              prefix,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="clearable"
+                          checked={comboboxSettings.clearable}
+                          onCheckedChange={(clearable) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              clearable,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="invalid"
+                          checked={comboboxSettings.invalid}
+                          onCheckedChange={(invalid) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              invalid,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="disabled"
+                          checked={comboboxSettings.disabled}
+                          onCheckedChange={(disabled) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              disabled,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="readOnly"
+                          checked={comboboxSettings.readOnly}
+                          onCheckedChange={(readOnly) =>
+                            setComboboxSettings((settings) => ({
+                              ...settings,
+                              readOnly,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
                     {activeComponent === "switch" && (
                       <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
                         <OptionRow
@@ -4823,6 +5390,81 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                             setPopoverSettings((settings) => ({
                               ...settings,
                               size,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
+                    {activeComponent === "toast" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="shape"
+                          values={toastOptions.shape}
+                          active={toastSettings.shape}
+                          onValueChange={(shape) =>
+                            setToastSettings((settings) => ({
+                              ...settings,
+                              shape,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="position"
+                          values={toastOptions.position}
+                          active={toastSettings.position}
+                          onValueChange={(position) =>
+                            setToastSettings((settings) => ({
+                              ...settings,
+                              position,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="maxToasts"
+                          values={toastOptions.maxToasts}
+                          active={toastSettings.maxToasts}
+                          onValueChange={(maxToasts) =>
+                            setToastSettings((settings) => ({
+                              ...settings,
+                              maxToasts,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="type"
+                          values={toastOptions.type}
+                          active={toastSettings.type}
+                          onValueChange={(type) =>
+                            setToastSettings((settings) => ({
+                              ...settings,
+                              type,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="action"
+                          checked={toastSettings.action}
+                          typeLabel="ReactNode"
+                          onCheckedChange={(action) =>
+                            setToastSettings((settings) => ({
+                              ...settings,
+                              action,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="colorful"
+                          checked={toastSettings.colorful}
+                          onCheckedChange={(colorful) =>
+                            setToastSettings((settings) => ({
+                              ...settings,
+                              colorful,
                             }))
                           }
                         />

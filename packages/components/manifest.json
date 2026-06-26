@@ -102,6 +102,31 @@
       ]
     },
     {
+      "name": "combobox",
+      "kind": "component",
+      "title": "Combobox",
+      "description": "A Base UI combobox with searchable input, popup styling, item indicators, empty state, and optional interaction sounds.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/combobox.tsx",
+          "target": "components/aspekt/combobox.tsx"
+        },
+        {
+          "path": "packages/components/src/components/sound.ts",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
       "name": "slider",
       "kind": "component",
       "title": "Slider",
@@ -261,6 +286,27 @@
       "categories": [
         "ui",
         "overlay"
+      ]
+    },
+    {
+      "name": "toast",
+      "kind": "component",
+      "title": "Toast",
+      "description": "A Base UI toast system with provider, viewport, manager hook, styled notifications, actions, and dismissal.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/toast.tsx",
+          "target": "components/aspekt/toast.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "feedback"
       ]
     },
     {
@@ -488,6 +534,10 @@
           "target": "components/aspekt/select.tsx"
         },
         {
+          "path": "packages/components/src/components/combobox.tsx",
+          "target": "components/aspekt/combobox.tsx"
+        },
+        {
           "path": "packages/components/src/components/slider.tsx",
           "target": "components/aspekt/slider.tsx"
         },
@@ -510,6 +560,10 @@
         {
           "path": "packages/components/src/components/popover.tsx",
           "target": "components/aspekt/popover.tsx"
+        },
+        {
+          "path": "packages/components/src/components/toast.tsx",
+          "target": "components/aspekt/toast.tsx"
         },
         {
           "path": "packages/components/src/components/tabs.tsx",

@@ -3,8 +3,14 @@
 import * as React from "react";
 import {
   configureSounds,
+  getSoundDepthSettings,
   getSoundSettings,
+  type SoundDepth,
+  soundDepths,
+  type SoundDepthInput,
+  type SoundDepthSettings,
   type SoundName,
+  type SoundPlayOptions,
   soundVariants,
   type SoundVariant,
   playSound,
@@ -14,6 +20,7 @@ import {
 
 type SoundProviderProps = {
   enabled?: boolean;
+  depths?: SoundDepthInput;
   variant?: SoundVariant;
   volume?: number;
   children: React.ReactNode;
@@ -21,10 +28,13 @@ type SoundProviderProps = {
 
 type SoundContextValue = {
   enabled: boolean;
+  depths: SoundDepthSettings;
   variant: SoundVariant;
   volume: number;
-  play: (sound: SoundName) => void;
+  play: (sound: SoundName, options?: SoundPlayOptions) => void;
   setEnabled: (enabled: boolean) => void;
+  setDepthEnabled: (depth: SoundDepth, enabled: boolean) => void;
+  setDepths: (depths: SoundDepthInput) => void;
   setVariant: (variant: SoundVariant) => void;
   setVolume: (volume: number) => void;
 };
@@ -33,11 +43,15 @@ const SoundContext = React.createContext<SoundContextValue | null>(null);
 
 export function SoundProvider({
   enabled = true,
+  depths,
   variant = "pop",
   volume = 1,
   children,
 }: SoundProviderProps) {
   const [enabledState, setEnabledState] = React.useState(enabled);
+  const [depthState, setDepthState] = React.useState(
+    () => getSoundDepthSettings(depths),
+  );
   const [variantState, setVariantState] = React.useState(variant);
   const [volumeState, setVolumeState] = React.useState(volume);
 
@@ -52,14 +66,32 @@ export function SoundProvider({
   React.useEffect(() => {
     configureSounds({
       enabled: enabledState,
+      depths: depthState,
       variant: variantState,
       volume: volumeState,
     });
-  }, [enabledState, variantState, volumeState]);
+  }, [depthState, enabledState, variantState, volumeState]);
 
-  const play = React.useCallback((sound: SoundName) => {
-    playSound(sound);
+  const play = React.useCallback(
+    (sound: SoundName, options?: SoundPlayOptions) => {
+      playSound(sound, options);
+    },
+    [],
+  );
+
+  const setDepths = React.useCallback((nextDepths: SoundDepthInput) => {
+    setDepthState(getSoundDepthSettings(nextDepths));
   }, []);
+
+  const setDepthEnabled = React.useCallback(
+    (depth: SoundDepth, enabled: boolean) => {
+      setDepthState((currentDepths) => ({
+        ...currentDepths,
+        [depth]: enabled,
+      }));
+    },
+    [],
+  );
 
   const setEnabled = React.useCallback((nextEnabled: boolean) => {
     setEnabledState(nextEnabled);
@@ -76,19 +108,25 @@ export function SoundProvider({
   const value = React.useMemo(
     () => ({
       enabled: enabledState,
+      depths: depthState,
       variant: variantState,
       volume: volumeState,
       play,
       setEnabled,
+      setDepthEnabled,
+      setDepths,
       setVariant,
       setVolume,
     }),
     [
+      depthState,
       enabledState,
       variantState,
       volumeState,
       play,
       setEnabled,
+      setDepthEnabled,
+      setDepths,
       setVariant,
       setVolume,
     ],
@@ -109,14 +147,24 @@ export function useSound() {
 
   return {
     enabled: settings.enabled,
+    depths: settings.depths,
     variant: settings.variant,
     volume: settings.volume,
     play: noop,
     setEnabled: noop,
+    setDepthEnabled: noop,
+    setDepths: noop,
     setVariant: noop,
     setVolume: noop,
   } satisfies SoundContextValue;
 }
 
-export { soundVariants };
-export type { SoundName, SoundVariant };
+export { soundDepths, soundVariants };
+export type {
+  SoundDepth,
+  SoundDepthInput,
+  SoundDepthSettings,
+  SoundName,
+  SoundPlayOptions,
+  SoundVariant,
+};

@@ -6,10 +6,11 @@ import { Analytics } from "@vercel/analytics/next";
 export const metadata: Metadata = {
   title: "Aspekt UI",
   description: "Precision-crafted React components for modern web apps.",
+  metadataBase: new URL("https://www.aspekt.systems"),
   openGraph: {
     title: "Aspekt UI",
     description: "Precision-crafted React components for modern web apps.",
-    url: "https://aspekt.systems",
+    url: "https://www.aspekt.systems",
     siteName: "Aspekt UI",
     images: [
       {

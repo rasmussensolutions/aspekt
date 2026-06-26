@@ -20,6 +20,7 @@ const packageJsonPath = join(packageRoot, "package.json");
 const statePath = ".aspekt/components.json";
 
 const themeStart = "/* aspekt:start */";
+const themeEnd = "/* aspekt:end */";
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
@@ -438,9 +439,21 @@ function initProject(manifest, options) {
 function updateCssFile(cssPath) {
   const fileExists = existsSync(cssPath);
   const current = fileExists ? readFileSync(cssPath, "utf8") : "";
+  const themeCss = loadThemeCss();
 
   if (current.includes(themeStart)) {
-    console.log(`Theme tokens already exist in ${cssPath}.`);
+    const themeBlockPattern = new RegExp(
+      `${escapeRegExp(themeStart)}[\\s\\S]*?${escapeRegExp(themeEnd)}`,
+    );
+
+    if (!themeBlockPattern.test(current)) {
+      fail(`Found ${themeStart} in ${cssPath}, but ${themeEnd} is missing.`);
+    }
+
+    const next = current.replace(themeBlockPattern, themeCss);
+
+    writeFileSync(cssPath, next.endsWith("\n") ? next : `${next}\n`);
+    console.log(`Updated Aspekt theme tokens in ${cssPath}.`);
     return;
   }
 
@@ -450,13 +463,16 @@ function updateCssFile(cssPath) {
   );
   const needsTailwindImport = !hasTailwindImport && !hasTailwindDirectives;
   const prefix = needsTailwindImport ? '@import "tailwindcss";\n\n' : "";
-  const themeCss = loadThemeCss();
   const body = current.trimEnd();
   const next = `${prefix}${body}${body ? "\n\n" : ""}${themeCss}\n`;
 
   mkdirSync(dirname(cssPath), { recursive: true });
   writeFileSync(cssPath, next);
   console.log(`Updated ${cssPath}.`);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function getInstalledDependencies(cwd) {
