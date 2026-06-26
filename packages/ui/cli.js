@@ -11,61 +11,35 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const packageRoot = dirname(fileURLToPath(import.meta.url));
-const registryRoot = join(packageRoot, "registry");
-const registryPath = join(registryRoot, "registry.json");
+const templatesRoot = join(packageRoot, "templates");
+const manifestPath = join(templatesRoot, "manifest.json");
+const themeCssPath = join(templatesRoot, "theme.css");
 const packageJsonPath = join(packageRoot, "package.json");
 
 const themeStart = "/* aspekt:start */";
-const themeEnd = "/* aspekt:end */";
-
-const themeCss = `${themeStart}
-@custom-variant dark (&:where(.dark, .dark *));
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --background-rgb: 255 255 255;
-  --foreground-rgb: 23 23 23;
-  --primary: #ff5800;
-  --primary-foreground: #ffffff;
-  --accent-foreground: #171717;
-  color-scheme: light;
-}
-
-:root.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --background-rgb: 10 10 10;
-  --foreground-rgb: 237 237 237;
-  --primary: #ff5800;
-  --primary-foreground: #171717;
-  --accent-foreground: #ededed;
-  color-scheme: dark;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-accent-foreground: var(--accent-foreground);
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
-}
-${themeEnd}`;
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
 }
 
-function loadRegistry() {
-  if (!existsSync(registryPath)) {
+function loadManifest() {
+  if (!existsSync(manifestPath)) {
     fail(
-      "The Aspekt registry is missing. Run `pnpm --filter @aspekt/cli registry:sync` in the Aspekt repo before publishing.",
+      "The Aspekt templates are missing. Run `pnpm --filter @aspekt/ui templates:sync` in the Aspekt repo before publishing.",
     );
   }
 
-  return readJson(registryPath);
+  return readJson(manifestPath);
+}
+
+function loadThemeCss() {
+  if (!existsSync(themeCssPath)) {
+    fail(
+      "The Aspekt theme template is missing. Run `pnpm --filter @aspekt/ui templates:sync` in the Aspekt repo before publishing.",
+    );
+  }
+
+  return readFileSync(themeCssPath, "utf8").trimEnd();
 }
 
 function fail(message) {
@@ -77,9 +51,9 @@ function printHelp() {
   console.log(`aspekt
 
 Usage:
-  npx @aspekt/cli init [options]
-  npx @aspekt/cli add <component...> [options]
-  npx @aspekt/cli list
+  npx @aspekt/ui init [options]
+  npx @aspekt/ui add <component...> [options]
+  npx @aspekt/ui list
 
 Commands:
   init                 Add Aspekt theme tokens and install shared dependencies.
@@ -146,23 +120,23 @@ function getVersion() {
   return readJson(packageJsonPath).version;
 }
 
-function getPublicItems(registry) {
-  return registry.items.filter((item) => item.type !== "registry:base");
+function getPublicItems(manifest) {
+  return manifest.items.filter((item) => item.kind !== "base");
 }
 
-function getItem(registry, name) {
-  return registry.items.find((item) => item.name === name);
+function getItem(manifest, name) {
+  return manifest.items.find((item) => item.name === name);
 }
 
-function listItems(registry) {
+function listItems(manifest) {
   console.log("Available Aspekt components:\n");
 
-  for (const item of getPublicItems(registry)) {
+  for (const item of getPublicItems(manifest)) {
     console.log(`  ${item.name.padEnd(16)} ${item.description ?? ""}`);
   }
 
   console.log("\nInstall with:");
-  console.log("  npx @aspekt/cli add button");
+  console.log("  npx @aspekt/ui add button");
 }
 
 function getTargetPath(file, options) {
@@ -173,15 +147,15 @@ function getTargetPath(file, options) {
   return file.target;
 }
 
-function collectItems(registry, names) {
+function collectItems(manifest, names) {
   const selectedNames = names.includes("all")
-    ? getPublicItems(registry).map((item) => item.name)
+    ? getPublicItems(manifest).map((item) => item.name)
     : names;
 
   const selectedItems = selectedNames.map((name) => {
-    const item = getItem(registry, name);
+    const item = getItem(manifest, name);
     if (!item) {
-      const available = getPublicItems(registry)
+      const available = getPublicItems(manifest)
         .map((publicItem) => publicItem.name)
         .join(", ");
       fail(`Unknown component "${name}". Available components: ${available}.`);
@@ -218,21 +192,21 @@ function ensureProject(cwd, options) {
   }
 }
 
-function addComponents(registry, names, options) {
+function addComponents(manifest, names, options) {
   const requestedNames = options.all ? ["all"] : names;
 
   if (requestedNames.length === 0) {
     fail(
-      "Pass at least one component name, for example `npx @aspekt/cli add button`.",
+      "Pass at least one component name, for example `npx @aspekt/ui add button`.",
     );
   }
 
   const cwd = resolve(options.cwd);
   ensureProject(cwd, options);
 
-  const { dependencies, files, items } = collectItems(registry, requestedNames);
+  const { dependencies, files, items } = collectItems(manifest, requestedNames);
   const writes = files.map((file) => {
-    const sourcePath = join(registryRoot, file.source);
+    const sourcePath = join(templatesRoot, file.source);
     const target = getTargetPath(file, options);
     const targetPath = resolve(cwd, target);
 
@@ -309,13 +283,13 @@ function findCssFile(cwd, requestedPath) {
   return resolve(cwd, "src/index.css");
 }
 
-function initProject(registry, options) {
+function initProject(manifest, options) {
   const cwd = resolve(options.cwd);
   ensureProject(cwd, options);
 
   const targetDir = resolve(cwd, options.path ?? "components/aspekt");
   const cssPath = findCssFile(cwd, options.css);
-  const baseItem = getItem(registry, "aspekt-ui");
+  const baseItem = getItem(manifest, "aspekt-ui");
   const dependencies = baseItem?.dependencies ?? [];
 
   if (options.dryRun) {
@@ -336,7 +310,7 @@ function initProject(registry, options) {
   }
 
   console.log("\nNext:");
-  console.log("  npx @aspekt/cli add button");
+  console.log("  npx @aspekt/ui add button");
 }
 
 function updateCssFile(cssPath) {
@@ -354,6 +328,7 @@ function updateCssFile(cssPath) {
   );
   const needsTailwindImport = !hasTailwindImport && !hasTailwindDirectives;
   const prefix = needsTailwindImport ? '@import "tailwindcss";\n\n' : "";
+  const themeCss = loadThemeCss();
   const body = current.trimEnd();
   const next = `${prefix}${body}${body ? "\n\n" : ""}${themeCss}\n`;
 
@@ -441,16 +416,16 @@ function main() {
     return;
   }
 
-  const registry = loadRegistry();
+  const manifest = loadManifest();
 
   if (command === "list") {
-    listItems(registry);
+    listItems(manifest);
   } else if (command === "add") {
-    addComponents(registry, args, options);
+    addComponents(manifest, args, options);
   } else if (command === "init") {
-    initProject(registry, options);
+    initProject(manifest, options);
   } else {
-    fail(`Unknown command "${command}". Run \`npx @aspekt/cli --help\`.`);
+    fail(`Unknown command "${command}". Run \`npx @aspekt/ui --help\`.`);
   }
 }
 

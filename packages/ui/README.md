@@ -1,46 +1,22 @@
-# Aspekt UI
+# Aspekt CLI
 
-React components for Aspekt.
-
-## Recommended usage
-
-Use the Aspekt CLI to copy component source into your React and Tailwind
-project:
+Add Aspekt UI source components to React and Tailwind projects.
 
 ```sh
-npx @aspekt/cli init
-npx @aspekt/cli add button
+npx @aspekt/ui init
+npx @aspekt/ui add button
 ```
 
-Then import the copied component from your app:
+The CLI copies component source into your project, usually under
+`components/aspekt`, so you can edit the components directly.
 
-```tsx
-import { Button } from "@/components/aspekt/button";
-
-export function Example() {
-  return <Button>Save</Button>;
-}
-```
-
-## Package install
-
-The compiled package is still available if you prefer a traditional npm
-dependency:
+## Commands
 
 ```sh
-npm install @aspekt/ui
+npx @aspekt/ui list
+npx @aspekt/ui init
+npx @aspekt/ui add button input dialog
 ```
 
-Import components from the root package or focused subpaths:
-
-```tsx
-import { Button } from "@aspekt/ui/button";
-
-export function Example() {
-  return <Button>Save</Button>;
-}
-```
-
-The package includes Base UI-powered primitives, Tailwind-generated styles, and Aspekt theme variables. Add the `dark` class to your root element to enable dark mode.
-
-Component entrypoints automatically load the package stylesheet. If your bundler requires explicit CSS imports, you can still import `@aspekt/ui/styles.css` once in your app entrypoint.
+Use `--force` to overwrite existing files, `--dry-run` to preview writes, and
+`--no-install` to skip package installation.

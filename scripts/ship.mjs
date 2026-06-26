@@ -35,8 +35,6 @@ if (!commitMessage) {
   process.exit(1);
 }
 
-run("pnpm", ["registry:validate"]);
-run("pnpm", ["registry:build"]);
 run("pnpm", ["cli:sync"]);
 run("pnpm", ["--dir", "apps/www", "lint"]);
 run("pnpm", ["docs:build"]);

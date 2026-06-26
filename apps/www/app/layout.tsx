@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { SoundProvider } from "@aspekt/ui/sound-provider";
+import { SoundProvider } from "@aspekt/components/sound-provider";
 
 export const metadata: Metadata = {
   title: "Aspekt UI",

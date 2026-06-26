@@ -1,205 +1,27 @@
 {
   "name": "@aspekt/ui",
-  "version": "0.1.5",
-  "description": "Aspekt UI React components.",
+  "version": "0.2.0",
+  "description": "CLI for adding Aspekt UI source components to React and Tailwind projects.",
   "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rasmussensolutions/aspekt.git",
-    "directory": "packages/ui"
-  },
-  "bugs": {
-    "url": "https://github.com/rasmussensolutions/aspekt/issues"
-  },
-  "homepage": "https://www.aspekt.systems",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./styles.css": "./dist/styles.css",
-    "./button": {
-      "types": "./dist/components/button.d.ts",
-      "import": "./dist/button.js"
-    },
-    "./checkbox": {
-      "types": "./dist/components/checkbox.d.ts",
-      "import": "./dist/checkbox.js"
-    },
-    "./code": {
-      "types": "./dist/components/code.d.ts",
-      "import": "./dist/code.js"
-    },
-    "./kbd": {
-      "types": "./dist/components/kbd.d.ts",
-      "import": "./dist/kbd.js"
-    },
-    "./prose": {
-      "types": "./dist/components/prose.d.ts",
-      "import": "./dist/prose.js"
-    },
-    "./blockquote": {
-      "types": "./dist/components/blockquote.d.ts",
-      "import": "./dist/blockquote.js"
-    },
-    "./list": {
-      "types": "./dist/components/list.d.ts",
-      "import": "./dist/list.js"
-    },
-    "./popover": {
-      "types": "./dist/components/popover.d.ts",
-      "import": "./dist/popover.js"
-    },
-    "./toggle": {
-      "types": "./dist/components/toggle.d.ts",
-      "import": "./dist/toggle.js"
-    },
-    "./dialog": {
-      "types": "./dist/components/dialog.d.ts",
-      "import": "./dist/dialog.js"
-    },
-    "./drawer": {
-      "types": "./dist/components/drawer.d.ts",
-      "import": "./dist/drawer.js"
-    },
-    "./input": {
-      "types": "./dist/components/input.d.ts",
-      "import": "./dist/input.js"
-    },
-    "./select": {
-      "types": "./dist/components/select.d.ts",
-      "import": "./dist/select.js"
-    },
-    "./snippet": {
-      "types": "./dist/components/snippet.d.ts",
-      "import": "./dist/snippet.js"
-    },
-    "./slider": {
-      "types": "./dist/components/slider.d.ts",
-      "import": "./dist/slider.js"
-    },
-    "./switch": {
-      "types": "./dist/components/switch.d.ts",
-      "import": "./dist/switch.js"
-    },
-    "./heading": {
-      "types": "./dist/components/heading.d.ts",
-      "import": "./dist/heading.js"
-    },
-    "./text": {
-      "types": "./dist/components/text.d.ts",
-      "import": "./dist/text.js"
-    },
-    "./sound": {
-      "types": "./dist/components/sound.d.ts",
-      "import": "./dist/sound.js"
-    },
-    "./sound-provider": {
-      "types": "./dist/components/sound-provider.d.ts",
-      "import": "./dist/sound-provider.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "blockquote": [
-        "dist/components/blockquote.d.ts"
-      ],
-      "button": [
-        "dist/components/button.d.ts"
-      ],
-      "checkbox": [
-        "dist/components/checkbox.d.ts"
-      ],
-      "code": [
-        "dist/components/code.d.ts"
-      ],
-      "dialog": [
-        "dist/components/dialog.d.ts"
-      ],
-      "drawer": [
-        "dist/components/drawer.d.ts"
-      ],
-      "heading": [
-        "dist/components/heading.d.ts"
-      ],
-      "input": [
-        "dist/components/input.d.ts"
-      ],
-      "kbd": [
-        "dist/components/kbd.d.ts"
-      ],
-      "list": [
-        "dist/components/list.d.ts"
-      ],
-      "popover": [
-        "dist/components/popover.d.ts"
-      ],
-      "prose": [
-        "dist/components/prose.d.ts"
-      ],
-      "select": [
-        "dist/components/select.d.ts"
-      ],
-      "slider": [
-        "dist/components/slider.d.ts"
-      ],
-      "snippet": [
-        "dist/components/snippet.d.ts"
-      ],
-      "sound": [
-        "dist/components/sound.d.ts"
-      ],
-      "sound-provider": [
-        "dist/components/sound-provider.d.ts"
-      ],
-      "switch": [
-        "dist/components/switch.d.ts"
-      ],
-      "text": [
-        "dist/components/text.d.ts"
-      ],
-      "toggle": [
-        "dist/components/toggle.d.ts"
-      ]
-    }
+  "bin": {
+    "aspekt": "./cli.js"
   },
   "files": [
-    "dist",
+    "cli.js",
+    "templates",
     "README.md"
   ],
-  "sideEffects": [
-    "./dist/*.js",
-    "./dist/styles.css"
-  ],
+  "scripts": {
+    "templates:sync": "node scripts/sync-templates.mjs",
+    "dev": "node cli.js",
+    "pack:dry-run": "pnpm pack --dry-run",
+    "prepack": "node scripts/sync-templates.mjs",
+    "prepublishOnly": "node scripts/sync-templates.mjs"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "scripts": {
-    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-    "build": "pnpm run clean && pnpm run build:js && pnpm run build:css",
-    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
-    "build:js": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "pack:dry-run": "pnpm pack --dry-run",
-    "publish:public": "pnpm publish --access public"
-  },
-  "dependencies": {
-    "@base-ui/react": "^1.6.0",
-    "class-variance-authority": "^0.7.1",
-    "cnfast": "^0.0.8",
-    "refractor": "^5.0.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/cli": "^4.3.1",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "tailwindcss": "^4.3.1",
-    "typescript": "^5"
-  },
-  "peerDependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
   }
 }

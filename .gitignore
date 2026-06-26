@@ -15,6 +15,7 @@ build/
 coverage/
 .turbo/
 *.tsbuildinfo
+packages/ui/templates/
 
 # Environment and local tooling
 .env

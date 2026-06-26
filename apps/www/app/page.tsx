@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@aspekt/ui/button";
-import { Checkbox } from "@aspekt/ui/checkbox";
-import { Code } from "@aspekt/ui/code";
-import { Blockquote } from "@aspekt/ui/blockquote";
+import { Button } from "@aspekt/components/button";
+import { Checkbox } from "@aspekt/components/checkbox";
+import { Code } from "@aspekt/components/code";
+import { Blockquote } from "@aspekt/components/blockquote";
 import {
   DialogClose,
   DialogContent,
@@ -15,7 +15,7 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@aspekt/ui/dialog";
+} from "@aspekt/components/dialog";
 import {
   DrawerBody,
   DrawerClose,
@@ -29,7 +29,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
   DrawerViewport,
-} from "@aspekt/ui/drawer";
+} from "@aspekt/components/drawer";
 import {
   PopoverArrow,
   PopoverBackdrop,
@@ -43,14 +43,14 @@ import {
   PopoverRoot,
   PopoverTitle,
   PopoverTrigger,
-} from "@aspekt/ui/popover";
-import { Heading } from "@aspekt/ui/heading";
-import { Kbd } from "@aspekt/ui/kbd";
-import { List, ListItem } from "@aspekt/ui/list";
-import { Prose } from "@aspekt/ui/prose";
-import { Text } from "@aspekt/ui/text";
+} from "@aspekt/components/popover";
+import { Heading } from "@aspekt/components/heading";
+import { Kbd } from "@aspekt/components/kbd";
+import { List, ListItem } from "@aspekt/components/list";
+import { Prose } from "@aspekt/components/prose";
+import { Text } from "@aspekt/components/text";
 
-import { Input } from "@aspekt/ui/input";
+import { Input } from "@aspekt/components/input";
 import {
   SelectItem,
   SelectList,
@@ -61,12 +61,12 @@ import {
   SelectScrollDownArrow,
   SelectScrollUpArrow,
   SelectTrigger,
-} from "@aspekt/ui/select";
-import { Slider } from "@aspekt/ui/slider";
-import { Snippet } from "@aspekt/ui/snippet";
-import { SoundProvider, useSound } from "@aspekt/ui/sound-provider";
-import { Switch } from "@aspekt/ui/switch";
-import { Toggle } from "@aspekt/ui/toggle";
+} from "@aspekt/components/select";
+import { Slider } from "@aspekt/components/slider";
+import { Snippet } from "@aspekt/components/snippet";
+import { SoundProvider, useSound } from "@aspekt/components/sound-provider";
+import { Switch } from "@aspekt/components/switch";
+import { Toggle } from "@aspekt/components/toggle";
 import {
   ArrowRightIcon,
   MagnifyingGlassIcon,
@@ -596,26 +596,26 @@ const componentCopy = {
 >;
 
 const componentImportExamples = {
-  button: 'import { Button } from "@aspekt/ui/button";',
-  checkbox: 'import { Checkbox } from "@aspekt/ui/checkbox";',
-  input: 'import { Input } from "@aspekt/ui/input";',
-  select: 'import { SelectRoot, SelectTrigger } from "@aspekt/ui/select";',
-  slider: 'import { Slider } from "@aspekt/ui/slider";',
-  switch: 'import { Switch } from "@aspekt/ui/switch";',
-  toggle: 'import { Toggle } from "@aspekt/ui/toggle";',
-  dialog: 'import { DialogRoot, DialogTrigger } from "@aspekt/ui/dialog";',
-  drawer: 'import { DrawerRoot, DrawerTrigger } from "@aspekt/ui/drawer";',
-  popover: 'import { PopoverRoot, PopoverTrigger } from "@aspekt/ui/popover";',
-  snippet: 'import { Snippet } from "@aspekt/ui/snippet";',
-  heading: 'import { Heading } from "@aspekt/ui/heading";',
-  text: 'import { Text } from "@aspekt/ui/text";',
-  code: 'import { Code } from "@aspekt/ui/code";',
-  kbd: 'import { Kbd } from "@aspekt/ui/kbd";',
-  prose: 'import { Prose } from "@aspekt/ui/prose";',
-  blockquote: 'import { Blockquote } from "@aspekt/ui/blockquote";',
-  list: 'import { List, ListItem } from "@aspekt/ui/list";',
+  button: 'import { Button } from "@/components/aspekt/button";',
+  checkbox: 'import { Checkbox } from "@/components/aspekt/checkbox";',
+  input: 'import { Input } from "@/components/aspekt/input";',
+  select: 'import { SelectRoot, SelectTrigger } from "@/components/aspekt/select";',
+  slider: 'import { Slider } from "@/components/aspekt/slider";',
+  switch: 'import { Switch } from "@/components/aspekt/switch";',
+  toggle: 'import { Toggle } from "@/components/aspekt/toggle";',
+  dialog: 'import { DialogRoot, DialogTrigger } from "@/components/aspekt/dialog";',
+  drawer: 'import { DrawerRoot, DrawerTrigger } from "@/components/aspekt/drawer";',
+  popover: 'import { PopoverRoot, PopoverTrigger } from "@/components/aspekt/popover";',
+  snippet: 'import { Snippet } from "@/components/aspekt/snippet";',
+  heading: 'import { Heading } from "@/components/aspekt/heading";',
+  text: 'import { Text } from "@/components/aspekt/text";',
+  code: 'import { Code } from "@/components/aspekt/code";',
+  kbd: 'import { Kbd } from "@/components/aspekt/kbd";',
+  prose: 'import { Prose } from "@/components/aspekt/prose";',
+  blockquote: 'import { Blockquote } from "@/components/aspekt/blockquote";',
+  list: 'import { List, ListItem } from "@/components/aspekt/list";',
   "sound-provider":
-    'import { SoundProvider, useSound } from "@aspekt/ui/sound-provider";',
+    'import { SoundProvider, useSound } from "@/components/aspekt/sound-provider";',
 } satisfies Record<ComponentPreview, string>;
 
 const componentUsageExamples = {
@@ -941,7 +941,7 @@ const selectPreviewItems = [
 const snippetExamples = {
   tsx: {
     filename: "save-button.tsx",
-    code: `import { Button } from "@aspekt/ui/button";
+    code: `import { Button } from "@/components/aspekt/button";
 
 export function SaveButton() {
   return (
@@ -953,16 +953,12 @@ export function SaveButton() {
   },
   bash: {
     filename: "terminal",
-    code: `npm install @aspekt/ui
-pnpm --filter @aspekt/ui build`,
+    code: `npx @aspekt/ui init
+npx @aspekt/ui add button`,
   },
   json: {
-    filename: "package.json",
-    code: `{
-  "dependencies": {
-    "@aspekt/ui": "^0.1.5"
-  }
-}`,
+    filename: "terminal",
+    code: `npx @aspekt/ui add button input dialog`,
   },
   css: {
     filename: "theme.css",
@@ -1452,7 +1448,7 @@ function ImportExample({
 }
 
 const soundProviderRootExample = `
-import { SoundProvider } from "@aspekt/ui/sound-provider";
+import { SoundProvider } from "@/components/aspekt/sound-provider";
 
 export default function RootLayout({
   children,
@@ -1472,7 +1468,7 @@ export default function RootLayout({
 `;
 
 const useSoundExample = `
-import { useSound } from "@aspekt/ui/sound-provider";
+import { useSound } from "@/components/aspekt/sound-provider";
 
 export function SoundSettings() {
   const variants = ["soft", "click", "snap", "pop", "thock"] as const;
@@ -1507,7 +1503,7 @@ export function SoundSettings() {
 `;
 
 const dialogExample = `
-import { Button } from "@aspekt/ui/button";
+import { Button } from "@/components/aspekt/button";
 import {
   DialogClose,
   DialogContent,
@@ -1519,7 +1515,7 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@aspekt/ui/dialog";
+} from "@/components/aspekt/dialog";
 
 export function ExampleDialog() {
   return (
@@ -1546,7 +1542,7 @@ export function ExampleDialog() {
 `;
 
 const drawerExample = `
-import { Button } from "@aspekt/ui/button";
+import { Button } from "@/components/aspekt/button";
 import {
   DrawerBody,
   DrawerClose,
@@ -1560,7 +1556,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
   DrawerViewport,
-} from "@aspekt/ui/drawer";
+} from "@/components/aspekt/drawer";
 
 export function ExampleDrawer() {
   return (
@@ -1591,7 +1587,7 @@ export function ExampleDrawer() {
 `;
 
 const popoverExample = `
-import { Button } from "@aspekt/ui/button";
+import { Button } from "@/components/aspekt/button";
 import {
   PopoverArrow,
   PopoverClose,
@@ -1604,7 +1600,7 @@ import {
   PopoverRoot,
   PopoverTitle,
   PopoverTrigger,
-} from "@aspekt/ui/popover";
+} from "@/components/aspekt/popover";
 
 export function ExamplePopover() {
   return (
@@ -1899,8 +1895,8 @@ function CodePreview({ settings }: { settings: CodeSettings }) {
           copyable={settings.copyable}
           variant={settings.variant}
           tone={settings.tone}
-        >{`npm install @aspekt/ui
-import { Code } from "@aspekt/ui/code";`}</Code>
+        >{`npx @aspekt/ui init
+import { Code } from "@/components/aspekt/code";`}</Code>
       )}
     </div>
   );
@@ -2113,7 +2109,7 @@ function DialogPreview({ settings }: { settings: DialogSettings }) {
           </DialogHeader>
 
           <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-500 dark:border-white/15 dark:bg-white/5 dark:text-neutral-300">
-            @aspekt/ui/dialog
+            @/components/aspekt/dialog
           </div>
 
           <DialogFooter>
@@ -2163,7 +2159,7 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
                     target
                   </span>
                   <span className="min-w-0 break-all text-right font-mono text-foreground">
-                    @aspekt/ui/drawer
+                    @/components/aspekt/drawer
                   </span>
                 </div>
                 <div className="flex min-w-0 items-center justify-between gap-4">
@@ -2171,7 +2167,7 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
                     install
                   </span>
                   <span className="min-w-0 break-all text-right font-mono text-foreground">
-                    npm install @aspekt/ui
+                    npx @aspekt/ui init
                   </span>
                 </div>
               </div>
@@ -2228,7 +2224,7 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
                   export
                 </span>
                 <span className="min-w-0 break-all text-right font-mono text-foreground">
-                  @aspekt/ui/popover
+                  @/components/aspekt/popover
                 </span>
               </div>
             </div>
@@ -2501,31 +2497,45 @@ function GettingStartedDocumentation() {
     <div className="grid gap-12">
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
         <Heading level={2} size="h5" className="max-w-3xl">
-          Install the package
+          Initialize Aspekt UI
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Add Aspekt UI from npm. Components are imported from focused subpaths
-          so you only reach for the pieces your app actually uses.
+          Run the CLI in a React and Tailwind project. It adds the Aspekt theme
+          tokens and prepares your project for copied source components.
         </Text>
         <Snippet
           className="max-w-3xl"
-          code="npm install @aspekt/ui"
+          code="npx @aspekt/ui init"
           language="bash"
         />
       </section>
 
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
         <Heading level={2} size="h5" className="max-w-3xl">
-          Import a component
+          Add a component
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Import directly from the component subpath. The shared Aspekt
-          stylesheet is loaded by the component entry, so you do not need a
-          separate global CSS import to get the default styles.
+          Add only the components you need. The CLI copies the component source
+          into your project so you can edit it directly.
         </Text>
         <Snippet
           className="max-w-3xl"
-          code={`import { Button } from "@aspekt/ui/button";
+          code="npx @aspekt/ui add button"
+          language="bash"
+        />
+      </section>
+
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <Heading level={2} size="h5" className="max-w-3xl">
+          Import local source
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Components live in your app, usually under components/aspekt. Import
+          them from your local component path.
+        </Text>
+        <Snippet
+          className="max-w-3xl"
+          code={`import { Button } from "@/components/aspekt/button";
 
 export function SaveButton() {
   return <Button>Save changes</Button>;
@@ -2540,8 +2550,8 @@ export function SaveButton() {
           Use the same pattern everywhere
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Every component follows the same package pattern. Browse the sidebar,
-          pick the component you need, and import it from its own path.
+          Every component follows the same local source pattern. Browse the
+          sidebar, pick the component you need, and add it with the CLI.
         </Text>
         <List
           variant="disc"
@@ -2550,16 +2560,17 @@ export function SaveButton() {
           className="max-w-3xl"
         >
           <ListItem>
-            <Code>@aspekt/ui/button</Code> for buttons.
+            <Code>npx @aspekt/ui add button</Code> for buttons.
           </ListItem>
           <ListItem>
-            <Code>@aspekt/ui/dialog</Code> for modal workflows.
+            <Code>npx @aspekt/ui add dialog</Code> for modal workflows.
           </ListItem>
           <ListItem>
-            <Code>@aspekt/ui/input</Code> for form fields.
+            <Code>npx @aspekt/ui add input</Code> for form fields.
           </ListItem>
           <ListItem>
-            <Code>@aspekt/ui/sound-provider</Code> for global sound control.
+            <Code>npx @aspekt/ui add sound-provider</Code> for global sound
+            control.
           </ListItem>
         </List>
       </section>
@@ -2575,7 +2586,7 @@ export function SaveButton() {
         </Text>
         <Snippet
           className="max-w-3xl"
-          code={`import { SoundProvider } from "@aspekt/ui/sound-provider";
+          code={`import { SoundProvider } from "@/components/aspekt/sound-provider";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -2600,7 +2611,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         </Text>
         <Snippet
           className="max-w-3xl"
-          code={`import { Button } from "@aspekt/ui/button";
+          code={`import { Button } from "@/components/aspekt/button";
 
 export function Actions() {
   return (

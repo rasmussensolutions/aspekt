@@ -3,18 +3,12 @@
   "private": true,
   "packageManager": "pnpm@11.2.2",
   "scripts": {
-    "dev": "pnpm --filter @aspekt/ui build && pnpm --dir apps/www dev",
-    "build": "pnpm registry:build && pnpm cli:sync && pnpm --dir apps/www build",
-    "docs:dev": "pnpm --filter @aspekt/ui build && pnpm --dir apps/www dev",
+    "dev": "pnpm --filter @aspekt/components build && pnpm --dir apps/www dev",
+    "build": "pnpm cli:sync && pnpm --dir apps/www build",
+    "docs:dev": "pnpm --filter @aspekt/components build && pnpm --dir apps/www dev",
     "docs:build": "pnpm --dir apps/www build",
-    "cli:sync": "pnpm --filter @aspekt/cli registry:sync",
-    "cli:pack:dry-run": "pnpm --filter @aspekt/cli pack:dry-run",
-    "registry:build": "shadcn build apps/registry.json -c . -o apps/www/public/r",
-    "registry:validate": "shadcn registry validate apps/registry.json -c .",
-    "registry:ship": "node scripts/ship.mjs",
+    "cli:sync": "pnpm --filter @aspekt/ui templates:sync",
+    "cli:pack:dry-run": "pnpm --filter @aspekt/ui pack:dry-run",
     "ship": "node scripts/ship.mjs"
-  },
-  "devDependencies": {
-    "shadcn": "^4.11.0"
   }
 }
