@@ -211,18 +211,27 @@ function addComponents(manifest, names, options) {
     const targetPath = resolve(cwd, target);
 
     if (!existsSync(sourcePath)) {
-      fail(`Registry source file is missing: ${file.source}.`);
+      fail(`Template source file is missing: ${file.source}.`);
     }
 
+    const sourceContent = readFileSync(sourcePath, "utf8");
+    const existingContent = existsSync(targetPath)
+      ? readFileSync(targetPath, "utf8")
+      : undefined;
+
     return {
+      existingContent,
+      isChanged: existingContent !== undefined && existingContent !== sourceContent,
+      isUnchanged: existingContent === sourceContent,
+      sourceContent,
       sourcePath,
       target,
       targetPath,
     };
   });
 
-  const existingTargets = writes
-    .filter((write) => existsSync(write.targetPath))
+  const changedTargets = writes
+    .filter((write) => write.isChanged)
     .map((write) => write.target);
 
   if (options.dryRun) {
@@ -230,7 +239,13 @@ function addComponents(manifest, names, options) {
     for (const item of items) console.log(`  ${item.name}`);
     console.log("\nWould write:");
     for (const write of writes) {
-      const suffix = existsSync(write.targetPath) ? " (exists)" : "";
+      const suffix = write.isUnchanged
+        ? " (exists, unchanged)"
+        : write.isChanged
+          ? options.force
+            ? " (exists, would overwrite)"
+            : " (exists, differs)"
+          : "";
       console.log(`  ${write.target}${suffix}`);
     }
     if (dependencies.length > 0) {
@@ -240,17 +255,19 @@ function addComponents(manifest, names, options) {
     return;
   }
 
-  if (existingTargets.length > 0 && !options.force) {
+  if (changedTargets.length > 0 && !options.force) {
     fail(
-      `Refusing to overwrite existing files: ${existingTargets.join(
+      `Refusing to overwrite changed files: ${changedTargets.join(
         ", ",
       )}. Re-run with --force to overwrite.`,
     );
   }
 
   for (const write of writes) {
+    if (write.isUnchanged) continue;
+
     mkdirSync(dirname(write.targetPath), { recursive: true });
-    writeFileSync(write.targetPath, readFileSync(write.sourcePath, "utf8"));
+    writeFileSync(write.targetPath, write.sourceContent);
   }
 
   console.log(
