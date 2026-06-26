@@ -752,7 +752,7 @@ const componentUsageExamples = {
   <ListItem>Import the component.</ListItem>
   <ListItem>Ship the interface.</ListItem>
 </List>`,
-  "sound-provider": `<SoundProvider enabled variant="soft" volume={0.8}>
+  "sound-provider": `<SoundProvider enabled variant="pop" volume={0.8}>
   <App />
 </SoundProvider>`,
 } satisfies Record<ComponentPreview, string>;
@@ -1458,7 +1458,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SoundProvider enabled variant="soft" volume={0.8}>
+        <SoundProvider enabled variant="pop" volume={0.8}>
           {children}
         </SoundProvider>
       </body>
@@ -2054,7 +2054,7 @@ function SelectPreview({
 
 function SoundProviderPreview() {
   return (
-    <SoundProvider enabled variant="soft" volume={0.8}>
+    <SoundProvider enabled variant="pop" volume={0.8}>
       <SoundProviderControls />
     </SoundProvider>
   );
@@ -2590,7 +2590,7 @@ export function SaveButton() {
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
-    <SoundProvider enabled variant="soft" volume={0.8}>
+    <SoundProvider enabled variant="pop" volume={0.8}>
       {children}
     </SoundProvider>
   );

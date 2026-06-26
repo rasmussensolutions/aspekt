@@ -31,7 +31,7 @@ const SoundContext = React.createContext<SoundContextValue | null>(null);
 
 export function SoundProvider({
   enabled = true,
-  variant = "soft",
+  variant = "pop",
   volume = 1,
   children,
 }: SoundProviderProps) {

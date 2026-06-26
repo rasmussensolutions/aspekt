@@ -38,7 +38,7 @@ type SoundSettings = {
 
 const settings: SoundSettings = {
   enabled: true,
-  variant: "soft",
+  variant: "pop",
   volume: 1,
 };
 
