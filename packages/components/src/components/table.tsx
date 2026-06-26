@@ -24,10 +24,8 @@ const tableWrapperVariants = cva(
   {
     variants: {
       variant: {
-        outline:
-          "border border-neutral-200 bg-background shadow-sm dark:border-white/15 dark:bg-neutral-950",
-        soft:
-          "border border-transparent bg-neutral-950/[0.04] dark:bg-white/[0.06]",
+        outline: "border border-border bg-card shadow-sm",
+        soft: "border border-transparent bg-muted",
         ghost: "border border-transparent bg-transparent",
       },
       size: {
@@ -52,19 +50,15 @@ const tableWrapperVariants = cva(
 );
 
 const tableRowVariants = cva(
-  [
-    "group/table-row border-b border-neutral-200 transition-colors last:border-b-0",
-    "dark:border-white/10",
-  ],
+  ["group/table-row border-b border-border transition-colors last:border-b-0"],
   {
     variants: {
       hoverable: {
-        true: "hover:bg-neutral-950/[0.035] dark:hover:bg-white/[0.06]",
+        true: "hover:bg-muted",
         false: "",
       },
       striped: {
-        true:
-          "odd:bg-transparent even:bg-neutral-950/[0.025] dark:even:bg-white/[0.035]",
+        true: "odd:bg-transparent even:bg-muted/60",
         false: "",
       },
     },
@@ -77,8 +71,7 @@ const tableRowVariants = cva(
 
 const tableHeaderVariants = cva(
   [
-    "border-y border-neutral-200 bg-transparent px-[var(--table-cell-x)] py-[var(--table-cell-y)] align-middle text-xs font-semibold text-neutral-500",
-    "dark:border-white/10 dark:bg-transparent dark:text-neutral-400",
+    "border-y border-border bg-transparent px-[var(--table-cell-x)] py-[var(--table-cell-y)] align-middle text-xs font-semibold text-muted-foreground",
   ],
 );
 
@@ -125,7 +118,7 @@ function SortIndicator({ direction }: { direction: false | "asc" | "desc" }) {
       aria-hidden="true"
       className={cn(
         "size-3.5 shrink-0 transition-colors",
-        direction ? "text-foreground" : "text-neutral-400",
+        direction ? "text-foreground" : "text-muted-foreground",
       )}
       viewBox="0 0 16 16"
       fill="none"
@@ -238,7 +231,7 @@ function Table<TData extends RowData>({
             <caption
               data-slot="table-caption"
               className={cn(
-                "px-[var(--table-cell-x)] py-[var(--table-cell-y)] text-left text-sm text-neutral-500 dark:text-neutral-400",
+                "px-[var(--table-cell-x)] py-[var(--table-cell-y)] text-left text-sm text-muted-foreground",
                 captionClassName,
               )}
             >
@@ -262,7 +255,7 @@ function Table<TData extends RowData>({
                         tableHeaderVariants(),
                         stickyHeader ? "sticky top-0 z-10 backdrop-blur" : "",
                         showColumnBorders
-                          ? "border-r last:border-r-0 dark:border-r-white/10"
+                          ? "border-r border-border last:border-r-0"
                           : "",
                         headerClassName,
                       )}
@@ -300,7 +293,7 @@ function Table<TData extends RowData>({
               <tr data-slot="table-loading-row">
                 <td
                   data-slot="table-loading"
-                  className="px-[var(--table-cell-x)] py-8 text-center text-sm text-neutral-500 dark:text-neutral-400"
+                  className="px-[var(--table-cell-x)] py-8 text-center text-sm text-muted-foreground"
                   colSpan={columnCount}
                 >
                   {loadingState}
@@ -310,7 +303,7 @@ function Table<TData extends RowData>({
               <tr data-slot="table-empty-row">
                 <td
                   data-slot="table-empty"
-                  className="px-[var(--table-cell-x)] py-8 text-center text-sm text-neutral-500 dark:text-neutral-400"
+                  className="px-[var(--table-cell-x)] py-8 text-center text-sm text-muted-foreground"
                   colSpan={columnCount}
                 >
                   {emptyState}
@@ -335,7 +328,7 @@ function Table<TData extends RowData>({
                       className={cn(
                         "px-[var(--table-cell-x)] py-[var(--table-cell-y)] align-middle text-foreground",
                         showColumnBorders
-                          ? "border-r border-neutral-200 last:border-r-0 dark:border-r-white/10"
+                          ? "border-r border-border last:border-r-0"
                           : "",
                       )}
                     >

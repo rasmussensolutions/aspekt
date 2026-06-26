@@ -10,18 +10,17 @@ import { playSound, type SoundName } from "./sound";
 const inputVariants = cva(
   [
     "group/input relative inline-flex w-full shrink-0 items-center border bg-[var(--input-background)] [--input-background:var(--background)]",
-    "[--input-ring:rgba(23,23,23,0.25)] dark:[--input-ring:rgba(237,237,237,0.25)]",
+    "[--input-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
     "text-foreground shadow-[0_0_0_1px_transparent]",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
     "focus-within:shadow-[0_0_0_1px_var(--input-ring)]",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-    "data-[invalid]:border-red-600/55 data-[invalid]:[--input-ring:rgba(220,38,38,0.2)]",
-    "dark:data-[invalid]:border-red-500/60",
+    "data-[invalid]:border-destructive/55 data-[invalid]:[--input-ring:color-mix(in_oklab,var(--destructive)_20%,transparent)]",
   ],
   {
     variants: {
       variant: {
-        outline: "border-neutral-200 dark:border-white/15",
+        outline: "border-border",
         soft:
           "border-transparent [--input-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] hover:[--input-background:color-mix(in_oklab,var(--foreground)_8%,var(--background))] dark:[--input-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))] dark:hover:[--input-background:color-mix(in_oklab,var(--foreground)_12%,var(--background))]",
         ghost:
@@ -212,9 +211,9 @@ function InputAffix({
       data-slot={isPrefix ? "input-prefix" : "input-suffix"}
       data-visible={show ? "" : undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden text-neutral-400",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden text-muted-foreground",
         "transition-[width,opacity,margin] duration-200 ease-out",
-        "group-focus-within/input:text-neutral-500 dark:group-focus-within/input:text-neutral-300",
+        "group-focus-within/input:text-foreground/70",
         show ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -245,9 +244,9 @@ function InputSuffix({
       data-slot="input-suffix"
       data-visible={show ? "" : undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden text-neutral-400",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden text-muted-foreground",
         "transition-[margin,opacity] duration-200 ease-out",
-        "group-focus-within/input:text-neutral-500 dark:group-focus-within/input:text-neutral-300",
+        "group-focus-within/input:text-foreground/70",
         show ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -454,7 +453,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
         onBlur={handleBlur}
         className={cn(
           "min-w-0 flex-1 bg-transparent outline-none",
-          "placeholder:text-neutral-400 disabled:cursor-not-allowed",
+          "placeholder:text-muted-foreground disabled:cursor-not-allowed",
           "read-only:cursor-default",
         )}
         {...props}
@@ -482,7 +481,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
             aria-hidden={!showClear || loading}
             tabIndex={showClear && !loading ? 0 : -1}
             className={cn(
-              "inline-flex items-center justify-center rounded-sm text-neutral-400 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/20",
+              "inline-flex items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/20",
               inputSpinnerSizes[resolvedSize],
             )}
           >

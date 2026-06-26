@@ -5,33 +5,101 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
+  --background: oklch(0.985 0.0053 106.5);
   --foreground: #171717;
+  --card: oklch(0.97 0.0068 100.36);
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
   --background-rgb: 255 255 255;
   --foreground-rgb: 23 23 23;
-  --primary: #ff5800;
+  --primary: #171717;
   --primary-foreground: #ffffff;
+  --secondary: oklch(0.94 0.006 100.36);
+  --secondary-foreground: #171717;
+  --accent: oklch(0.94 0.006 100.36);
   --accent-foreground: #171717;
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: #ffffff;
+  --muted: oklch(0.94 0.006 100.36);
+  --muted-foreground: #737373;
+  --border: oklch(0.88 0.006 100.36);
+  --input: oklch(0.88 0.006 100.36);
+  --ring: #737373;
+  --success: oklch(0.8118 0.2245 134.56);
+  --success-foreground: #ffffff;
+  --warning: oklch(0.7824 0.1703 68.82);
+  --warning-foreground: #ffffff;
+  --info: oklch(0.5282 0.2628 262.87);
+  --info-foreground: #ffffff;
+  --radius: 0.625rem;
   color-scheme: light;
 }
 
 :root.dark {
   --background: #0a0a0a;
   --foreground: #ededed;
+  --card: #171717;
+  --card-foreground: #ededed;
+  --popover: #171717;
+  --popover-foreground: #ededed;
   --background-rgb: 10 10 10;
   --foreground-rgb: 237 237 237;
-  --primary: #ff5800;
+  --primary: #ededed;
   --primary-foreground: #171717;
+  --secondary: #262626;
+  --secondary-foreground: #ededed;
+  --accent: #262626;
   --accent-foreground: #ededed;
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: #ffffff;
+  --muted: #262626;
+  --muted-foreground: #a1a1a1;
+  --border: rgb(255 255 255 / 15%);
+  --input: rgb(255 255 255 / 15%);
+  --ring: #a1a1a1;
+  --success: oklch(0.7 0.16 145);
+  --success-foreground: #07130a;
+  --warning: oklch(0.7824 0.1703 68.82);
+  --warning-foreground: #ffffff;
+  --info: oklch(0.72 0.15 250);
+  --info-foreground: #07111f;
   color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-full: 9999px;
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 }

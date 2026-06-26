@@ -10,7 +10,7 @@ import { playSound, type SoundName } from "./sound";
 const selectTriggerVariants = cva(
   [
     "group/select inline-flex w-full shrink-0 cursor-pointer items-center border bg-[var(--select-background)] [--select-background:var(--background)]",
-    "[--select-ring:rgba(23,23,23,0.25)] dark:[--select-ring:rgba(237,237,237,0.25)]",
+    "[--select-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
     "text-foreground shadow-[0_0_0_1px_transparent] outline-none select-none",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
     "hover:[--select-background:color-mix(in_oklab,var(--foreground)_4%,var(--background))]",
@@ -18,13 +18,12 @@ const selectTriggerVariants = cva(
     "data-[popup-open]:shadow-[0_0_0_1px_var(--select-ring)]",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
     "disabled:cursor-not-allowed disabled:opacity-50",
-    "data-[invalid]:border-red-600/55 data-[invalid]:[--select-ring:rgba(220,38,38,0.2)]",
-    "dark:data-[invalid]:border-red-500/60",
+    "data-[invalid]:border-destructive/55 data-[invalid]:[--select-ring:color-mix(in_oklab,var(--destructive)_20%,transparent)]",
   ],
   {
     variants: {
       variant: {
-        outline: "border-neutral-200 dark:border-white/15",
+        outline: "border-border",
         soft:
           "border-transparent [--select-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] hover:[--select-background:color-mix(in_oklab,var(--foreground)_8%,var(--background))] dark:[--select-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))] dark:hover:[--select-background:color-mix(in_oklab,var(--foreground)_12%,var(--background))]",
         ghost:
@@ -52,11 +51,10 @@ const selectTriggerVariants = cva(
 
 const selectPopupVariants = cva(
   [
-    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-neutral-200 bg-background text-foreground shadow-xl outline-none",
+    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border bg-popover text-popover-foreground shadow-xl outline-none",
     "origin-[var(--transform-origin)] transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
-    "dark:border-white/15 dark:bg-neutral-950",
   ],
   {
     variants: {
@@ -269,10 +267,9 @@ function SelectAffix({
       data-slot={isPrefix ? "select-prefix" : "select-suffix"}
       data-visible={show ? "" : undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden text-neutral-400",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden text-muted-foreground",
         "transition-[width,max-width,opacity,margin] duration-200 ease-out",
-        "group-focus-visible/select:text-neutral-500 group-data-[popup-open]/select:text-neutral-500",
-        "dark:group-focus-visible/select:text-neutral-300 dark:group-data-[popup-open]/select:text-neutral-300",
+        "group-focus-visible/select:text-foreground/70 group-data-[popup-open]/select:text-foreground/70",
         show ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -364,7 +361,7 @@ const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
         data-slot="select-value"
         className={cn(
           "min-w-0 flex-1 truncate text-left",
-          "data-[placeholder]:text-neutral-400 dark:data-[placeholder]:text-neutral-500",
+          "data-[placeholder]:text-muted-foreground",
           className,
         )}
         {...props}
@@ -439,7 +436,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         <SelectPrimitive.Icon
           data-slot="select-icon"
           className={cn(
-            "ml-2 inline-flex shrink-0 items-center justify-center text-neutral-400",
+            "ml-2 inline-flex shrink-0 items-center justify-center text-muted-foreground",
             "transition-transform duration-200 group-data-[popup-open]/select:rotate-180",
           )}
         >
@@ -553,8 +550,7 @@ const SelectItem = React.forwardRef<HTMLElement, SelectItemProps>(
         className={cn(
           "grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none select-none",
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-          "data-[highlighted]:bg-neutral-950 data-[highlighted]:text-white",
-          "dark:data-[highlighted]:bg-white dark:data-[highlighted]:text-neutral-950",
+          "data-[highlighted]:bg-foreground data-[highlighted]:text-background",
           className,
         )}
         {...props}
@@ -577,8 +573,7 @@ const SelectScrollUpArrow = React.forwardRef<
       ref={ref}
       data-slot="select-scroll-up-arrow"
       className={cn(
-        "flex h-5 cursor-default items-center justify-center bg-background text-neutral-400",
-        "dark:bg-neutral-950",
+        "flex h-5 cursor-default items-center justify-center bg-popover text-muted-foreground",
         className,
       )}
       {...props}
@@ -601,8 +596,7 @@ const SelectScrollDownArrow = React.forwardRef<
       ref={ref}
       data-slot="select-scroll-down-arrow"
       className={cn(
-        "flex h-5 cursor-default items-center justify-center bg-background text-neutral-400",
-        "dark:bg-neutral-950",
+        "flex h-5 cursor-default items-center justify-center bg-popover text-muted-foreground",
         className,
       )}
       {...props}
@@ -623,7 +617,7 @@ const SelectGroupLabel = React.forwardRef<HTMLDivElement, SelectGroupLabelProps>
         ref={ref}
         data-slot="select-group-label"
         className={cn(
-          "px-2.5 py-1.5 text-xs font-medium text-neutral-500 dark:text-neutral-400",
+          "px-2.5 py-1.5 text-xs font-medium text-muted-foreground",
           className,
         )}
         {...props}

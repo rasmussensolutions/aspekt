@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@aspekt/components-source/*": [
+        "../../packages/components/src/components/*"
+      ]
     }
   },
   "include": [

@@ -15,16 +15,12 @@ const blockquoteVariants = cva(
         lg: "text-lg leading-8",
       },
       tone: {
-        default: "border-neutral-300 dark:border-white/20",
-        muted:
-          "border-neutral-200 text-neutral-600 dark:border-white/15 dark:text-neutral-300",
+        default: "border-border",
+        muted: "border-border text-muted-foreground",
         accent: "border-primary",
-        danger:
-          "border-red-600 text-red-800 dark:border-red-500 dark:text-red-300",
-        success:
-          "border-emerald-600 text-emerald-800 dark:border-emerald-500 dark:text-emerald-300",
-        warning:
-          "border-amber-500 text-amber-900 dark:border-amber-400 dark:text-amber-300",
+        danger: "border-destructive text-destructive",
+        success: "border-success text-success",
+        warning: "border-warning text-warning",
       },
     },
     defaultVariants: {
@@ -37,12 +33,12 @@ const blockquoteVariants = cva(
 const blockquoteSourceVariants = cva("mt-3 block text-sm not-italic", {
   variants: {
     tone: {
-      default: "text-neutral-500 dark:text-neutral-400",
-      muted: "text-neutral-500 dark:text-neutral-400",
-      accent: "text-neutral-600 dark:text-neutral-300",
-      danger: "text-red-700/80 dark:text-red-300/80",
-      success: "text-emerald-700/80 dark:text-emerald-300/80",
-      warning: "text-amber-800/80 dark:text-amber-300/80",
+      default: "text-muted-foreground",
+      muted: "text-muted-foreground",
+      accent: "text-muted-foreground",
+      danger: "text-destructive/80",
+      success: "text-success/80",
+      warning: "text-warning/80",
     },
   },
   defaultVariants: {

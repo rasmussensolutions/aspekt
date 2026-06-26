@@ -16,13 +16,12 @@ import typescript from "refractor/typescript";
 import { CodeCopyButton } from "./code-copy-button";
 
 const snippetVariants = cva(
-  "overflow-hidden border font-mono text-sm leading-6 text-neutral-700 dark:text-neutral-300",
+  "overflow-hidden border font-mono text-sm leading-6 text-foreground",
   {
     variants: {
       variant: {
-        outline:
-          "border-neutral-200 bg-white dark:border-white/10 dark:bg-neutral-950",
-        soft: "border-transparent bg-neutral-50 dark:bg-white/[0.06]",
+        outline: "border-border bg-card",
+        soft: "border-transparent bg-muted",
       },
       shape: {
         square: "rounded-lg",
@@ -168,7 +167,7 @@ function getTokenClassName(className: unknown) {
     names.has("doctype") ||
     names.has("cdata")
   ) {
-    return "text-neutral-400 dark:text-neutral-500";
+    return "text-muted-foreground";
   }
 
   if (names.has("deleted")) {
@@ -241,7 +240,7 @@ function getTokenClassName(className: unknown) {
     names.has("punctuation") ||
     names.has("script-punctuation")
   ) {
-    return "text-neutral-500 dark:text-neutral-400";
+    return "text-muted-foreground";
   }
 
   return undefined;
@@ -442,7 +441,7 @@ function Snippet({
         <figcaption
           data-slot="snippet-header"
           className={cn(
-            "flex min-h-10 items-center justify-between gap-3 border-b border-neutral-200 bg-neutral-50 py-2 dark:border-white/10 dark:bg-white/[0.03]",
+            "flex min-h-10 items-center justify-between gap-3 border-b border-border bg-muted py-2",
             shape === "round" ? "px-5" : "px-3",
           )}
         >
@@ -465,8 +464,8 @@ function Snippet({
                         "inline-flex h-6 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-none transition-[background-color,color,box-shadow]",
                         "focus-visible:ring-2 focus-visible:ring-current/25",
                         selected
-                          ? "bg-white text-foreground shadow-sm ring-1 ring-neutral-200 dark:bg-white/10 dark:ring-white/10"
-                          : "text-neutral-500 hover:bg-neutral-950/[0.04] hover:text-foreground dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-white",
+                          ? "bg-background text-foreground shadow-sm ring-1 ring-border"
+                          : "text-muted-foreground hover:bg-background hover:text-foreground",
                       )}
                       id={tab.tabId}
                       onClick={() => handleTabChange(tab.value)}
@@ -489,7 +488,7 @@ function Snippet({
                   </span>
                 ) : null}
                 {selectedLanguage ? (
-                  <span className="inline-flex h-4 items-center rounded-md bg-neutral-950/[0.04] px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-neutral-500 dark:bg-white/10 dark:text-neutral-400">
+                  <span className="inline-flex h-4 items-center rounded-md bg-background px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-muted-foreground">
                     {normalizedLanguage}
                   </span>
                 ) : null}
@@ -538,14 +537,14 @@ function Snippet({
                     ? "grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4"
                     : "",
                   highlighted
-                    ? "-mx-4 bg-primary/10 px-4 dark:bg-primary/15"
+                    ? "-mx-4 bg-primary/10 px-4"
                     : "",
                 )}
               >
                 {showLineNumbers ? (
                   <span
                     aria-hidden="true"
-                    className="select-none text-right text-neutral-400 dark:text-neutral-600"
+                    className="select-none text-right text-muted-foreground"
                   >
                     {lineNumber}
                   </span>

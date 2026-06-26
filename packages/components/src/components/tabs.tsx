@@ -28,10 +28,10 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        line: "data-[orientation=horizontal]:border-b data-[orientation=vertical]:border-r border-neutral-200 dark:border-white/15",
-        soft: "rounded-lg bg-neutral-950/5 p-1 dark:bg-white/10 data-[orientation=vertical]:w-full",
+        line: "data-[orientation=horizontal]:border-b data-[orientation=vertical]:border-r border-border",
+        soft: "rounded-lg bg-muted p-1 data-[orientation=vertical]:w-full",
         outline:
-          "rounded-lg border border-neutral-200 bg-background p-1 dark:border-white/15 dark:bg-neutral-950 data-[orientation=vertical]:w-full",
+          "rounded-lg border border-border bg-background p-1 data-[orientation=vertical]:w-full",
       },
       shape: {
         square: "",
@@ -66,19 +66,17 @@ const tabsTabVariants = cva(
   {
     variants: {
       variant: {
-        line: "text-neutral-500 hover:text-neutral-950 data-[active]:text-[var(--tabs-active-color)] dark:text-neutral-400 dark:hover:text-white",
-        soft: "text-neutral-500 hover:text-neutral-950 data-[active]:text-[var(--tabs-active-color)] dark:text-neutral-400 dark:hover:text-white",
+        line: "text-muted-foreground hover:text-foreground data-[active]:text-[var(--tabs-active-color)]",
+        soft: "text-muted-foreground hover:text-foreground data-[active]:text-[var(--tabs-active-color)]",
         outline:
-          "text-neutral-500 hover:text-neutral-950 data-[active]:text-[var(--tabs-active-color)] dark:text-neutral-400 dark:hover:text-white",
+          "text-muted-foreground hover:text-foreground data-[active]:text-[var(--tabs-active-color)]",
       },
       color: {
         accent: "[--tabs-active-color:var(--primary)]",
-        blue: "[--tabs-active-color:#1d4ed8] dark:[--tabs-active-color:#93c5fd]",
-        red: "[--tabs-active-color:#b91c1c] dark:[--tabs-active-color:#fca5a5]",
-        amber:
-          "[--tabs-active-color:#92400e] dark:[--tabs-active-color:#fcd34d]",
-        neutral:
-          "[--tabs-active-color:#0a0a0a] dark:[--tabs-active-color:white]",
+        blue: "[--tabs-active-color:var(--info)]",
+        red: "[--tabs-active-color:var(--destructive)]",
+        amber: "[--tabs-active-color:var(--warning)]",
+        neutral: "[--tabs-active-color:var(--foreground)]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -123,17 +121,16 @@ const tabsIndicatorVariants = cva(
     variants: {
       variant: {
         line: "bg-[var(--tabs-indicator-color)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-0.5 data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-0.5",
-        soft: "rounded-[inherit] bg-background shadow-sm data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)] dark:bg-neutral-950",
+        soft: "rounded-[inherit] bg-background shadow-sm data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
         outline:
-          "rounded-[inherit] bg-neutral-950/5 data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)] dark:bg-white/10",
+          "rounded-[inherit] bg-muted data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
       },
       color: {
         accent: "[--tabs-indicator-color:var(--primary)]",
-        blue: "[--tabs-indicator-color:#2563eb]",
-        red: "[--tabs-indicator-color:#dc2626]",
-        amber: "[--tabs-indicator-color:#f59e0b]",
-        neutral:
-          "[--tabs-indicator-color:#0a0a0a] dark:[--tabs-indicator-color:white]",
+        blue: "[--tabs-indicator-color:var(--info)]",
+        red: "[--tabs-indicator-color:var(--destructive)]",
+        amber: "[--tabs-indicator-color:var(--warning)]",
+        neutral: "[--tabs-indicator-color:var(--foreground)]",
       },
       shape: {
         square: "rounded-md",

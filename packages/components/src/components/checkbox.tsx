@@ -16,18 +16,18 @@ const checkboxVariants = cva(
     "focus-visible:ring-2 focus-visible:ring-current/25",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:active:scale-100",
     "data-[readonly]:cursor-default data-[readonly]:active:scale-100",
-    "data-[invalid]:border-red-600/55 data-[invalid]:ring-red-600/20 dark:data-[invalid]:border-red-500/60",
+    "data-[invalid]:border-destructive/55 data-[invalid]:ring-destructive/20",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   ],
   {
     variants: {
       variant: {
         solid:
-          "border-neutral-300 bg-white text-white hover:bg-neutral-50 dark:border-white/15 dark:bg-neutral-900 dark:hover:bg-white/10",
+          "border-border bg-background text-primary-foreground hover:bg-muted",
         soft:
-          "border-transparent bg-neutral-950/5 text-transparent hover:bg-neutral-950/10 dark:bg-white/10 dark:hover:bg-white/15",
+          "border-transparent bg-muted text-transparent hover:bg-muted/80",
         outline:
-          "border-neutral-300 bg-transparent text-transparent hover:bg-neutral-950/5 dark:border-white/15 dark:hover:bg-white/10",
+          "border-border bg-transparent text-transparent hover:bg-muted",
       },
       color: {
         accent: "",
@@ -53,31 +53,31 @@ const checkboxVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "data-[checked]:border-black/15 data-[checked]:bg-primary data-[checked]:text-white data-[checked]:hover:bg-primary/90 data-[indeterminate]:border-black/15 data-[indeterminate]:bg-primary data-[indeterminate]:text-white",
+          "data-[checked]:border-primary/15 data-[checked]:bg-primary data-[checked]:text-primary-foreground data-[checked]:hover:bg-primary/90 data-[indeterminate]:border-primary/15 data-[indeterminate]:bg-primary data-[indeterminate]:text-primary-foreground",
       },
       {
         variant: "solid",
         color: "blue",
         className:
-          "data-[checked]:border-blue-700 data-[checked]:bg-blue-600 data-[checked]:text-white data-[checked]:hover:bg-blue-700 data-[indeterminate]:border-blue-700 data-[indeterminate]:bg-blue-600 data-[indeterminate]:text-white",
+          "data-[checked]:border-info/20 data-[checked]:bg-info data-[checked]:text-info-foreground data-[checked]:hover:bg-info/90 data-[indeterminate]:border-info/20 data-[indeterminate]:bg-info data-[indeterminate]:text-info-foreground",
       },
       {
         variant: "solid",
         color: "red",
         className:
-          "data-[checked]:border-red-700 data-[checked]:bg-red-600 data-[checked]:text-white data-[checked]:hover:bg-red-700 data-[indeterminate]:border-red-700 data-[indeterminate]:bg-red-600 data-[indeterminate]:text-white",
+          "data-[checked]:border-destructive/20 data-[checked]:bg-destructive data-[checked]:text-destructive-foreground data-[checked]:hover:bg-destructive/90 data-[indeterminate]:border-destructive/20 data-[indeterminate]:bg-destructive data-[indeterminate]:text-destructive-foreground",
       },
       {
         variant: "solid",
         color: "amber",
         className:
-          "data-[checked]:border-amber-600 data-[checked]:bg-amber-500 data-[checked]:text-amber-950 data-[checked]:hover:bg-amber-600 data-[indeterminate]:border-amber-600 data-[indeterminate]:bg-amber-500 data-[indeterminate]:text-amber-950",
+          "data-[checked]:border-warning/25 data-[checked]:bg-warning data-[checked]:text-warning-foreground data-[checked]:hover:bg-warning/90 data-[indeterminate]:border-warning/25 data-[indeterminate]:bg-warning data-[indeterminate]:text-warning-foreground",
       },
       {
         variant: "solid",
         color: "neutral",
         className:
-          "data-[checked]:border-neutral-900 data-[checked]:bg-neutral-950 data-[checked]:text-white data-[checked]:hover:bg-neutral-800 data-[indeterminate]:border-neutral-900 data-[indeterminate]:bg-neutral-950 data-[indeterminate]:text-white dark:data-[checked]:border-white/80 dark:data-[checked]:bg-white dark:data-[checked]:text-neutral-950 dark:data-[checked]:hover:bg-neutral-200 dark:data-[indeterminate]:border-white/80 dark:data-[indeterminate]:bg-white dark:data-[indeterminate]:text-neutral-950",
+          "data-[checked]:border-foreground/10 data-[checked]:bg-foreground data-[checked]:text-background data-[checked]:hover:bg-foreground/90 data-[indeterminate]:border-foreground/10 data-[indeterminate]:bg-foreground data-[indeterminate]:text-background",
       },
 
       {
@@ -90,25 +90,25 @@ const checkboxVariants = cva(
         variant: "soft",
         color: "blue",
         className:
-          "data-[checked]:bg-blue-600/10 data-[checked]:text-blue-700 data-[checked]:hover:bg-blue-600/15 data-[indeterminate]:bg-blue-600/10 data-[indeterminate]:text-blue-700 dark:data-[checked]:bg-blue-600/25 dark:data-[checked]:text-blue-100 dark:data-[indeterminate]:bg-blue-600/25 dark:data-[indeterminate]:text-blue-100",
+          "data-[checked]:bg-info/10 data-[checked]:text-info data-[checked]:hover:bg-info/15 data-[indeterminate]:bg-info/10 data-[indeterminate]:text-info",
       },
       {
         variant: "soft",
         color: "red",
         className:
-          "data-[checked]:bg-red-600/10 data-[checked]:text-red-700 data-[checked]:hover:bg-red-600/15 data-[indeterminate]:bg-red-600/10 data-[indeterminate]:text-red-700 dark:data-[checked]:bg-red-600/25 dark:data-[checked]:text-red-300 dark:data-[indeterminate]:bg-red-600/25 dark:data-[indeterminate]:text-red-300",
+          "data-[checked]:bg-destructive/10 data-[checked]:text-destructive data-[checked]:hover:bg-destructive/15 data-[indeterminate]:bg-destructive/10 data-[indeterminate]:text-destructive",
       },
       {
         variant: "soft",
         color: "amber",
         className:
-          "data-[checked]:bg-amber-500/15 data-[checked]:text-amber-800 data-[checked]:hover:bg-amber-500/20 data-[indeterminate]:bg-amber-500/15 data-[indeterminate]:text-amber-800 dark:data-[checked]:bg-amber-500/25 dark:data-[checked]:text-amber-300 dark:data-[indeterminate]:bg-amber-500/25 dark:data-[indeterminate]:text-amber-300",
+          "data-[checked]:bg-warning/15 data-[checked]:text-warning data-[checked]:hover:bg-warning/20 data-[indeterminate]:bg-warning/15 data-[indeterminate]:text-warning",
       },
       {
         variant: "soft",
         color: "neutral",
         className:
-          "data-[checked]:bg-neutral-950/10 data-[checked]:text-neutral-950 data-[checked]:hover:bg-neutral-950/15 data-[indeterminate]:bg-neutral-950/10 data-[indeterminate]:text-neutral-950 dark:data-[checked]:bg-white/15 dark:data-[checked]:text-white dark:data-[checked]:hover:bg-white/20 dark:data-[indeterminate]:bg-white/15 dark:data-[indeterminate]:text-white",
+          "data-[checked]:bg-muted data-[checked]:text-foreground data-[checked]:hover:bg-muted/80 data-[indeterminate]:bg-muted data-[indeterminate]:text-foreground",
       },
 
       {
@@ -121,25 +121,25 @@ const checkboxVariants = cva(
         variant: "outline",
         color: "blue",
         className:
-          "data-[checked]:border-blue-600/30 data-[checked]:bg-blue-600/5 data-[checked]:text-blue-700 data-[checked]:hover:bg-blue-600/10 data-[indeterminate]:border-blue-600/30 data-[indeterminate]:bg-blue-600/5 data-[indeterminate]:text-blue-700 dark:data-[checked]:bg-blue-600/25 dark:data-[checked]:text-blue-100 dark:data-[indeterminate]:bg-blue-600/25 dark:data-[indeterminate]:text-blue-100",
+          "data-[checked]:border-info/30 data-[checked]:bg-info/5 data-[checked]:text-info data-[checked]:hover:bg-info/10 data-[indeterminate]:border-info/30 data-[indeterminate]:bg-info/5 data-[indeterminate]:text-info",
       },
       {
         variant: "outline",
         color: "red",
         className:
-          "data-[checked]:border-red-600/30 data-[checked]:bg-red-600/5 data-[checked]:text-red-700 data-[checked]:hover:bg-red-600/10 data-[indeterminate]:border-red-600/30 data-[indeterminate]:bg-red-600/5 data-[indeterminate]:text-red-700 dark:data-[checked]:bg-red-600/25 dark:data-[checked]:text-red-300 dark:data-[indeterminate]:bg-red-600/25 dark:data-[indeterminate]:text-red-300",
+          "data-[checked]:border-destructive/30 data-[checked]:bg-destructive/5 data-[checked]:text-destructive data-[checked]:hover:bg-destructive/10 data-[indeterminate]:border-destructive/30 data-[indeterminate]:bg-destructive/5 data-[indeterminate]:text-destructive",
       },
       {
         variant: "outline",
         color: "amber",
         className:
-          "data-[checked]:border-amber-500/35 data-[checked]:bg-amber-500/10 data-[checked]:text-amber-800 data-[checked]:hover:bg-amber-500/15 data-[indeterminate]:border-amber-500/35 data-[indeterminate]:bg-amber-500/10 data-[indeterminate]:text-amber-800 dark:data-[checked]:bg-amber-500/5 dark:data-[checked]:text-amber-300 dark:data-[indeterminate]:bg-amber-500/5 dark:data-[indeterminate]:text-amber-300",
+          "data-[checked]:border-warning/35 data-[checked]:bg-warning/10 data-[checked]:text-warning data-[checked]:hover:bg-warning/15 data-[indeterminate]:border-warning/35 data-[indeterminate]:bg-warning/10 data-[indeterminate]:text-warning",
       },
       {
         variant: "outline",
         color: "neutral",
         className:
-          "data-[checked]:border-neutral-950/15 data-[checked]:bg-neutral-950/10 data-[checked]:text-neutral-950 data-[checked]:hover:bg-neutral-950/15 data-[indeterminate]:border-neutral-950/15 data-[indeterminate]:bg-neutral-950/10 data-[indeterminate]:text-neutral-950 dark:data-[checked]:border-white/20 dark:data-[checked]:bg-white/15 dark:data-[checked]:text-white dark:data-[checked]:hover:bg-white/20 dark:data-[indeterminate]:border-white/20 dark:data-[indeterminate]:bg-white/15 dark:data-[indeterminate]:text-white",
+          "data-[checked]:border-foreground/15 data-[checked]:bg-muted data-[checked]:text-foreground data-[checked]:hover:bg-muted/80 data-[indeterminate]:border-foreground/15 data-[indeterminate]:bg-muted data-[indeterminate]:text-foreground",
       },
     ],
     defaultVariants: {

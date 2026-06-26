@@ -16,9 +16,9 @@ const textVariants = cva("text-pretty text-foreground", {
       muted: "text-foreground/75",
       subtle: "text-foreground/50",
       accent: "text-accent-foreground",
-      danger: "text-red-600 dark:text-red-400",
-      success: "text-emerald-600 dark:text-emerald-400",
-      warning: "text-amber-600 dark:text-amber-400",
+      danger: "text-destructive",
+      success: "text-success",
+      warning: "text-warning",
     },
     weight: {
       normal: "font-normal",

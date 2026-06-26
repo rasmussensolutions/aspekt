@@ -5,16 +5,13 @@ import * as React from "react";
 const kbdVariants = cva(
   [
     "inline-flex items-center justify-center border font-mono font-medium tabular-nums",
-    "text-foreground shadow-[inset_0_-1px_0_rgb(0_0_0/0.12)]",
-    "dark:shadow-[inset_0_-1px_0_rgb(255_255_255/0.12)]",
+    "text-foreground shadow-[inset_0_-1px_0_color-mix(in_oklab,var(--foreground)_12%,transparent)]",
   ],
   {
     variants: {
       variant: {
-        outline:
-          "border-neutral-200 bg-white text-neutral-700 dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-200",
-        soft:
-          "border-transparent bg-neutral-950/5 text-neutral-700 dark:bg-white/10 dark:text-neutral-200",
+        outline: "border-border bg-background text-foreground",
+        soft: "border-transparent bg-muted text-foreground",
       },
       size: {
         sm: "h-5 min-w-5 px-1 text-[0.6875rem]",

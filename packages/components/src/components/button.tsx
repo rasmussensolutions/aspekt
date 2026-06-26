@@ -50,31 +50,31 @@ const buttonVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "bg-primary text-white border border-black/15 hover:bg-primary/90",
+          "bg-primary text-primary-foreground border border-primary/15 hover:bg-primary/90",
       },
       {
         variant: "solid",
         color: "blue",
         className:
-          "bg-blue-600 text-white border border-blue-700 hover:bg-blue-700",
+          "bg-info text-info-foreground border border-info/20 hover:bg-info/90",
       },
       {
         variant: "solid",
         color: "red",
         className:
-          "bg-red-600 text-white border border-red-700 hover:bg-red-700",
+          "bg-destructive text-destructive-foreground border border-destructive/20 hover:bg-destructive/90",
       },
       {
         variant: "solid",
         color: "amber",
         className:
-          "bg-amber-500 text-amber-950 border border-amber-600 hover:bg-amber-600",
+          "bg-warning text-warning-foreground border border-warning/25 hover:bg-warning/90",
       },
       {
         variant: "solid",
         color: "neutral",
         className:
-          "bg-neutral-950 text-white border border-neutral-900 hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:border-white/80 dark:hover:bg-neutral-200",
+          "bg-foreground text-background border border-foreground/10 hover:bg-foreground/90",
       },
 
       {
@@ -87,25 +87,25 @@ const buttonVariants = cva(
         variant: "soft",
         color: "blue",
         className:
-          "bg-blue-600/10 dark:bg-blue-600/25 text-blue-700 dark:text-blue-100 border border-transparent hover:bg-blue-600/15",
+          "bg-info/10 text-info border border-transparent hover:bg-info/15",
       },
       {
         variant: "soft",
         color: "red",
         className:
-          "bg-red-600/10 dark:bg-red-600/25 text-red-700 dark:text-red-300 border border-transparent hover:bg-red-600/15",
+          "bg-destructive/10 text-destructive border border-transparent hover:bg-destructive/15",
       },
       {
         variant: "soft",
         color: "amber",
         className:
-          "bg-amber-500/15 dark:bg-amber-500/25 text-amber-800 dark:text-amber-300 border border-transparent hover:bg-amber-500/20",
+          "bg-warning/15 text-warning border border-transparent hover:bg-warning/20",
       },
       {
         variant: "soft",
         color: "neutral",
         className:
-          "bg-neutral-950/5 text-neutral-950 border border-transparent hover:bg-neutral-950/10 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-white/15",
+          "bg-muted text-foreground border border-transparent hover:bg-muted/80",
       },
 
       {
@@ -116,25 +116,24 @@ const buttonVariants = cva(
       {
         variant: "ghost",
         color: "blue",
-        className:
-          "text-blue-700 border border-transparent hover:bg-blue-600/10",
+        className: "text-info border border-transparent hover:bg-info/10",
       },
       {
         variant: "ghost",
         color: "red",
-        className: "text-red-700 border border-transparent hover:bg-red-600/10",
+        className:
+          "text-destructive border border-transparent hover:bg-destructive/10",
       },
       {
         variant: "ghost",
         color: "amber",
-        className:
-          "text-amber-800 border border-transparent hover:bg-amber-500/15",
+        className: "text-warning border border-transparent hover:bg-warning/15",
       },
       {
         variant: "ghost",
         color: "neutral",
         className:
-          "text-neutral-950 border border-transparent hover:bg-neutral-950/10 dark:text-white dark:hover:bg-white/10",
+          "text-foreground border border-transparent hover:bg-muted",
       },
 
       {
@@ -147,25 +146,25 @@ const buttonVariants = cva(
         variant: "outline",
         color: "blue",
         className:
-          "bg-blue-600/5 dark:bg-blue-600/25 text-blue-700 dark:text-blue-100 border border-blue-600/30 hover:bg-blue-600/10",
+          "bg-info/5 text-info border border-info/30 hover:bg-info/10",
       },
       {
         variant: "outline",
         color: "red",
         className:
-          "bg-red-600/5 dark:bg-red-600/25 text-red-700 dark:text-red-300 border border-red-600/30 hover:bg-red-600/10",
+          "bg-destructive/5 text-destructive border border-destructive/30 hover:bg-destructive/10",
       },
       {
         variant: "outline",
         color: "amber",
         className:
-          "bg-amber-500/10 dark:bg-amber-500/5 text-amber-800 dark:text-amber-300 border border-amber-500/35 hover:bg-amber-500/15",
+          "bg-warning/10 text-warning border border-warning/35 hover:bg-warning/15",
       },
       {
         variant: "outline",
         color: "neutral",
         className:
-          "bg-white text-neutral-950 border border-neutral-950/10 hover:bg-neutral-950/5 dark:bg-neutral-900 dark:text-white dark:border-white/15 dark:hover:bg-white/10",
+          "bg-background text-foreground border border-border hover:bg-muted",
       },
     ],
     defaultVariants: {

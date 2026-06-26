@@ -128,14 +128,13 @@ function CodeCopyButton({
       className={cn(
         [
           "inline-flex shrink-0 items-center justify-center rounded-md",
-          "text-neutral-500 outline-none transition-[background-color,color,opacity,transform] duration-150",
-          "hover:bg-neutral-950/5 hover:text-foreground active:scale-95",
+          "text-muted-foreground outline-none transition-[background-color,color,opacity,transform] duration-150",
+          "hover:bg-muted hover:text-foreground active:scale-95",
           "focus-visible:ring-2 focus-visible:ring-current/25",
           "disabled:pointer-events-none disabled:opacity-50",
-          "dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-white",
           placement === "block"
-            ? "absolute right-2 top-2 size-7 bg-white/80 shadow-sm backdrop-blur dark:bg-neutral-950/75"
-            : "size-[1.45em] rounded-[0.325em] bg-transparent",
+            ? "absolute right-2 top-2 size-7 bg-card/80 shadow-sm backdrop-blur"
+            : "size-[1.45em] rounded-sm bg-transparent",
         ],
         className,
       )}

@@ -22,13 +22,13 @@ const toggleVariants = cva(
     variants: {
       variant: {
         solid:
-          "border border-neutral-950/10 bg-neutral-950/5 text-neutral-700 hover:bg-neutral-950/10 dark:border-white/10 dark:bg-white/10 dark:text-neutral-200 dark:hover:bg-white/15",
+          "border border-border bg-muted text-foreground hover:bg-muted/80",
         soft:
-          "border border-transparent bg-neutral-950/5 text-neutral-700 hover:bg-neutral-950/10 dark:bg-white/10 dark:text-neutral-200 dark:hover:bg-white/15",
+          "border border-transparent bg-muted text-foreground hover:bg-muted/80",
         ghost:
-          "border border-transparent bg-transparent text-neutral-700 hover:bg-neutral-950/5 dark:text-neutral-200 dark:hover:bg-white/10",
+          "border border-transparent bg-transparent text-foreground hover:bg-muted",
         outline:
-          "border border-neutral-950/10 bg-white text-neutral-700 hover:bg-neutral-950/5 dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-white/10",
+          "border border-border bg-background text-foreground hover:bg-muted",
       },
       color: {
         accent: "",
@@ -54,31 +54,31 @@ const toggleVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "data-[pressed]:border-black/15 data-[pressed]:bg-primary data-[pressed]:text-white data-[pressed]:hover:bg-primary/90",
+          "data-[pressed]:border-primary/15 data-[pressed]:bg-primary data-[pressed]:text-primary-foreground data-[pressed]:hover:bg-primary/90",
       },
       {
         variant: "solid",
         color: "blue",
         className:
-          "data-[pressed]:border-blue-700 data-[pressed]:bg-blue-600 data-[pressed]:text-white data-[pressed]:hover:bg-blue-700",
+          "data-[pressed]:border-info/20 data-[pressed]:bg-info data-[pressed]:text-info-foreground data-[pressed]:hover:bg-info/90",
       },
       {
         variant: "solid",
         color: "red",
         className:
-          "data-[pressed]:border-red-700 data-[pressed]:bg-red-600 data-[pressed]:text-white data-[pressed]:hover:bg-red-700",
+          "data-[pressed]:border-destructive/20 data-[pressed]:bg-destructive data-[pressed]:text-destructive-foreground data-[pressed]:hover:bg-destructive/90",
       },
       {
         variant: "solid",
         color: "amber",
         className:
-          "data-[pressed]:border-amber-600 data-[pressed]:bg-amber-500 data-[pressed]:text-amber-950 data-[pressed]:hover:bg-amber-600",
+          "data-[pressed]:border-warning/25 data-[pressed]:bg-warning data-[pressed]:text-warning-foreground data-[pressed]:hover:bg-warning/90",
       },
       {
         variant: "solid",
         color: "neutral",
         className:
-          "data-[pressed]:border-neutral-900 data-[pressed]:bg-neutral-950 data-[pressed]:text-white data-[pressed]:hover:bg-neutral-800 dark:data-[pressed]:border-white/80 dark:data-[pressed]:bg-white dark:data-[pressed]:text-neutral-950 dark:data-[pressed]:hover:bg-neutral-200",
+          "data-[pressed]:border-foreground/10 data-[pressed]:bg-foreground data-[pressed]:text-background data-[pressed]:hover:bg-foreground/90",
       },
 
       {
@@ -91,25 +91,25 @@ const toggleVariants = cva(
         variant: "soft",
         color: "blue",
         className:
-          "data-[pressed]:bg-blue-600/10 data-[pressed]:text-blue-700 data-[pressed]:hover:bg-blue-600/15 dark:data-[pressed]:bg-blue-600/25 dark:data-[pressed]:text-blue-100",
+          "data-[pressed]:bg-info/10 data-[pressed]:text-info data-[pressed]:hover:bg-info/15",
       },
       {
         variant: "soft",
         color: "red",
         className:
-          "data-[pressed]:bg-red-600/10 data-[pressed]:text-red-700 data-[pressed]:hover:bg-red-600/15 dark:data-[pressed]:bg-red-600/25 dark:data-[pressed]:text-red-300",
+          "data-[pressed]:bg-destructive/10 data-[pressed]:text-destructive data-[pressed]:hover:bg-destructive/15",
       },
       {
         variant: "soft",
         color: "amber",
         className:
-          "data-[pressed]:bg-amber-500/15 data-[pressed]:text-amber-800 data-[pressed]:hover:bg-amber-500/20 dark:data-[pressed]:bg-amber-500/25 dark:data-[pressed]:text-amber-300",
+          "data-[pressed]:bg-warning/15 data-[pressed]:text-warning data-[pressed]:hover:bg-warning/20",
       },
       {
         variant: "soft",
         color: "neutral",
         className:
-          "data-[pressed]:bg-neutral-950/10 data-[pressed]:text-neutral-950 data-[pressed]:hover:bg-neutral-950/15 dark:data-[pressed]:bg-white/15 dark:data-[pressed]:text-white dark:data-[pressed]:hover:bg-white/20",
+          "data-[pressed]:bg-muted data-[pressed]:text-foreground data-[pressed]:hover:bg-muted/80",
       },
 
       {
@@ -122,25 +122,25 @@ const toggleVariants = cva(
         variant: "ghost",
         color: "blue",
         className:
-          "data-[pressed]:bg-blue-600/10 data-[pressed]:text-blue-700 data-[pressed]:hover:bg-blue-600/15 dark:data-[pressed]:bg-blue-600/25 dark:data-[pressed]:text-blue-100",
+          "data-[pressed]:bg-info/10 data-[pressed]:text-info data-[pressed]:hover:bg-info/15",
       },
       {
         variant: "ghost",
         color: "red",
         className:
-          "data-[pressed]:bg-red-600/10 data-[pressed]:text-red-700 data-[pressed]:hover:bg-red-600/15 dark:data-[pressed]:bg-red-600/25 dark:data-[pressed]:text-red-300",
+          "data-[pressed]:bg-destructive/10 data-[pressed]:text-destructive data-[pressed]:hover:bg-destructive/15",
       },
       {
         variant: "ghost",
         color: "amber",
         className:
-          "data-[pressed]:bg-amber-500/15 data-[pressed]:text-amber-800 data-[pressed]:hover:bg-amber-500/20 dark:data-[pressed]:bg-amber-500/25 dark:data-[pressed]:text-amber-300",
+          "data-[pressed]:bg-warning/15 data-[pressed]:text-warning data-[pressed]:hover:bg-warning/20",
       },
       {
         variant: "ghost",
         color: "neutral",
         className:
-          "data-[pressed]:bg-neutral-950/10 data-[pressed]:text-neutral-950 data-[pressed]:hover:bg-neutral-950/15 dark:data-[pressed]:bg-white/15 dark:data-[pressed]:text-white dark:data-[pressed]:hover:bg-white/20",
+          "data-[pressed]:bg-muted data-[pressed]:text-foreground data-[pressed]:hover:bg-muted/80",
       },
 
       {
@@ -153,25 +153,25 @@ const toggleVariants = cva(
         variant: "outline",
         color: "blue",
         className:
-          "data-[pressed]:border-blue-600/30 data-[pressed]:bg-blue-600/5 data-[pressed]:text-blue-700 data-[pressed]:hover:bg-blue-600/10 dark:data-[pressed]:bg-blue-600/25 dark:data-[pressed]:text-blue-100",
+          "data-[pressed]:border-info/30 data-[pressed]:bg-info/5 data-[pressed]:text-info data-[pressed]:hover:bg-info/10",
       },
       {
         variant: "outline",
         color: "red",
         className:
-          "data-[pressed]:border-red-600/30 data-[pressed]:bg-red-600/5 data-[pressed]:text-red-700 data-[pressed]:hover:bg-red-600/10 dark:data-[pressed]:bg-red-600/25 dark:data-[pressed]:text-red-300",
+          "data-[pressed]:border-destructive/30 data-[pressed]:bg-destructive/5 data-[pressed]:text-destructive data-[pressed]:hover:bg-destructive/10",
       },
       {
         variant: "outline",
         color: "amber",
         className:
-          "data-[pressed]:border-amber-500/35 data-[pressed]:bg-amber-500/10 data-[pressed]:text-amber-800 data-[pressed]:hover:bg-amber-500/15 dark:data-[pressed]:bg-amber-500/5 dark:data-[pressed]:text-amber-300",
+          "data-[pressed]:border-warning/35 data-[pressed]:bg-warning/10 data-[pressed]:text-warning data-[pressed]:hover:bg-warning/15",
       },
       {
         variant: "outline",
         color: "neutral",
         className:
-          "data-[pressed]:border-neutral-950/15 data-[pressed]:bg-neutral-950/10 data-[pressed]:text-neutral-950 data-[pressed]:hover:bg-neutral-950/15 dark:data-[pressed]:border-white/20 dark:data-[pressed]:bg-white/15 dark:data-[pressed]:text-white dark:data-[pressed]:hover:bg-white/20",
+          "data-[pressed]:border-foreground/15 data-[pressed]:bg-muted data-[pressed]:text-foreground data-[pressed]:hover:bg-muted/80",
       },
     ],
     defaultVariants: {

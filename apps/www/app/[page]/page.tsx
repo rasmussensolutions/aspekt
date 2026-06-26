@@ -4,6 +4,9 @@ import { DocsApp } from "../page";
 
 const docsPages = [
   "principles",
+  "typography",
+  "colors",
+  "sonification",
   "button",
   "checkbox",
   "input",
@@ -17,14 +20,6 @@ const docsPages = [
   "tabs",
   "table",
   "snippet",
-  "sound-provider",
-  "heading",
-  "text",
-  "code",
-  "kbd",
-  "prose",
-  "blockquote",
-  "list",
 ] as const;
 
 type DocsRoutePage = (typeof docsPages)[number];

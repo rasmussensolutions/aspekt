@@ -5,7 +5,7 @@ import * as React from "react";
 const proseVariants = cva(
   [
     "max-w-prose text-pretty text-foreground",
-    "[&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-neutral-300 [&_a]:underline-offset-4 hover:[&_a]:decoration-foreground",
+    "[&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-border [&_a]:underline-offset-4 hover:[&_a]:decoration-foreground",
     "[&_strong]:font-semibold [&_strong]:text-foreground",
     "[&_p]:my-4",
     "[&_h1]:mb-4 [&_h1]:mt-10 [&_h1]:text-4xl [&_h1]:font-semibold [&_h1]:leading-tight",
@@ -14,10 +14,10 @@ const proseVariants = cva(
     "[&_h4]:mb-2 [&_h4]:mt-6 [&_h4]:text-xl [&_h4]:font-semibold [&_h4]:leading-snug",
     "[&_ul]:my-4 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5",
     "[&_ol]:my-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-5",
-    "[&_li]:pl-1 [&_li]:marker:text-neutral-400 dark:[&_li]:marker:text-neutral-500",
-    "[&_blockquote]:my-6 [&_blockquote]:border-l-2 [&_blockquote]:border-neutral-300 [&_blockquote]:pl-5 [&_blockquote]:text-foreground/80 dark:[&_blockquote]:border-white/20",
-    "[&_code]:rounded-md [&_code]:border [&_code]:border-neutral-200 [&_code]:bg-neutral-950/[0.04] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.875em] dark:[&_code]:border-white/10 dark:[&_code]:bg-white/10",
-    "[&_pre]:my-5 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:border [&_pre]:border-neutral-200 [&_pre]:bg-neutral-50 [&_pre]:p-4 [&_pre]:font-mono [&_pre]:text-sm [&_pre]:leading-6 dark:[&_pre]:border-white/10 dark:[&_pre]:bg-white/5",
+    "[&_li]:pl-1 [&_li]:marker:text-muted-foreground",
+    "[&_blockquote]:my-6 [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-5 [&_blockquote]:text-foreground/80",
+    "[&_code]:rounded-md [&_code]:border [&_code]:border-border [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.875em]",
+    "[&_pre]:my-5 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:border [&_pre]:border-border [&_pre]:bg-muted [&_pre]:p-4 [&_pre]:font-mono [&_pre]:text-sm [&_pre]:leading-6",
     "[&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0",
   ],
   {
@@ -29,7 +29,7 @@ const proseVariants = cva(
       },
       tone: {
         default: "text-foreground",
-        muted: "text-neutral-600 dark:text-neutral-300",
+        muted: "text-muted-foreground",
       },
     },
     defaultVariants: {

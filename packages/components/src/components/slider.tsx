@@ -11,7 +11,7 @@ const sliderRootVariants = cva(
   [
     "group/slider grid w-full gap-2 text-foreground",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-    "data-[invalid]:text-red-600 dark:data-[invalid]:text-red-400",
+    "data-[invalid]:text-destructive",
   ],
   {
     variants: {
@@ -61,15 +61,14 @@ const sliderTrackVariants = cva(
     "relative grow transition-[background-color,border-color,box-shadow]",
     "data-[orientation=horizontal]:h-[var(--slider-track-size)] data-[orientation=horizontal]:w-full",
     "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-[var(--slider-track-size)]",
-    "data-[invalid]:border-red-600/45 data-[invalid]:ring-red-600/15 dark:data-[invalid]:border-red-500/50",
+    "data-[invalid]:border-destructive/45 data-[invalid]:ring-destructive/15",
   ],
   {
     variants: {
       variant: {
-        solid: "border border-transparent bg-neutral-200 dark:bg-white/15",
-        soft: "border border-transparent bg-neutral-950/5 dark:bg-white/10",
-        outline:
-          "border border-neutral-300 bg-white dark:border-white/15 dark:bg-neutral-900",
+        solid: "border border-transparent bg-muted",
+        soft: "border border-transparent bg-muted/70",
+        outline: "border border-border bg-background",
       },
       shape: {
         square: "rounded-md",
@@ -93,10 +92,10 @@ const sliderIndicatorVariants = cva(
     variants: {
       color: {
         accent: "bg-primary",
-        blue: "bg-blue-600",
-        red: "bg-red-600",
-        amber: "bg-amber-500",
-        neutral: "bg-neutral-950 dark:bg-white",
+        blue: "bg-info",
+        red: "bg-destructive",
+        amber: "bg-warning",
+        neutral: "bg-foreground",
       },
       variant: {
         solid: "",
@@ -113,14 +112,14 @@ const sliderIndicatorVariants = cva(
 
 const sliderThumbVariants = cva(
   [
-    "z-10 block size-[var(--slider-thumb-size)] shrink-0 border bg-white shadow-[0_1px_2px_rgb(0_0_0/0.16)] ring-1 ring-black/10",
+    "z-10 block size-[var(--slider-thumb-size)] shrink-0 border bg-background shadow-sm ring-1 ring-border",
     "cursor-grab outline-none transition-[background-color,border-color,box-shadow,scale,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
     "active:scale-95 data-[disabled]:cursor-not-allowed data-[disabled]:active:scale-100",
     "data-[dragging]:cursor-grabbing data-[dragging]:scale-95",
     "data-[elastic]:[transform:translate3d(var(--slider-elastic-thumb-x),var(--slider-elastic-thumb-y),0)_scale(var(--slider-elastic-thumb-scale))]",
     "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-current/25",
-    "data-[invalid]:border-red-600/55 data-[invalid]:ring-red-600/20 dark:data-[invalid]:border-red-500/60",
-    "dark:border-white/15 dark:bg-neutral-950 dark:ring-white/15",
+    "data-[invalid]:border-destructive/55 data-[invalid]:ring-destructive/20",
+    "border-border",
   ],
   {
     variants: {
@@ -150,22 +149,22 @@ const sliderThumbVariants = cva(
       {
         color: "blue",
         variant: ["soft", "outline"],
-        className: "border-blue-600/25",
+        className: "border-info/25",
       },
       {
         color: "red",
         variant: ["soft", "outline"],
-        className: "border-red-600/25",
+        className: "border-destructive/25",
       },
       {
         color: "amber",
         variant: ["soft", "outline"],
-        className: "border-amber-500/35",
+        className: "border-warning/35",
       },
       {
         color: "neutral",
         variant: ["soft", "outline"],
-        className: "border-neutral-950/15 dark:border-white/20",
+        className: "border-foreground/15",
       },
     ],
     defaultVariants: {
@@ -528,7 +527,7 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
           {showValue && (
             <SliderPrimitive.Value
               className={cn(
-                "ml-auto font-mono text-sm text-neutral-500 dark:text-neutral-400",
+                "ml-auto font-mono text-sm text-muted-foreground",
                 valueClassName,
               )}
             >

@@ -8,26 +8,21 @@ const codeVariants = cva("font-mono tabular-nums text-foreground", {
   variants: {
     variant: {
       inline: [
-        "inline rounded-md border border-neutral-200 bg-neutral-950/[0.04]",
+        "inline rounded-md border border-border bg-muted",
         "px-1.5 py-0.5 text-[0.875em] leading-none",
-        "dark:border-white/10 dark:bg-white/10",
       ],
       block: [
-        "block max-w-full overflow-x-auto whitespace-pre rounded-lg border border-neutral-200",
-        "bg-neutral-50 px-4 py-3 text-sm leading-6 text-neutral-700 shadow-sm",
-        "dark:border-white/10 dark:bg-white/5 dark:text-neutral-300",
+        "block max-w-full overflow-x-auto whitespace-pre rounded-lg border border-border",
+        "bg-muted px-4 py-3 text-sm leading-6 text-foreground shadow-sm",
       ],
     },
     tone: {
       default: "",
-      muted: "text-neutral-600 dark:text-neutral-300",
+      muted: "text-muted-foreground",
       accent: "border-primary/25 bg-primary/10 text-foreground",
-      danger:
-        "border-red-600/20 bg-red-600/10 text-red-700 dark:text-red-300",
-      success:
-        "border-emerald-600/20 bg-emerald-600/10 text-emerald-700 dark:text-emerald-300",
-      warning:
-        "border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-300",
+      danger: "border-destructive/20 bg-destructive/10 text-destructive",
+      success: "border-success/20 bg-success/10 text-success",
+      warning: "border-warning/25 bg-warning/10 text-warning",
     },
   },
   defaultVariants: {

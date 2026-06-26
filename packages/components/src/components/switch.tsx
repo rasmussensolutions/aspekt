@@ -14,17 +14,17 @@ const switchVariants = cva(
     "active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-current/25",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:active:scale-100",
     "data-[readonly]:cursor-default data-[readonly]:active:scale-100",
-    "data-[invalid]:border-red-600/55 data-[invalid]:ring-red-600/20 dark:data-[invalid]:border-red-500/60",
+    "data-[invalid]:border-destructive/55 data-[invalid]:ring-destructive/20",
   ],
   {
     variants: {
       variant: {
         solid:
-          "border-neutral-300 bg-neutral-100 hover:bg-neutral-200 dark:border-white/15 dark:bg-white/10 dark:hover:bg-white/15",
+          "border-border bg-muted hover:bg-muted/80",
         soft:
-          "border-transparent bg-neutral-950/5 hover:bg-neutral-950/10 dark:bg-white/10 dark:hover:bg-white/15",
+          "border-transparent bg-muted hover:bg-muted/80",
         outline:
-          "border-neutral-300 bg-white hover:bg-neutral-950/5 dark:border-white/15 dark:bg-neutral-900 dark:hover:bg-white/10",
+          "border-border bg-background hover:bg-muted",
       },
       color: {
         accent: "",
@@ -35,19 +35,20 @@ const switchVariants = cva(
       },
       size: {
         micro:
-          "h-4 w-7 p-0.5 [--switch-thumb-size:0.75rem] [--switch-thumb-translate:0.75rem]",
+          "h-4 w-7 p-0.5 [--switch-thumb-radius:calc(var(--radius-sm)*0.8)] [--switch-thumb-size:0.75rem] [--switch-thumb-translate:0.75rem] [--switch-track-radius:var(--radius-sm)]",
         tiny:
-          "h-4.5 w-8 p-0.5 [--switch-thumb-size:0.875rem] [--switch-thumb-translate:0.875rem]",
+          "h-4.5 w-8 p-0.5 [--switch-thumb-radius:var(--radius-sm)] [--switch-thumb-size:0.875rem] [--switch-thumb-translate:0.875rem] [--switch-track-radius:var(--radius-md)]",
         small:
-          "h-5 w-9 p-0.5 [--switch-thumb-size:1rem] [--switch-thumb-translate:1rem]",
+          "h-5 w-9 p-0.5 [--switch-thumb-radius:var(--radius-sm)] [--switch-thumb-size:1rem] [--switch-thumb-translate:1rem] [--switch-track-radius:var(--radius-md)]",
         medium:
-          "h-6 w-10.5 p-0.5 [--switch-thumb-size:1.25rem] [--switch-thumb-translate:1.125rem]",
+          "h-6 w-10.5 p-0.5 [--switch-thumb-radius:var(--radius-md)] [--switch-thumb-size:1.25rem] [--switch-thumb-translate:1.125rem] [--switch-track-radius:var(--radius-lg)]",
         large:
-          "h-7 w-12 p-0.5 [--switch-thumb-size:1.5rem] [--switch-thumb-translate:1.25rem]",
+          "h-7 w-12 p-0.5 [--switch-thumb-radius:var(--radius-md)] [--switch-thumb-size:1.5rem] [--switch-thumb-translate:1.25rem] [--switch-track-radius:var(--radius-lg)]",
       },
       shape: {
-        square: "rounded-lg [--switch-thumb-radius:0.375rem]",
-        round: "rounded-full [--switch-thumb-radius:999px]",
+        square: "rounded-[var(--switch-track-radius)]",
+        round:
+          "rounded-full [--switch-thumb-radius:var(--radius-full)] [--switch-track-radius:var(--radius-full)]",
       },
     },
     compoundVariants: [
@@ -55,31 +56,31 @@ const switchVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "data-[checked]:border-black/15 data-[checked]:bg-primary data-[checked]:hover:bg-primary/90",
+          "data-[checked]:border-primary/15 data-[checked]:bg-primary data-[checked]:hover:bg-primary/90",
       },
       {
         variant: "solid",
         color: "blue",
         className:
-          "data-[checked]:border-blue-700 data-[checked]:bg-blue-600 data-[checked]:hover:bg-blue-700",
+          "data-[checked]:border-info/20 data-[checked]:bg-info data-[checked]:hover:bg-info/90",
       },
       {
         variant: "solid",
         color: "red",
         className:
-          "data-[checked]:border-red-700 data-[checked]:bg-red-600 data-[checked]:hover:bg-red-700",
+          "data-[checked]:border-destructive/20 data-[checked]:bg-destructive data-[checked]:hover:bg-destructive/90",
       },
       {
         variant: "solid",
         color: "amber",
         className:
-          "data-[checked]:border-amber-600 data-[checked]:bg-amber-500 data-[checked]:hover:bg-amber-600",
+          "data-[checked]:border-warning/25 data-[checked]:bg-warning data-[checked]:hover:bg-warning/90",
       },
       {
         variant: "solid",
         color: "neutral",
         className:
-          "data-[checked]:border-neutral-900 data-[checked]:bg-neutral-950 data-[checked]:hover:bg-neutral-800 dark:data-[checked]:border-white/80 dark:data-[checked]:bg-white dark:data-[checked]:hover:bg-neutral-200",
+          "data-[checked]:border-foreground/10 data-[checked]:bg-foreground data-[checked]:hover:bg-foreground/90",
       },
 
       {
@@ -92,25 +93,25 @@ const switchVariants = cva(
         variant: "soft",
         color: "blue",
         className:
-          "data-[checked]:bg-blue-600/10 data-[checked]:hover:bg-blue-600/15 dark:data-[checked]:bg-blue-600/25",
+          "data-[checked]:bg-info/10 data-[checked]:hover:bg-info/15",
       },
       {
         variant: "soft",
         color: "red",
         className:
-          "data-[checked]:bg-red-600/10 data-[checked]:hover:bg-red-600/15 dark:data-[checked]:bg-red-600/25",
+          "data-[checked]:bg-destructive/10 data-[checked]:hover:bg-destructive/15",
       },
       {
         variant: "soft",
         color: "amber",
         className:
-          "data-[checked]:bg-amber-500/15 data-[checked]:hover:bg-amber-500/20 dark:data-[checked]:bg-amber-500/25",
+          "data-[checked]:bg-warning/15 data-[checked]:hover:bg-warning/20",
       },
       {
         variant: "soft",
         color: "neutral",
         className:
-          "data-[checked]:bg-neutral-950/10 data-[checked]:hover:bg-neutral-950/15 dark:data-[checked]:bg-white/15 dark:data-[checked]:hover:bg-white/20",
+          "data-[checked]:bg-foreground/10 data-[checked]:hover:bg-foreground/15",
       },
 
       {
@@ -123,25 +124,25 @@ const switchVariants = cva(
         variant: "outline",
         color: "blue",
         className:
-          "data-[checked]:border-blue-600/30 data-[checked]:bg-blue-600/5 data-[checked]:hover:bg-blue-600/10 dark:data-[checked]:bg-blue-600/25",
+          "data-[checked]:border-info/30 data-[checked]:bg-info/5 data-[checked]:hover:bg-info/10",
       },
       {
         variant: "outline",
         color: "red",
         className:
-          "data-[checked]:border-red-600/30 data-[checked]:bg-red-600/5 data-[checked]:hover:bg-red-600/10 dark:data-[checked]:bg-red-600/25",
+          "data-[checked]:border-destructive/30 data-[checked]:bg-destructive/5 data-[checked]:hover:bg-destructive/10",
       },
       {
         variant: "outline",
         color: "amber",
         className:
-          "data-[checked]:border-amber-500/35 data-[checked]:bg-amber-500/10 data-[checked]:hover:bg-amber-500/15 dark:data-[checked]:bg-amber-500/5",
+          "data-[checked]:border-warning/35 data-[checked]:bg-warning/10 data-[checked]:hover:bg-warning/15",
       },
       {
         variant: "outline",
         color: "neutral",
         className:
-          "data-[checked]:border-neutral-950/15 data-[checked]:bg-neutral-950/10 data-[checked]:hover:bg-neutral-950/15 dark:data-[checked]:border-white/20 dark:data-[checked]:bg-white/15 dark:data-[checked]:hover:bg-white/20",
+          "data-[checked]:border-foreground/15 data-[checked]:bg-foreground/10 data-[checked]:hover:bg-foreground/15",
       },
     ],
     defaultVariants: {
@@ -156,20 +157,19 @@ const switchVariants = cva(
 const switchThumbVariants = cva(
   [
     "pointer-events-none block size-[var(--switch-thumb-size)] rounded-[var(--switch-thumb-radius)]",
-    "bg-white shadow-[0_1px_2px_rgb(0_0_0/0.16)] ring-1 ring-black/10",
+    "bg-background shadow-sm ring-1 ring-border",
     "transition-[translate,background-color,box-shadow] duration-200 ease-out",
     "data-[checked]:translate-x-[var(--switch-thumb-translate)]",
-    "dark:bg-neutral-950 dark:ring-white/15 dark:data-[checked]:bg-white",
+    "data-[checked]:bg-primary-foreground",
   ],
   {
     variants: {
       color: {
-        accent: "data-[checked]:bg-white",
-        blue: "data-[checked]:bg-white",
-        red: "data-[checked]:bg-white",
-        amber: "data-[checked]:bg-amber-950 dark:data-[checked]:bg-amber-950",
-        neutral:
-          "data-[checked]:bg-white dark:data-[checked]:bg-neutral-950",
+        accent: "data-[checked]:bg-primary-foreground",
+        blue: "data-[checked]:bg-info-foreground",
+        red: "data-[checked]:bg-destructive-foreground",
+        amber: "data-[checked]:bg-warning-foreground",
+        neutral: "data-[checked]:bg-background",
       },
       variant: {
         solid: "",
@@ -186,23 +186,22 @@ const switchThumbVariants = cva(
       {
         variant: ["soft", "outline"],
         color: "blue",
-        className: "data-[checked]:bg-blue-600",
+        className: "data-[checked]:bg-info",
       },
       {
         variant: ["soft", "outline"],
         color: "red",
-        className: "data-[checked]:bg-red-600",
+        className: "data-[checked]:bg-destructive",
       },
       {
         variant: ["soft", "outline"],
         color: "amber",
-        className:
-          "data-[checked]:bg-amber-500 dark:data-[checked]:bg-amber-500",
+        className: "data-[checked]:bg-warning",
       },
       {
         variant: ["soft", "outline"],
         color: "neutral",
-        className: "data-[checked]:bg-neutral-950 dark:data-[checked]:bg-white",
+        className: "data-[checked]:bg-foreground",
       },
     ],
     defaultVariants: {

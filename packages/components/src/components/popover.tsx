@@ -10,11 +10,10 @@ import { playSound, type SoundName } from "./sound";
 
 const popoverPopupVariants = cva(
   [
-    "relative z-50 grid max-w-[calc(100vw-2rem)] gap-4 border border-neutral-200 bg-background text-foreground shadow-xl outline-none",
+    "relative z-50 grid max-w-[calc(100vw-2rem)] gap-4 border border-border bg-popover text-popover-foreground shadow-xl outline-none",
     "origin-[var(--transform-origin)] transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
-    "dark:border-white/15 dark:bg-neutral-950",
   ],
   {
     variants: {
@@ -261,8 +260,7 @@ const PopoverArrow = React.forwardRef<HTMLDivElement, PopoverArrowProps>(
           "data-[side=bottom]:top-[-6px] data-[side=left]:right-[-9px] data-[side=left]:rotate-90",
           "data-[side=right]:left-[-9px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-6px] data-[side=top]:rotate-180",
           "before:absolute before:bottom-0 before:left-1/2 before:size-2 before:-translate-x-1/2 before:translate-y-1/2",
-          "before:rotate-45 before:border before:border-neutral-200 before:bg-background before:content-['']",
-          "dark:before:border-white/15 dark:before:bg-neutral-950",
+          "before:rotate-45 before:border before:border-border before:bg-popover before:content-['']",
           className,
         )}
         {...props}
@@ -417,7 +415,7 @@ const PopoverDescription = React.forwardRef<
       ref={ref}
       data-slot="popover-description"
       className={cn(
-        "text-sm leading-6 text-neutral-500 dark:text-neutral-400",
+        "text-sm leading-6 text-muted-foreground",
         className,
       )}
       {...props}
