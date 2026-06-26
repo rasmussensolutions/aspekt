@@ -21,9 +21,17 @@
       "import": "./src/index.ts"
     },
     "./styles.css": "./src/styles.css",
+    "./app-tabs": {
+      "types": "./src/app-tabs.ts",
+      "import": "./src/app-tabs.ts"
+    },
     "./button": {
       "types": "./src/button.ts",
       "import": "./src/button.ts"
+    },
+    "./avatar": {
+      "types": "./src/avatar.ts",
+      "import": "./src/avatar.ts"
     },
     "./checkbox": {
       "types": "./src/checkbox.ts",
@@ -77,6 +85,10 @@
       "types": "./src/select.ts",
       "import": "./src/select.ts"
     },
+    "./sidebar": {
+      "types": "./src/sidebar.ts",
+      "import": "./src/sidebar.ts"
+    },
     "./snippet": {
       "types": "./src/snippet.ts",
       "import": "./src/snippet.ts"
@@ -120,8 +132,14 @@
   },
   "typesVersions": {
     "*": {
+      "app-tabs": [
+        "src/app-tabs.ts"
+      ],
       "blockquote": [
         "src/blockquote.ts"
+      ],
+      "avatar": [
+        "src/avatar.ts"
       ],
       "button": [
         "src/button.ts"
@@ -161,6 +179,9 @@
       ],
       "select": [
         "src/select.ts"
+      ],
+      "sidebar": [
+        "src/sidebar.ts"
       ],
       "slider": [
         "src/slider.ts"

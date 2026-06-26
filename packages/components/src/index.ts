@@ -1,6 +1,8 @@
 import "./styles.css";
 
+export * from "./components/app-tabs";
 export * from "./components/button";
+export * from "./components/avatar";
 export * from "./components/checkbox";
 export * from "./components/code";
 export * from "./components/blockquote";
@@ -14,6 +16,7 @@ export * from "./components/list";
 export * from "./components/popover";
 export * from "./components/prose";
 export * from "./components/select";
+export * from "./components/sidebar";
 export * from "./components/slider";
 export * from "./components/snippet";
 export * from "./components/sound";

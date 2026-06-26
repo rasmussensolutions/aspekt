@@ -3,6 +3,27 @@
   "homepage": "https://www.aspekt.systems",
   "items": [
     {
+      "name": "avatar",
+      "kind": "component",
+      "title": "Avatar",
+      "description": "A Base UI avatar with image, fallback initials, sizes, shapes, and Aspekt styling.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/avatar.tsx",
+          "target": "components/aspekt/avatar.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "data-display"
+      ]
+    },
+    {
       "name": "button",
       "kind": "component",
       "title": "Button",
@@ -310,6 +331,55 @@
       ]
     },
     {
+      "name": "sidebar",
+      "kind": "component",
+      "title": "Sidebar",
+      "description": "A composable application sidebar with controlled collapse state, drag resizing, grouped navigation, and inset layout.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/sidebar.tsx",
+          "target": "components/aspekt/sidebar.tsx"
+        },
+        {
+          "path": "packages/components/src/components/button.tsx",
+          "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/components/src/components/sound.ts",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "navigation"
+      ]
+    },
+    {
+      "name": "app-tabs",
+      "kind": "component",
+      "title": "App Tabs",
+      "description": "Application-shell tabs for opening, closing, switching, and preserving mounted page panels.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/app-tabs.tsx",
+          "target": "components/aspekt/app-tabs.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "navigation"
+      ]
+    },
+    {
       "name": "tabs",
       "kind": "component",
       "title": "Tabs",
@@ -518,6 +588,10 @@
       ],
       "files": [
         {
+          "path": "packages/components/src/components/avatar.tsx",
+          "target": "components/aspekt/avatar.tsx"
+        },
+        {
           "path": "packages/components/src/components/button.tsx",
           "target": "components/aspekt/button.tsx"
         },
@@ -568,6 +642,10 @@
         {
           "path": "packages/components/src/components/tabs.tsx",
           "target": "components/aspekt/tabs.tsx"
+        },
+        {
+          "path": "packages/components/src/components/sidebar.tsx",
+          "target": "components/aspekt/sidebar.tsx"
         },
         {
           "path": "packages/components/src/components/table.tsx",

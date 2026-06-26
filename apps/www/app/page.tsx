@@ -1,5 +1,13 @@
 "use client";
 
+import { Avatar } from "@aspekt/components-source/avatar";
+import {
+  AppTabsList,
+  AppTabsPanel,
+  AppTabsRoot,
+  type AppTabsTabData,
+  useAppTabs,
+} from "@aspekt/components-source/app-tabs";
 import { Button } from "@aspekt/components-source/button";
 import { Checkbox } from "@aspekt/components-source/checkbox";
 import { Code } from "@aspekt/components-source/code";
@@ -75,6 +83,23 @@ import {
   SelectScrollUpArrow,
   SelectTrigger,
 } from "@aspekt/components-source/select";
+import {
+  Sidebar as ComponentSidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarInset,
+  SidebarInsetContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  SidebarRoot,
+  SidebarSection,
+  SidebarSectionLabel,
+  SidebarSeparator,
+  SidebarTrigger,
+} from "@aspekt/components-source/sidebar";
 import { Slider } from "@aspekt/components-source/slider";
 import { Snippet } from "@aspekt/components-source/snippet";
 import {
@@ -113,6 +138,8 @@ import Image from "next/image";
 type IntroPage = "getting-started" | "principles";
 type FoundationPage = "typography" | "colors" | "sonification";
 type ComponentPreview =
+  | "app-tabs"
+  | "avatar"
   | "button"
   | "checkbox"
   | "input"
@@ -124,6 +151,7 @@ type ComponentPreview =
   | "dialog"
   | "drawer"
   | "popover"
+  | "sidebar"
   | "toast"
   | "tabs"
   | "table"
@@ -202,6 +230,14 @@ type ListTone = "default" | "muted" | "subtle";
 type SnippetLanguageOption = "tsx" | "bash" | "json" | "css" | "html";
 type SnippetVariant = "outline" | "soft";
 type ButtonStatusOption = "none" | "success" | "fail";
+type AvatarSize = "micro" | "tiny" | "small" | "medium" | "large";
+type AvatarShape = "square" | "round";
+type AppTabsVariant = "soft" | "outline" | "line";
+type AppTabsSize = "small" | "medium" | "large";
+type AppTabsColor = ButtonColor;
+type AppTabsShape = ButtonShape;
+type SidebarVariant = "solid" | "soft" | "floating" | "inset";
+type SidebarSide = "left" | "right";
 
 type ButtonSettings = {
   variant: ButtonVariant;
@@ -213,6 +249,12 @@ type ButtonSettings = {
   loading: boolean;
   status: ButtonStatusOption;
   disabled: boolean;
+};
+
+type AvatarSettings = {
+  image: boolean;
+  shape: AvatarShape;
+  size: AvatarSize;
 };
 
 type InputSettings = {
@@ -318,6 +360,7 @@ type PopoverSettings = {
 
 type ToastSettings = {
   action: boolean;
+  autoClose: boolean;
   colorful: boolean;
   maxToasts: ToastMaxToasts;
   position: ToastPosition;
@@ -335,6 +378,13 @@ type TabsSettings = {
   activateOnFocus: boolean;
 };
 
+type AppTabsSettings = {
+  variant: AppTabsVariant;
+  size: AppTabsSize;
+  color: AppTabsColor;
+  shape: AppTabsShape;
+};
+
 type TableSettings = {
   variant: TableVariant;
   size: TableSize;
@@ -344,6 +394,13 @@ type TableSettings = {
   sortable: boolean;
   stickyHeader: boolean;
   showColumnBorders: boolean;
+};
+
+type SidebarSettings = {
+  collapsible: boolean;
+  open: boolean;
+  side: SidebarSide;
+  variant: SidebarVariant;
 };
 
 type HeadingSettings = {
@@ -423,6 +480,8 @@ const typographyPrimitiveIds = [
   "list",
 ] as const satisfies readonly TypographyPrimitive[];
 const componentIds = [
+  "app-tabs",
+  "avatar",
   "button",
   "checkbox",
   "input",
@@ -434,6 +493,7 @@ const componentIds = [
   "dialog",
   "drawer",
   "popover",
+  "sidebar",
   "toast",
   "tabs",
   "table",
@@ -447,6 +507,8 @@ const componentIds = [
   "list",
 ] as const;
 const docsComponentIds = [
+  "app-tabs",
+  "avatar",
   "button",
   "checkbox",
   "input",
@@ -458,6 +520,7 @@ const docsComponentIds = [
   "dialog",
   "drawer",
   "popover",
+  "sidebar",
   "toast",
   "tabs",
   "table",
@@ -501,9 +564,12 @@ const navGroups = [
   {
     title: "Components",
     items: [
+      { label: "Avatar", page: "avatar" },
       { label: "Dialog", page: "dialog" },
       { label: "Drawer", page: "drawer" },
       { label: "Popover", page: "popover" },
+      { label: "Sidebar", page: "sidebar" },
+      { label: "App Tabs", page: "app-tabs" },
       { label: "Toast", page: "toast" },
       { label: "Tabs", page: "tabs" },
       { label: "Table", page: "table" },
@@ -521,6 +587,11 @@ const buttonOptions = {
   color: ["accent", "blue", "red", "amber", "neutral"],
   shape: ["square", "round"],
   status: ["none", "success", "fail"],
+} as const;
+
+const avatarOptions = {
+  size: ["micro", "tiny", "small", "medium", "large"],
+  shape: ["square", "round"],
 } as const;
 
 const inputOptions = {
@@ -601,10 +672,22 @@ const tabsOptions = {
   orientation: ["horizontal", "vertical"],
 } as const;
 
+const appTabsOptions = {
+  variant: ["soft", "outline", "line"],
+  size: ["small", "medium", "large"],
+  color: buttonOptions.color,
+  shape: buttonOptions.shape,
+} as const;
+
 const tableOptions = {
   variant: ["outline", "soft", "ghost"],
   size: ["compact", "medium", "large"],
   shape: buttonOptions.shape,
+} as const;
+
+const sidebarOptions = {
+  variant: ["solid", "soft", "floating", "inset"],
+  side: ["left", "right"],
 } as const;
 
 const headingOptions = {
@@ -691,6 +774,15 @@ const soundDepthCopy = {
 >;
 
 const componentCopy = {
+  "app-tabs": {
+    title: "App Tabs",
+    description:
+      "is used to keep open application pages mounted while switching between them.",
+  },
+  avatar: {
+    title: "Avatar",
+    description: "is used to identify people, teams, and entities.",
+  },
   button: {
     title: "Button",
     description: "is used to initiate interactions.",
@@ -734,6 +826,10 @@ const componentCopy = {
   popover: {
     title: "Popover",
     description: "is used to reveal anchored contextual content.",
+  },
+  sidebar: {
+    title: "Sidebar",
+    description: "is used to frame persistent application navigation.",
   },
   toast: {
     title: "Toast",
@@ -788,6 +884,7 @@ const componentCopy = {
 >;
 
 const componentImportExamples = {
+  avatar: 'import { Avatar } from "@/components/aspekt/avatar";',
   button: 'import { Button } from "@/components/aspekt/button";',
   checkbox: 'import { Checkbox } from "@/components/aspekt/checkbox";',
   input: 'import { Input } from "@/components/aspekt/input";',
@@ -804,6 +901,24 @@ const componentImportExamples = {
     'import { DrawerRoot, DrawerTrigger } from "@/components/aspekt/drawer";',
   popover:
     'import { PopoverRoot, PopoverTrigger } from "@/components/aspekt/popover";',
+  "app-tabs": `import {
+  AppTabsList,
+  AppTabsPanel,
+  AppTabsRoot,
+} from "@/components/aspekt/app-tabs";`,
+  sidebar: `import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarInsetContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRoot,
+  SidebarSection,
+  SidebarSectionLabel,
+} from "@/components/aspekt/sidebar";`,
   toast: 'import { toast, Toaster } from "@/components/aspekt/toast";',
   tabs: 'import { TabsRoot, TabsList, TabsTab, TabsPanel, TabsIndicator } from "@/components/aspekt/tabs";',
   table:
@@ -819,6 +934,7 @@ const componentImportExamples = {
 } satisfies Record<ComponentPreview, string>;
 
 const componentUsageExamples = {
+  avatar: `<Avatar alt="Maya Chen" fallback="MC" />`,
   button: `<Button color="neutral" status="success" sound="success">
   Save changes
 </Button>`,
@@ -945,6 +1061,38 @@ const componentUsageExamples = {
     </PopoverPositioner>
   </PopoverPortal>
 </PopoverRoot>`,
+  "app-tabs": `<AppTabsRoot
+  defaultTabs={tabs}
+  defaultValue="projects"
+  variant="soft"
+  color="neutral"
+  shape="round"
+>
+  <AppTabsList />
+  <AppTabsPanel value="projects">
+    <ProjectsPage />
+  </AppTabsPanel>
+</AppTabsRoot>`,
+  sidebar: `<SidebarRoot>
+  <Sidebar variant="inset">
+    <SidebarHeader>Acme</SidebarHeader>
+    <SidebarContent>
+      <SidebarSection>
+        <SidebarSectionLabel>Workspace</SidebarSectionLabel>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton active>Projects</SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarSection>
+    </SidebarContent>
+  </Sidebar>
+  <SidebarInset>
+    <SidebarInsetContent>
+      <ProjectsPage />
+    </SidebarInsetContent>
+  </SidebarInset>
+</SidebarRoot>`,
   toast: `async function publishRelease(releaseId: string) {
   try {
     await publishReleaseById(releaseId);
@@ -955,7 +1103,7 @@ const componentUsageExamples = {
   }
 }
 
-<Toaster colorful maxToasts={6} position="bottom-right" />`,
+<Toaster autoClose colorful maxToasts={6} position="bottom-right" />`,
   tabs: `<TabsRoot defaultValue="overview">
   <TabsList>
     <TabsTab value="overview">Overview</TabsTab>
@@ -1076,6 +1224,12 @@ const foundationCopy = {
   }
 >;
 
+const defaultAvatarSettings = {
+  image: false,
+  shape: "round",
+  size: "large",
+} satisfies AvatarSettings;
+
 const defaultButtonSettings = {
   variant: "solid",
   size: "medium",
@@ -1191,6 +1345,7 @@ const defaultPopoverSettings = {
 
 const defaultToastSettings = {
   action: true,
+  autoClose: false,
   colorful: true,
   maxToasts: "6",
   position: "bottom-right",
@@ -1208,6 +1363,13 @@ const defaultTabsSettings = {
   activateOnFocus: true,
 } satisfies TabsSettings;
 
+const defaultAppTabsSettings = {
+  variant: "soft",
+  size: "small",
+  color: "neutral",
+  shape: "square",
+} satisfies AppTabsSettings;
+
 const defaultTableSettings = {
   variant: "outline",
   size: "medium",
@@ -1218,6 +1380,13 @@ const defaultTableSettings = {
   stickyHeader: false,
   showColumnBorders: false,
 } satisfies TableSettings;
+
+const defaultSidebarSettings = {
+  collapsible: true,
+  open: true,
+  side: "left",
+  variant: "inset",
+} satisfies SidebarSettings;
 
 const defaultHeadingSettings = {
   size: "h1",
@@ -2352,6 +2521,26 @@ function TogglePreview({
   );
 }
 
+function AvatarPreview({ settings }: { settings: AvatarSettings }) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-4 px-6">
+      <Avatar
+        alt="Maya Chen"
+        fallback="MC"
+        shape={settings.shape}
+        size={settings.size}
+        src={settings.image ? "/logo.png" : undefined}
+      />
+      <div className="grid min-w-0 gap-1">
+        <p className="text-sm font-medium text-foreground">Maya Chen</p>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Product systems
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function TextPreview({ settings }: { settings: TextSettings }) {
   return (
     <Text
@@ -2608,7 +2797,7 @@ function ComboboxPreview({
 
 function SoundProviderPreview() {
   return (
-    <SoundProvider enabled depths={soundDepths} variant="pop" volume={0.8}>
+    <SoundProvider enabled variant="pop" volume={0.8}>
       <SoundProviderControls />
     </SoundProvider>
   );
@@ -2762,6 +2951,265 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
   );
 }
 
+const sidebarPreviewPages = {
+  issues: {
+    icon: MagnifyingGlassIcon,
+    label: "My work",
+  },
+  projects: {
+    icon: StackIcon,
+    label: "Projects",
+  },
+  members: {
+    icon: PlusCircleIcon,
+    label: "Members",
+  },
+} as const;
+
+type SidebarPreviewPageValue = keyof typeof sidebarPreviewPages;
+
+const sidebarPreviewPageValues = [
+  "issues",
+  "projects",
+  "members",
+] as const satisfies readonly SidebarPreviewPageValue[];
+
+function getSidebarPreviewTab(value: SidebarPreviewPageValue): AppTabsTabData {
+  const page = sidebarPreviewPages[value];
+  const Icon = page.icon;
+
+  return {
+    label: page.label,
+    prefix: <Icon />,
+    value,
+  };
+}
+
+const sidebarPreviewInitialTabs = [
+  getSidebarPreviewTab("projects"),
+  getSidebarPreviewTab("issues"),
+] satisfies AppTabsTabData[];
+
+const sidebarPreviewSections = [
+  {
+    label: null,
+    items: [{ value: "issues" }],
+  },
+  {
+    label: "Workspace",
+    items: [{ value: "projects" }, { value: "members" }],
+  },
+] as const satisfies readonly {
+  label: string | null;
+  items: readonly { value: SidebarPreviewPageValue }[];
+}[];
+
+function isSidebarPreviewPageValue(
+  value: string,
+): value is SidebarPreviewPageValue {
+  return value in sidebarPreviewPages;
+}
+
+function SidebarPreviewNavigation({
+  activeValue,
+  onItemSelect,
+}: {
+  activeValue: SidebarPreviewPageValue;
+  onItemSelect: (value: SidebarPreviewPageValue) => void;
+}) {
+  return (
+    <SidebarContent className="space-y-5 p-2">
+      {sidebarPreviewSections.map((section) => (
+        <SidebarSection key={section.label ?? "primary"}>
+          {section.label && (
+            <SidebarSectionLabel>{section.label}</SidebarSectionLabel>
+          )}
+          <SidebarMenu>
+            {section.items.map((item) => {
+              const page = sidebarPreviewPages[item.value];
+              const Icon = page.icon;
+
+              return (
+                <SidebarMenuItem key={`${section.label}-${item.value}`}>
+                  <SidebarMenuButton
+                    active={activeValue === item.value}
+                    onClick={() => onItemSelect(item.value)}
+                    prefix={<Icon />}
+                    size="small"
+                  >
+                    {page.label}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarSection>
+      ))}
+    </SidebarContent>
+  );
+}
+
+function AppTabsPreviewNavigation() {
+  const { activeValue, openTab } = useAppTabs("AppTabsPreviewNavigation");
+  const selectedValue = isSidebarPreviewPageValue(activeValue)
+    ? activeValue
+    : "projects";
+
+  return (
+    <SidebarPreviewNavigation
+      activeValue={selectedValue}
+      onItemSelect={(value) => openTab(getSidebarPreviewTab(value))}
+    />
+  );
+}
+
+function AppTabsPreviewPage({ value }: { value: SidebarPreviewPageValue }) {
+  const page = sidebarPreviewPages[value];
+  const [count, setCount] = React.useState(0);
+
+  return (
+    <div className="grid h-full place-items-center p-4">
+      <Button
+        aria-label={`Increase ${page.label} count`}
+        color="neutral"
+        size="medium"
+        variant="soft"
+        onClick={() => setCount((value) => value + 1)}
+      >
+        Count {count}
+      </Button>
+    </div>
+  );
+}
+
+function SidebarPreview({
+  settings,
+  onOpenChange,
+}: {
+  settings: SidebarSettings;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [activeValue, setActiveValue] =
+    React.useState<SidebarPreviewPageValue>("projects");
+
+  return (
+    <div className="w-full max-w-2xl px-6">
+      <SidebarRoot
+        collapsedWidth="3rem"
+        collapsible={settings.collapsible}
+        open={settings.open}
+        onOpenChange={onOpenChange}
+        side={settings.side}
+        width="13rem"
+        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-background shadow-sm"
+      >
+        <ComponentSidebar
+          variant={settings.variant}
+          className={
+            settings.variant === "floating"
+              ? "h-[calc(100%-1rem)] !min-h-[calc(100%-1rem)]"
+              : "h-full !min-h-full"
+          }
+        >
+          <SidebarHeader className="min-h-11">
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground transition-[max-width,opacity] group-data-[state=collapsed]/sidebar:max-w-0 group-data-[state=collapsed]/sidebar:opacity-0">
+              Aspekt UI
+            </span>
+            <SidebarTrigger
+              className="group-data-[state=collapsed]/sidebar:hidden"
+              size="tiny"
+            />
+          </SidebarHeader>
+
+          <SidebarPreviewNavigation
+            activeValue={activeValue}
+            onItemSelect={setActiveValue}
+          />
+
+          <SidebarFooter>
+            <SidebarSeparator />
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  prefix={<Avatar alt="TR" fallback="TR" size="micro" />}
+                >
+                  Tobias
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+          <SidebarRail />
+        </ComponentSidebar>
+
+        <SidebarInset className="flex min-h-0 flex-col overflow-hidden p-0">
+          <SidebarInsetContent />
+        </SidebarInset>
+      </SidebarRoot>
+    </div>
+  );
+}
+
+function AppTabsPreview({ settings }: { settings: AppTabsSettings }) {
+  return (
+    <div className="w-full max-w-2xl px-6">
+      <AppTabsRoot
+        color={settings.color}
+        defaultTabs={sidebarPreviewInitialTabs}
+        defaultValue="projects"
+        shape={settings.shape}
+        size={settings.size}
+        variant={settings.variant}
+        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-background shadow-sm"
+      >
+        <SidebarRoot
+          collapsedWidth="3rem"
+          width="13rem"
+          className="!min-h-0 flex-1 overflow-hidden"
+        >
+          <ComponentSidebar variant="inset" className="h-full !min-h-full">
+            <SidebarHeader className="min-h-11">
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground transition-[max-width,opacity] group-data-[state=collapsed]/sidebar:max-w-0 group-data-[state=collapsed]/sidebar:opacity-0">
+                Aspekt UI
+              </span>
+              <SidebarTrigger
+                className="group-data-[state=collapsed]/sidebar:hidden"
+                size="tiny"
+              />
+            </SidebarHeader>
+
+            <AppTabsPreviewNavigation />
+
+            <SidebarFooter>
+              <SidebarSeparator />
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    prefix={<Avatar alt="TR" fallback="TR" size="micro" />}
+                  >
+                    Tobias
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarFooter>
+            <SidebarRail />
+          </ComponentSidebar>
+
+          <SidebarInset className="flex min-h-0 flex-col overflow-hidden p-0">
+            <AppTabsList />
+            <SidebarInsetContent>
+              {sidebarPreviewPageValues.map((value) => (
+                <AppTabsPanel key={value} value={value} className="h-full">
+                  <AppTabsPreviewPage value={value} />
+                </AppTabsPanel>
+              ))}
+            </SidebarInsetContent>
+          </SidebarInset>
+        </SidebarRoot>
+      </AppTabsRoot>
+    </div>
+  );
+}
+
 const toastPreviewCopy = {
   default: {
     title: "Queued",
@@ -2791,12 +3239,12 @@ function ToastPreview({ settings }: { settings: ToastSettings }) {
   return (
     <>
       <Toaster
+        autoClose={settings.autoClose}
         colorful={settings.colorful}
         limit={maxToasts}
         maxToasts={maxToasts}
         position={settings.position}
         shape={settings.shape}
-        timeout={0}
       />
       <ToastPreviewContent settings={settings} />
     </>
@@ -2822,7 +3270,6 @@ function ToastPreviewContent({ settings }: { settings: ToastSettings }) {
       title: copy.title,
       description: copy.description,
       type,
-      timeout: 0,
       actionProps,
       onRemove: () => {
         toastIds.current.delete(id);
@@ -2841,11 +3288,7 @@ function ToastPreviewContent({ settings }: { settings: ToastSettings }) {
 
   return (
     <div className="relative flex min-h-80 w-full items-center justify-center px-6 py-10">
-      <Button
-        type="button"
-        color="neutral"
-        onClick={showToast}
-      >
+      <Button type="button" color="neutral" onClick={showToast}>
         Show toast
       </Button>
     </div>
@@ -4072,6 +4515,9 @@ function IntroDocumentation({ activePage }: { activePage: IntroPage }) {
 }
 
 export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
+  const [avatarSettings, setAvatarSettings] = React.useState<AvatarSettings>(
+    defaultAvatarSettings,
+  );
   const [buttonSettings, setButtonSettings] = React.useState<ButtonSettings>(
     defaultButtonSettings,
   );
@@ -4106,8 +4552,14 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
     React.useState<ToastSettings>(defaultToastSettings);
   const [tabsSettings, setTabsSettings] =
     React.useState<TabsSettings>(defaultTabsSettings);
+  const [appTabsSettings, setAppTabsSettings] = React.useState<AppTabsSettings>(
+    defaultAppTabsSettings,
+  );
   const [tableSettings, setTableSettings] =
     React.useState<TableSettings>(defaultTableSettings);
+  const [sidebarSettings, setSidebarSettings] = React.useState<SidebarSettings>(
+    defaultSidebarSettings,
+  );
   const [snippetSettings, setSnippetSettings] = React.useState<SnippetSettings>(
     defaultSnippetSettings,
   );
@@ -4233,6 +4685,13 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
     }, 2000);
   }
 
+  const previewStageClassName = [
+    "relative mb-12 flex items-center justify-center overflow-hidden rounded-2xl bg-card dark:bg-neutral-900/70",
+    activeComponent === "sidebar" || activeComponent === "app-tabs"
+      ? "min-h-[38rem] sm:min-h-[40rem] lg:min-h-[42rem]"
+      : "min-h-80 sm:min-h-80 lg:min-h-80",
+  ].join(" ");
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <MobileNavbar onMenuOpen={() => setMobileMenuOpen(true)} />
@@ -4262,8 +4721,10 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
 
             {activeComponent ? (
               <>
-                <div className="relative mb-12 flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-card dark:bg-neutral-900/70 sm:min-h-80 lg:min-h-80">
-                  {activeComponent === "button" ? (
+                <div className={previewStageClassName}>
+                  {activeComponent === "avatar" ? (
+                    <AvatarPreview settings={avatarSettings} />
+                  ) : activeComponent === "button" ? (
                     <div className="flex flex-wrap items-center justify-center gap-3">
                       <Button
                         variant={buttonSettings.variant}
@@ -4395,6 +4856,18 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     <DrawerPreview settings={drawerSettings} />
                   ) : activeComponent === "popover" ? (
                     <PopoverPreview settings={popoverSettings} />
+                  ) : activeComponent === "app-tabs" ? (
+                    <AppTabsPreview settings={appTabsSettings} />
+                  ) : activeComponent === "sidebar" ? (
+                    <SidebarPreview
+                      settings={sidebarSettings}
+                      onOpenChange={(open) =>
+                        setSidebarSettings((settings) => ({
+                          ...settings,
+                          open,
+                        }))
+                      }
+                    />
                   ) : activeComponent === "toast" ? (
                     <ToastPreview settings={toastSettings} />
                   ) : activeComponent === "tabs" ? (
@@ -4435,6 +4908,45 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     <ImportExample activeComponent={activeComponent} />
                   </TabsPanel>
                   <TabsPanel value="controls">
+                    {activeComponent === "avatar" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="size"
+                          values={avatarOptions.size}
+                          active={avatarSettings.size}
+                          onValueChange={(size) =>
+                            setAvatarSettings((settings) => ({
+                              ...settings,
+                              size,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="shape"
+                          values={avatarOptions.shape}
+                          active={avatarSettings.shape}
+                          onValueChange={(shape) =>
+                            setAvatarSettings((settings) => ({
+                              ...settings,
+                              shape,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="image"
+                          checked={avatarSettings.image}
+                          onCheckedChange={(image) =>
+                            setAvatarSettings((settings) => ({
+                              ...settings,
+                              image,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
                     {activeComponent === "button" && (
                       <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
                         <OptionRow
@@ -5396,6 +5908,110 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                       </div>
                     )}
 
+                    {activeComponent === "sidebar" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="variant"
+                          values={sidebarOptions.variant}
+                          active={sidebarSettings.variant}
+                          onValueChange={(variant) =>
+                            setSidebarSettings((settings) => ({
+                              ...settings,
+                              variant,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="side"
+                          values={sidebarOptions.side}
+                          active={sidebarSettings.side}
+                          onValueChange={(side) =>
+                            setSidebarSettings((settings) => ({
+                              ...settings,
+                              side,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="collapsible"
+                          checked={sidebarSettings.collapsible}
+                          onCheckedChange={(collapsible) =>
+                            setSidebarSettings((settings) => ({
+                              ...settings,
+                              collapsible,
+                              open: collapsible ? settings.open : true,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="open"
+                          checked={sidebarSettings.open}
+                          onCheckedChange={(open) =>
+                            setSidebarSettings((settings) => ({
+                              ...settings,
+                              open,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
+                    {activeComponent === "app-tabs" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="variant"
+                          values={appTabsOptions.variant}
+                          active={appTabsSettings.variant}
+                          onValueChange={(variant) =>
+                            setAppTabsSettings((settings) => ({
+                              ...settings,
+                              variant,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="size"
+                          values={appTabsOptions.size}
+                          active={appTabsSettings.size}
+                          onValueChange={(size) =>
+                            setAppTabsSettings((settings) => ({
+                              ...settings,
+                              size,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="color"
+                          values={appTabsOptions.color}
+                          active={appTabsSettings.color}
+                          dots={buttonColorDots}
+                          onValueChange={(color) =>
+                            setAppTabsSettings((settings) => ({
+                              ...settings,
+                              color,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="shape"
+                          values={appTabsOptions.shape}
+                          active={appTabsSettings.shape}
+                          onValueChange={(shape) =>
+                            setAppTabsSettings((settings) => ({
+                              ...settings,
+                              shape,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
                     {activeComponent === "toast" && (
                       <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
                         <OptionRow
@@ -5454,6 +6070,17 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                             setToastSettings((settings) => ({
                               ...settings,
                               action,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="autoClose"
+                          checked={toastSettings.autoClose}
+                          onCheckedChange={(autoClose) =>
+                            setToastSettings((settings) => ({
+                              ...settings,
+                              autoClose,
                             }))
                           }
                         />

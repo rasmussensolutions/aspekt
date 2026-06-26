@@ -81,7 +81,10 @@ type ToastPosition = (typeof toastPositions)[number];
 type ToastObject = React.ComponentProps<typeof ToastPrimitive.Root>["toast"];
 type ToastSide = "bottom" | "top";
 type ToastManager = ReturnType<typeof ToastPrimitive.createToastManager>;
-type ToastOptions = Parameters<ToastManager["add"]>[0];
+type ToastManagerOptions = Parameters<ToastManager["add"]>[0];
+type ToastOptions = ToastManagerOptions & {
+  autoClose?: boolean;
+};
 type ToastInput = React.ReactNode | ToastOptions;
 type ToastBaseOptions = Omit<ToastOptions, "title">;
 type ToastShortcutOptions = Omit<ToastOptions, "title" | "type">;
@@ -104,6 +107,7 @@ type ToastFunction = {
 type ToastProviderProps = React.ComponentProps<
   typeof ToastPrimitive.Provider
 > & {
+  autoClose?: boolean;
   maxToasts?: number;
 };
 
@@ -228,6 +232,7 @@ function isToastOptions(value: ToastInput): value is ToastOptions {
 
   return [
     "actionProps",
+    "autoClose",
     "data",
     "description",
     "id",
@@ -252,13 +257,28 @@ function normalizeToastOptions(
   return { ...options, title: input };
 }
 
+function resolveToastOptions({
+  autoClose,
+  timeout,
+  ...options
+}: ToastOptions): ToastManagerOptions {
+  return {
+    ...options,
+    timeout: autoClose === false ? 0 : timeout,
+  };
+}
+
 function addToast(input: ToastInput, options?: ToastBaseOptions) {
-  return globalToastManager.add(normalizeToastOptions(input, options));
+  return globalToastManager.add(
+    resolveToastOptions(normalizeToastOptions(input, options)),
+  );
 }
 
 function addToastWithType(type: string): ToastShortcut {
   return (input, options) =>
-    globalToastManager.add(normalizeToastOptions(input, { ...options, type }));
+    globalToastManager.add(
+      resolveToastOptions(normalizeToastOptions(input, { ...options, type })),
+    );
 }
 
 const toast = Object.assign(addToast, {
@@ -309,9 +329,11 @@ function XIcon() {
 }
 
 function ToastProvider({
+  autoClose = true,
   children,
   limit,
   maxToasts,
+  timeout,
   toastManager = globalToastManager,
   ...props
 }: ToastProviderProps) {
@@ -322,6 +344,7 @@ function ToastProvider({
     <ToastMaxToastsContext.Provider value={resolvedMaxToasts}>
       <ToastPrimitive.Provider
         limit={Math.min(resolvedLimit, resolvedMaxToasts)}
+        timeout={autoClose ? timeout : 0}
         toastManager={toastManager}
         {...props}
       >
