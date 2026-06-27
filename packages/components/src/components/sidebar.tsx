@@ -11,7 +11,7 @@ const SIDEBAR_RESIZE_STEP = 16;
 
 const sidebarRootVariants = cva(
   [
-    "group/sidebar-root flex min-h-dvh w-full bg-background text-foreground",
+    "group/sidebar-root flex min-h-dvh w-full bg-surface text-primary",
     "[--sidebar-width:16rem] [--sidebar-collapsed-width:3rem]",
   ],
   {
@@ -29,7 +29,7 @@ const sidebarRootVariants = cva(
 
 const sidebarVariants = cva(
   [
-    "peer/sidebar group/sidebar relative z-10 flex min-h-dvh shrink-0 flex-col text-foreground",
+    "peer/sidebar group/sidebar relative z-10 flex min-h-dvh shrink-0 flex-col text-primary",
     "transition-[width,background-color,border-color,box-shadow] duration-200 ease-out",
     "group-data-[resizing]/sidebar-root:transition-none",
     "data-[side=left]:border-r data-[side=right]:border-l",
@@ -40,10 +40,10 @@ const sidebarVariants = cva(
   {
     variants: {
       variant: {
-        solid: "border-border bg-card",
-        soft: "border-transparent bg-muted/35",
+        solid: "border-border bg-surface-raised",
+        soft: "border-transparent bg-surface-sunken/35",
         floating: [
-          "m-2 min-h-[calc(100dvh-1rem)] rounded-md border border-border bg-card shadow-sm",
+          "m-2 min-h-[calc(100dvh-1rem)] rounded-md border border-border bg-surface-raised shadow-sm",
           "data-[side=left]:border data-[side=right]:border",
         ],
         inset: [
@@ -61,11 +61,11 @@ const sidebarVariants = cva(
 const sidebarMenuButtonVariants = cva(
   [
     "group/sidebar-menu-button relative flex w-full min-w-0 items-center gap-2 rounded-lg",
-    "font-medium text-muted-foreground outline-none select-none",
+    "font-medium text-secondary outline-none select-none",
     "transition-[background-color,color,box-shadow,opacity] duration-150 ease-out",
-    "hover:bg-muted/70 hover:text-foreground",
+    "hover:bg-surface-sunken/70 hover:text-primary",
     "focus-visible:ring-2 focus-visible:ring-current/20",
-    "data-[active]:bg-muted data-[active]:text-foreground",
+    "data-[active]:bg-surface-sunken data-[active]:text-primary",
     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
     "group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:gap-0 group-data-[state=collapsed]/sidebar:px-0",
@@ -470,8 +470,8 @@ const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
           "peer-data-[variant=floating]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-md",
           "peer-data-[variant=inset]/sidebar:m-2 peer-data-[variant=inset]/sidebar:rounded-lg",
           "group-data-[side=left]/sidebar-root:peer-data-[variant=inset]/sidebar:ml-0 group-data-[side=right]/sidebar-root:peer-data-[variant=inset]/sidebar:mr-0",
-          "peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-card peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
-          "peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-background peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
+          "peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-surface-raised peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
+          "peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-surface peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
           className,
         )}
         {...props}
@@ -489,7 +489,7 @@ const SidebarInsetContent = React.forwardRef<
       ref={ref}
       data-slot="sidebar-inset-content"
       className={cn(
-        "min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-card shadow-sm",
+        "min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-surface-raised shadow-sm",
         className,
       )}
       {...props}
@@ -569,7 +569,7 @@ const SidebarSectionLabel = React.forwardRef<
       ref={ref}
       data-slot="sidebar-section-label"
       className={cn(
-        "max-h-8 overflow-hidden px-2 pb-1 pt-3 text-xs font-medium text-muted-foreground",
+        "max-h-8 overflow-hidden px-2 pb-1 pt-3 text-xs font-medium text-secondary",
         "transition-[max-height,opacity,padding,transform] duration-150 ease-out",
         "group-data-[state=collapsed]/sidebar:max-h-0 group-data-[state=collapsed]/sidebar:translate-x-1 group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:pb-0 group-data-[state=collapsed]/sidebar:opacity-0",
         className,
@@ -677,7 +677,7 @@ const SidebarMenuButton = React.forwardRef<HTMLElement, SidebarMenuButtonProps>(
           <span
             data-slot="sidebar-menu-suffix"
             className={cn(
-              "ml-auto inline-flex shrink-0 items-center justify-center text-xs text-muted-foreground",
+              "ml-auto inline-flex shrink-0 items-center justify-center text-xs text-secondary",
               "group-data-[state=collapsed]/sidebar:hidden",
             )}
           >

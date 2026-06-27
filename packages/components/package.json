@@ -233,6 +233,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "cnfast": "^0.0.8",

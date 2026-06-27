@@ -9,9 +9,9 @@ import { playSound, type SoundName } from "./sound";
 
 const inputVariants = cva(
   [
-    "group/input relative inline-flex w-full shrink-0 items-center border bg-[var(--input-background)] [--input-background:var(--background)]",
+    "group/input relative inline-flex w-full shrink-0 items-center border bg-[var(--input-background)] [--input-background:var(--surface)]",
     "[--input-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
-    "text-foreground shadow-[0_0_0_1px_transparent]",
+    "text-primary shadow-[0_0_0_1px_transparent]",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
     "focus-within:shadow-[0_0_0_1px_var(--input-ring)]",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
@@ -22,9 +22,9 @@ const inputVariants = cva(
       variant: {
         outline: "border-border",
         soft:
-          "border-transparent [--input-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] hover:[--input-background:color-mix(in_oklab,var(--foreground)_8%,var(--background))] dark:[--input-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))] dark:hover:[--input-background:color-mix(in_oklab,var(--foreground)_12%,var(--background))]",
+          "border-transparent [--input-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] hover:[--input-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--input-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--input-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
         ghost:
-          "border-transparent [--input-background:transparent] hover:[--input-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] focus-within:[--input-background:transparent] dark:hover:[--input-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))]",
+          "border-transparent [--input-background:transparent] hover:[--input-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] focus-within:[--input-background:transparent] dark:hover:[--input-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -211,9 +211,9 @@ function InputAffix({
       data-slot={isPrefix ? "input-prefix" : "input-suffix"}
       data-visible={show ? "" : undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden text-muted-foreground",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden text-secondary",
         "transition-[width,opacity,margin] duration-200 ease-out",
-        "group-focus-within/input:text-foreground/70",
+        "group-focus-within/input:text-primary/70",
         show ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -244,9 +244,9 @@ function InputSuffix({
       data-slot="input-suffix"
       data-visible={show ? "" : undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden text-muted-foreground",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden text-secondary",
         "transition-[margin,opacity] duration-200 ease-out",
-        "group-focus-within/input:text-foreground/70",
+        "group-focus-within/input:text-primary/70",
         show ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -453,7 +453,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
         onBlur={handleBlur}
         className={cn(
           "min-w-0 flex-1 bg-transparent outline-none",
-          "placeholder:text-muted-foreground disabled:cursor-not-allowed",
+          "placeholder:text-secondary disabled:cursor-not-allowed",
           "read-only:cursor-default",
         )}
         {...props}
@@ -481,7 +481,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
             aria-hidden={!showClear || loading}
             tabIndex={showClear && !loading ? 0 : -1}
             className={cn(
-              "inline-flex items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/20",
+              "inline-flex items-center justify-center rounded-sm text-secondary outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-current/20",
               inputSpinnerSizes[resolvedSize],
             )}
           >

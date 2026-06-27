@@ -9,11 +9,11 @@ import { playSound, type SoundName } from "./sound";
 
 const comboboxInputGroupVariants = cva(
   [
-    "group/combobox inline-flex w-full shrink-0 items-center border bg-[var(--combobox-background)] [--combobox-background:var(--background)]",
+    "group/combobox inline-flex w-full shrink-0 items-center border bg-[var(--combobox-background)] [--combobox-background:var(--surface)]",
     "[--combobox-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
-    "text-foreground shadow-[0_0_0_1px_transparent] outline-none",
+    "text-primary shadow-[0_0_0_1px_transparent] outline-none",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
-    "hover:[--combobox-background:color-mix(in_oklab,var(--foreground)_4%,var(--background))]",
+    "hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_4%,var(--surface))]",
     "has-[:focus-visible]:shadow-[0_0_0_1px_var(--combobox-ring)]",
     "data-[popup-open]:shadow-[0_0_0_1px_var(--combobox-ring)]",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
@@ -24,9 +24,9 @@ const comboboxInputGroupVariants = cva(
       variant: {
         outline: "border-border",
         soft:
-          "border-transparent [--combobox-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] hover:[--combobox-background:color-mix(in_oklab,var(--foreground)_8%,var(--background))] dark:[--combobox-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))] dark:hover:[--combobox-background:color-mix(in_oklab,var(--foreground)_12%,var(--background))]",
+          "border-transparent [--combobox-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--combobox-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
         ghost:
-          "border-transparent [--combobox-background:transparent] hover:[--combobox-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] data-[popup-open]:[--combobox-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] dark:hover:[--combobox-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))] dark:data-[popup-open]:[--combobox-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))]",
+          "border-transparent [--combobox-background:transparent] hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] data-[popup-open]:[--combobox-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] dark:hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:data-[popup-open]:[--combobox-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -50,7 +50,7 @@ const comboboxInputGroupVariants = cva(
 
 const comboboxPopupVariants = cva(
   [
-    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border bg-popover text-popover-foreground shadow-xl outline-none",
+    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border bg-surface-floating text-primary shadow-xl outline-none",
     "origin-[var(--transform-origin)] transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
@@ -298,9 +298,9 @@ function ComboboxAffix({
       data-slot={isPrefix ? "combobox-prefix" : "combobox-suffix"}
       data-visible={show ? "" : undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden text-muted-foreground",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden text-secondary",
         "transition-[width,max-width,opacity,margin] duration-200 ease-out",
-        "group-focus-within/combobox:text-foreground/70 group-data-[popup-open]/combobox:text-foreground/70",
+        "group-focus-within/combobox:text-primary/70 group-data-[popup-open]/combobox:text-primary/70",
         show ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -381,7 +381,7 @@ const ComboboxLabel = React.forwardRef<HTMLDivElement, ComboboxLabelProps>(
       <ComboboxPrimitive.Label
         ref={ref}
         data-slot="combobox-label"
-        className={cn("text-sm font-medium text-foreground", className)}
+        className={cn("text-sm font-medium text-primary", className)}
         {...props}
       />
     );
@@ -462,7 +462,7 @@ const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputProps>(
         ref={ref}
         data-slot="combobox-input"
         className={cn(
-          "min-w-0 flex-1 bg-transparent text-left outline-none placeholder:text-muted-foreground",
+          "min-w-0 flex-1 bg-transparent text-left outline-none placeholder:text-secondary",
           "disabled:cursor-not-allowed",
           className,
         )}
@@ -482,7 +482,7 @@ const ComboboxTrigger = React.forwardRef<
       data-slot="combobox-trigger"
       type="button"
       className={cn(
-        "ml-1 inline-flex shrink-0 items-center justify-center text-muted-foreground outline-none",
+        "ml-1 inline-flex shrink-0 items-center justify-center text-secondary outline-none",
         "transition-transform duration-200 data-[popup-open]:rotate-180",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
@@ -502,8 +502,8 @@ const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearProps>(
         data-slot="combobox-clear"
         type="button"
         className={cn(
-          "ml-1 inline-flex shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none",
-          "transition-[opacity,color] duration-150 hover:text-foreground",
+          "ml-1 inline-flex shrink-0 items-center justify-center rounded-sm text-secondary outline-none",
+          "transition-[opacity,color] duration-150 hover:text-primary",
           "data-[hidden]:pointer-events-none data-[hidden]:opacity-0",
           className,
         )}
@@ -596,7 +596,7 @@ const ComboboxItem = React.forwardRef<HTMLDivElement, ComboboxItemProps>(
         className={cn(
           "grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none select-none",
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-          "data-[highlighted]:bg-foreground data-[highlighted]:text-background",
+          "data-[highlighted]:bg-primary data-[highlighted]:text-inverse",
           className,
         )}
         {...props}
@@ -623,7 +623,7 @@ const ComboboxGroupLabel = React.forwardRef<
       ref={ref}
       data-slot="combobox-group-label"
       className={cn(
-        "px-2.5 py-1.5 text-xs font-medium text-muted-foreground",
+        "px-2.5 py-1.5 text-xs font-medium text-secondary",
         className,
       )}
       {...props}
@@ -637,7 +637,7 @@ const ComboboxEmpty = React.forwardRef<HTMLDivElement, ComboboxEmptyProps>(
       <ComboboxPrimitive.Empty
         ref={ref}
         data-slot="combobox-empty"
-        className={cn("px-2.5 py-6 text-center text-sm text-muted-foreground", className)}
+        className={cn("px-2.5 py-6 text-center text-sm text-secondary", className)}
         {...props}
       />
     );

@@ -9,7 +9,7 @@ import { playSound, type SoundName } from "./sound";
 
 const sliderRootVariants = cva(
   [
-    "group/slider grid w-full gap-2 text-foreground",
+    "group/slider grid w-full gap-2 text-primary",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
     "data-[invalid]:text-destructive",
   ],
@@ -17,15 +17,15 @@ const sliderRootVariants = cva(
     variants: {
       size: {
         micro:
-          "text-xs [--slider-control-size:1.25rem] [--slider-thumb-size:0.875rem] [--slider-track-size:0.25rem]",
+          "text-xs [--slider-control-size:1.25rem] [--slider-thumb-radius:calc(var(--radius-sm)*0.5)] [--slider-thumb-size:0.875rem] [--slider-track-size:0.25rem]",
         tiny:
-          "text-xs [--slider-control-size:1.5rem] [--slider-thumb-size:1rem] [--slider-track-size:0.3125rem]",
+          "text-xs [--slider-control-size:1.5rem] [--slider-thumb-radius:calc(var(--radius-sm)*0.65)] [--slider-thumb-size:1rem] [--slider-track-size:0.3125rem]",
         small:
-          "text-sm [--slider-control-size:1.75rem] [--slider-thumb-size:1.125rem] [--slider-track-size:0.375rem]",
+          "text-sm [--slider-control-size:1.75rem] [--slider-thumb-radius:calc(var(--radius-sm)*0.8)] [--slider-thumb-size:1.125rem] [--slider-track-size:0.375rem]",
         medium:
-          "text-sm [--slider-control-size:2rem] [--slider-thumb-size:1.375rem] [--slider-track-size:0.5rem]",
+          "text-sm [--slider-control-size:2rem] [--slider-thumb-radius:var(--radius-sm)] [--slider-thumb-size:1.375rem] [--slider-track-size:0.5rem]",
         large:
-          "text-base [--slider-control-size:2.25rem] [--slider-thumb-size:1.625rem] [--slider-track-size:0.625rem]",
+          "text-base [--slider-control-size:2.25rem] [--slider-thumb-radius:var(--radius-md)] [--slider-thumb-size:1.625rem] [--slider-track-size:0.625rem]",
       },
     },
     defaultVariants: {
@@ -66,9 +66,9 @@ const sliderTrackVariants = cva(
   {
     variants: {
       variant: {
-        solid: "border border-transparent bg-muted",
-        soft: "border border-transparent bg-muted/70",
-        outline: "border border-border bg-background",
+        solid: "border border-transparent bg-control-track",
+        soft: "border border-transparent bg-control-track/80",
+        outline: "border border-border bg-surface",
       },
       shape: {
         square: "rounded-md",
@@ -91,11 +91,11 @@ const sliderIndicatorVariants = cva(
   {
     variants: {
       color: {
-        accent: "bg-primary",
+        accent: "bg-action",
         blue: "bg-info",
         red: "bg-destructive",
         amber: "bg-warning",
-        neutral: "bg-foreground",
+        neutral: "bg-primary",
       },
       variant: {
         solid: "",
@@ -112,7 +112,7 @@ const sliderIndicatorVariants = cva(
 
 const sliderThumbVariants = cva(
   [
-    "z-10 block size-[var(--slider-thumb-size)] shrink-0 border bg-background shadow-sm ring-1 ring-border",
+    "z-10 block size-[var(--slider-thumb-size)] shrink-0 border bg-surface shadow-sm ring-1 ring-border",
     "cursor-grab outline-none transition-[background-color,border-color,box-shadow,scale,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
     "active:scale-95 data-[disabled]:cursor-not-allowed data-[disabled]:active:scale-100",
     "data-[dragging]:cursor-grabbing data-[dragging]:scale-95",
@@ -131,7 +131,7 @@ const sliderThumbVariants = cva(
         neutral: "",
       },
       shape: {
-        square: "rounded-md",
+        square: "rounded-[var(--slider-thumb-radius)]",
         round: "rounded-full",
       },
       variant: {
@@ -144,7 +144,7 @@ const sliderThumbVariants = cva(
       {
         color: "accent",
         variant: ["soft", "outline"],
-        className: "border-primary/25",
+        className: "border-action/25",
       },
       {
         color: "blue",
@@ -164,7 +164,7 @@ const sliderThumbVariants = cva(
       {
         color: "neutral",
         variant: ["soft", "outline"],
-        className: "border-foreground/15",
+        className: "border-primary/15",
       },
     ],
     defaultVariants: {
@@ -568,7 +568,7 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
           {showValue && (
             <SliderPrimitive.Value
               className={cn(
-                "ml-auto font-mono text-sm text-muted-foreground",
+                "ml-auto font-mono text-sm text-secondary",
                 valueClassName,
               )}
             >

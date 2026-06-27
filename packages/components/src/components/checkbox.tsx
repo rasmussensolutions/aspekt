@@ -23,11 +23,11 @@ const checkboxVariants = cva(
     variants: {
       variant: {
         solid:
-          "border-border bg-background text-primary-foreground hover:bg-muted",
+          "border-border bg-surface text-on-color hover:bg-surface-sunken",
         soft:
-          "border-transparent bg-muted text-transparent hover:bg-muted/80",
+          "border-transparent bg-surface-sunken text-transparent hover:bg-surface-sunken/80",
         outline:
-          "border-border bg-transparent text-transparent hover:bg-muted",
+          "border-border bg-transparent text-transparent hover:bg-surface-sunken",
       },
       color: {
         accent: "",
@@ -37,14 +37,18 @@ const checkboxVariants = cva(
         neutral: "",
       },
       size: {
-        micro: "size-3.5 [&_svg]:size-2.5",
-        tiny: "size-4 [&_svg]:size-3",
-        small: "size-4.5 [&_svg]:size-3.5",
-        medium: "size-5 [&_svg]:size-4",
-        large: "size-5.5 [&_svg]:size-4.5",
+        micro:
+          "size-3.5 [--checkbox-radius:calc(var(--radius-sm)*0.5)] [&_svg]:size-2.5",
+        tiny:
+          "size-4 [--checkbox-radius:calc(var(--radius-sm)*0.65)] [&_svg]:size-3",
+        small:
+          "size-4.5 [--checkbox-radius:calc(var(--radius-sm)*0.8)] [&_svg]:size-3.5",
+        medium: "size-5 [--checkbox-radius:var(--radius-sm)] [&_svg]:size-4",
+        large:
+          "size-5.5 [--checkbox-radius:var(--radius-md)] [&_svg]:size-4.5",
       },
       shape: {
-        square: "rounded-md",
+        square: "rounded-[var(--checkbox-radius)]",
         round: "rounded-full",
       },
     },
@@ -53,38 +57,38 @@ const checkboxVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "data-[checked]:border-primary/15 data-[checked]:bg-primary data-[checked]:text-primary-foreground data-[checked]:hover:bg-primary/90 data-[indeterminate]:border-primary/15 data-[indeterminate]:bg-primary data-[indeterminate]:text-primary-foreground",
+          "data-[checked]:border-action/15 data-[checked]:bg-action data-[checked]:text-on-color data-[checked]:hover:bg-action/90 data-[indeterminate]:border-action/15 data-[indeterminate]:bg-action data-[indeterminate]:text-on-color",
       },
       {
         variant: "solid",
         color: "blue",
         className:
-          "data-[checked]:border-info/20 data-[checked]:bg-info data-[checked]:text-info-foreground data-[checked]:hover:bg-info/90 data-[indeterminate]:border-info/20 data-[indeterminate]:bg-info data-[indeterminate]:text-info-foreground",
+          "data-[checked]:border-info/20 data-[checked]:bg-info data-[checked]:text-on-color data-[checked]:hover:bg-info/90 data-[indeterminate]:border-info/20 data-[indeterminate]:bg-info data-[indeterminate]:text-on-color",
       },
       {
         variant: "solid",
         color: "red",
         className:
-          "data-[checked]:border-destructive/20 data-[checked]:bg-destructive data-[checked]:text-destructive-foreground data-[checked]:hover:bg-destructive/90 data-[indeterminate]:border-destructive/20 data-[indeterminate]:bg-destructive data-[indeterminate]:text-destructive-foreground",
+          "data-[checked]:border-destructive/20 data-[checked]:bg-destructive data-[checked]:text-on-color data-[checked]:hover:bg-destructive/90 data-[indeterminate]:border-destructive/20 data-[indeterminate]:bg-destructive data-[indeterminate]:text-on-color",
       },
       {
         variant: "solid",
         color: "amber",
         className:
-          "data-[checked]:border-warning/25 data-[checked]:bg-warning data-[checked]:text-warning-foreground data-[checked]:hover:bg-warning/90 data-[indeterminate]:border-warning/25 data-[indeterminate]:bg-warning data-[indeterminate]:text-warning-foreground",
+          "data-[checked]:border-warning/25 data-[checked]:bg-warning data-[checked]:text-on-color data-[checked]:hover:bg-warning/90 data-[indeterminate]:border-warning/25 data-[indeterminate]:bg-warning data-[indeterminate]:text-on-color",
       },
       {
         variant: "solid",
         color: "neutral",
         className:
-          "data-[checked]:border-foreground/10 data-[checked]:bg-foreground data-[checked]:text-background data-[checked]:hover:bg-foreground/90 data-[indeterminate]:border-foreground/10 data-[indeterminate]:bg-foreground data-[indeterminate]:text-background",
+          "data-[checked]:border-primary/10 data-[checked]:bg-primary data-[checked]:text-inverse data-[checked]:hover:bg-primary/90 data-[indeterminate]:border-primary/10 data-[indeterminate]:bg-primary data-[indeterminate]:text-inverse",
       },
 
       {
         variant: "soft",
         color: "accent",
         className:
-          "data-[checked]:bg-primary/10 data-[checked]:text-primary data-[checked]:hover:bg-primary/15 data-[indeterminate]:bg-primary/10 data-[indeterminate]:text-primary",
+          "data-[checked]:bg-action/10 data-[checked]:text-action data-[checked]:hover:bg-action/15 data-[indeterminate]:bg-action/10 data-[indeterminate]:text-action",
       },
       {
         variant: "soft",
@@ -108,14 +112,14 @@ const checkboxVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "data-[checked]:bg-muted data-[checked]:text-foreground data-[checked]:hover:bg-muted/80 data-[indeterminate]:bg-muted data-[indeterminate]:text-foreground",
+          "data-[checked]:bg-surface-sunken data-[checked]:text-primary data-[checked]:hover:bg-surface-sunken/80 data-[indeterminate]:bg-surface-sunken data-[indeterminate]:text-primary",
       },
 
       {
         variant: "outline",
         color: "accent",
         className:
-          "data-[checked]:border-primary/25 data-[checked]:bg-primary/5 data-[checked]:text-primary data-[checked]:hover:bg-primary/10 data-[indeterminate]:border-primary/25 data-[indeterminate]:bg-primary/5 data-[indeterminate]:text-primary",
+          "data-[checked]:border-action/25 data-[checked]:bg-action/5 data-[checked]:text-action data-[checked]:hover:bg-action/10 data-[indeterminate]:border-action/25 data-[indeterminate]:bg-action/5 data-[indeterminate]:text-action",
       },
       {
         variant: "outline",
@@ -139,7 +143,7 @@ const checkboxVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "data-[checked]:border-foreground/15 data-[checked]:bg-muted data-[checked]:text-foreground data-[checked]:hover:bg-muted/80 data-[indeterminate]:border-foreground/15 data-[indeterminate]:bg-muted data-[indeterminate]:text-foreground",
+          "data-[checked]:border-primary/15 data-[checked]:bg-surface-sunken data-[checked]:text-primary data-[checked]:hover:bg-surface-sunken/80 data-[indeterminate]:border-primary/15 data-[indeterminate]:bg-surface-sunken data-[indeterminate]:text-primary",
       },
     ],
     defaultVariants: {

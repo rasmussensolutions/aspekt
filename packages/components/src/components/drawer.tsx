@@ -39,7 +39,7 @@ const drawerViewportVariants = cva(
 const drawerContentVariants = cva(
   [
     "z-50 grid gap-5 overflow-y-auto overscroll-contain touch-auto",
-    "border border-border bg-popover text-popover-foreground shadow-2xl outline-none",
+    "border border-border bg-surface-floating text-primary shadow-2xl outline-none",
     "transition-[opacity,transform] duration-200 ease-out",
     "data-[swiping]:select-none",
     "data-[ending-style]:duration-[calc(var(--drawer-swipe-strength)*400ms)]",
@@ -412,7 +412,7 @@ const DrawerOverlay = React.forwardRef<HTMLDivElement, DrawerOverlayProps>(
         className={cn(
           "fixed inset-0 z-50 min-h-dvh",
           hasBackdrop
-            ? "bg-foreground/40 opacity-[calc(1_-_var(--drawer-swipe-progress))]"
+            ? "bg-overlay-scrim opacity-[calc(1_-_var(--drawer-swipe-progress))]"
             : "bg-transparent opacity-100",
           "transition-opacity duration-200 ease-out",
           "data-[swiping]:duration-0 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
@@ -622,7 +622,7 @@ const DrawerDescription = React.forwardRef<
       ref={ref}
       data-slot="drawer-description"
       className={cn(
-        "text-sm leading-6 text-muted-foreground",
+        "text-sm leading-6 text-secondary",
         className,
       )}
       {...props}

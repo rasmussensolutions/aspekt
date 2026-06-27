@@ -134,6 +134,7 @@ import {
 } from "@phosphor-icons/react";
 import * as React from "react";
 import Image from "next/image";
+import { ThemeToggle } from "./theme-toggle";
 
 type IntroPage = "getting-started" | "principles";
 type FoundationPage = "typography" | "colors" | "sonification";
@@ -1209,7 +1210,7 @@ const foundationCopy = {
   colors: {
     title: "Colors",
     description:
-      "documents the theme tokens that define Aspekt surfaces, actions, states, and contrast.",
+      "explains the z-axis surface scale and the theme tokens that ship through Aspekt.",
   },
   sonification: {
     title: "Sonification",
@@ -1290,9 +1291,9 @@ const defaultCheckboxSettings = {
 } satisfies CheckboxSettings;
 
 const defaultSwitchSettings = {
-  variant: "outline",
+  variant: "solid",
   size: "medium",
-  color: "blue",
+  color: "neutral",
   shape: "round",
   checked: true,
   invalid: false,
@@ -1301,10 +1302,10 @@ const defaultSwitchSettings = {
 } satisfies SwitchSettings;
 
 const defaultSliderSettings = {
-  variant: "outline",
-  size: "medium",
-  color: "blue",
-  shape: "round",
+  variant: "soft",
+  size: "small",
+  color: "neutral",
+  shape: "square",
   value: 64,
   showValue: true,
   invalid: false,
@@ -1344,20 +1345,20 @@ const defaultPopoverSettings = {
 } satisfies PopoverSettings;
 
 const defaultToastSettings = {
-  action: true,
-  autoClose: false,
+  action: false,
+  autoClose: true,
   colorful: true,
   maxToasts: "6",
   position: "bottom-right",
-  shape: "square",
+  shape: "round",
   type: "default",
 } satisfies ToastSettings;
 
 const defaultTabsSettings = {
   variant: "soft",
-  size: "medium",
-  color: "blue",
-  shape: "square",
+  size: "small",
+  color: "neutral",
+  shape: "round",
   orientation: "horizontal",
   indicator: true,
   activateOnFocus: true,
@@ -1593,8 +1594,8 @@ pnpm dlx @aspekt/ui add button`,
   css: {
     filename: "theme.css",
     code: `:root {
-  --primary: #171717;
-  --foreground: #171717;
+  --text-primary: #171717;
+  --action: #171717;
 }`,
   },
   html: {
@@ -1675,11 +1676,11 @@ const headingLevelValues = {
 } satisfies Record<HeadingLevelOption, HeadingLevel>;
 
 const buttonColorDots = {
-  accent: "bg-primary",
+  accent: "bg-action",
   blue: "bg-info",
   red: "bg-destructive",
   amber: "bg-warning",
-  neutral: "bg-foreground",
+  neutral: "bg-primary",
 } satisfies Record<ButtonColor, string>;
 
 function areOverflowStatesEqual(
@@ -1800,7 +1801,7 @@ function LogoLockup({ className = "" }: { className?: string }) {
         width={24}
         height={24}
         sizes="32px"
-        className="size-4.5"
+        className="size-4.5 dark:invert"
         alt="Aspekt logo"
       />
       <span className="rounded-full text-lg leading-none text-neutral-600 dark:border-white/30 dark:text-neutral-300">
@@ -1833,9 +1834,13 @@ function DocsNavigation({
     <nav className="flex flex-col gap-14" aria-label="Aspekt UI documentation">
       {filteredGroups.map((group) => (
         <div key={group.title} className="space-y-3">
-          <p className="text-lg tracking-tight font-normal text-neutral-500 dark:text-neutral-400">
+          <Text
+            as="p"
+            size={"lg"}
+            className="tracking-tight text-secondary dark:text-primary"
+          >
             {group.title}
-          </p>
+          </Text>
           <ul className="space-y-2">
             {group.items.map((item) => (
               <li key={item.label} className="ml-2">
@@ -1846,8 +1851,8 @@ function DocsNavigation({
                   className={[
                     "relative inline-flex text-left text-base leading-none outline-none transition-colors",
                     item.page === activePage
-                      ? "font-medium text-foreground"
-                      : "text-neutral-400 hover:text-foreground focus-visible:text-foreground dark:text-neutral-400",
+                      ? "font-medium text-primary"
+                      : "text-tertiary hover:text-primary focus-visible:text-primary dark:text-neutral-400",
                   ].join(" ")}
                 >
                   {item.label}
@@ -1863,14 +1868,14 @@ function DocsNavigation({
 
 function MobileNavbar({ onMenuOpen }: { onMenuOpen: () => void }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-background/95 px-6 py-4 backdrop-blur sm:px-10 lg:hidden dark:border-white/15">
+    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-surface/95 px-6 py-4 backdrop-blur sm:px-10 lg:hidden dark:border-white/15">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
         <LogoLockup />
         <button
           type="button"
           aria-label="Open menu"
           onClick={onMenuOpen}
-          className="inline-flex size-9 items-center justify-center rounded-lg text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/25 dark:text-neutral-400 dark:hover:bg-white/10"
+          className="inline-flex size-9 items-center justify-center rounded-lg text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-primary focus-visible:ring-2 focus-visible:ring-current/25 dark:text-neutral-400 dark:hover:bg-white/10"
         >
           <ListIcon className="size-5" weight="bold" />
         </button>
@@ -1919,14 +1924,14 @@ function MobileMenu({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background text-foreground lg:hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-surface text-primary lg:hidden">
       <div className="flex shrink-0 items-center justify-between gap-4 border-b border-neutral-200 px-6 py-4 sm:px-10 dark:border-white/15">
         <LogoLockup />
         <button
           type="button"
           aria-label="Close menu"
           onClick={onClose}
-          className="inline-flex size-9 items-center justify-center rounded-lg text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/25 dark:text-neutral-400 dark:hover:bg-white/10"
+          className="inline-flex size-9 items-center justify-center rounded-lg text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-primary focus-visible:ring-2 focus-visible:ring-current/25 dark:text-neutral-400 dark:hover:bg-white/10"
         >
           <XIcon className="size-5" weight="bold" />
         </button>
@@ -1945,7 +1950,7 @@ function MobileMenu({
             value={query}
             onChange={(event) => onQueryChange(event.currentTarget.value)}
             placeholder="Search documentation"
-            className="h-10 w-full rounded-lg border border-neutral-200 bg-transparent pl-9 pr-3 text-base text-foreground outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-900/10 dark:border-white/15 dark:placeholder:text-neutral-500 dark:focus:border-white/35 dark:focus:ring-white/10"
+            className="h-10 w-full rounded-lg border border-neutral-200 bg-transparent pl-9 pr-3 text-base text-primary outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-900/10 dark:border-white/15 dark:placeholder:text-neutral-500 dark:focus:border-white/35 dark:focus:ring-white/10"
           />
         </label>
       </div>
@@ -1986,6 +1991,9 @@ function Sidebar({
       >
         <LogoLockup className="mb-16" />
         <DocsNavigation activePage={activePage} onPageChange={onPageChange} />
+        <div className="mt-auto pt-8">
+          <ThemeToggle className="w-fit justify-start" />
+        </div>
       </div>
       <ProgressiveOverflowFade edge="top" visible={overflow.top} />
       <ProgressiveOverflowFade edge="bottom" visible={overflow.bottom} />
@@ -2152,7 +2160,7 @@ function OptionRow<T extends string>({
 
   return (
     <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
-      <h2 className="min-w-0 text-sm font-medium text-foreground">{label}</h2>
+      <h2 className="min-w-0 text-sm font-medium text-primary">{label}</h2>
       {control}
     </div>
   );
@@ -2172,7 +2180,7 @@ function BooleanOptionRow({
   return (
     <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
       <div className="min-w-0">
-        <h2 className="text-sm font-medium text-foreground">{label}</h2>
+        <h2 className="text-sm font-medium text-primary">{label}</h2>
         {typeLabel !== "boolean" && (
           <p className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
             {typeLabel}
@@ -2319,7 +2327,7 @@ function SoundProviderControls() {
 
         <label className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
           <span className="min-w-0">
-            <span className="block text-sm font-medium text-foreground">
+            <span className="block text-sm font-medium text-primary">
               volume
             </span>
             <span className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
@@ -2339,7 +2347,7 @@ function SoundProviderControls() {
 
         <label className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-2.5">
           <span className="min-w-0">
-            <span className="block text-sm font-medium text-foreground">
+            <span className="block text-sm font-medium text-primary">
               slider feedback
             </span>
             <span className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
@@ -2414,7 +2422,7 @@ function CheckboxPreview({
   return (
     <label
       className={[
-        "inline-flex items-center gap-3 px-6 text-sm font-medium text-foreground",
+        "inline-flex items-center gap-3 px-6 text-sm font-medium text-primary",
         settings.disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
       ].join(" ")}
     >
@@ -2445,7 +2453,7 @@ function SwitchPreview({
   return (
     <label
       className={[
-        "inline-flex items-center gap-3 px-6 text-sm font-medium text-foreground",
+        "inline-flex items-center gap-3 px-6 text-sm font-medium text-primary",
         settings.disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
       ].join(" ")}
     >
@@ -2532,7 +2540,7 @@ function AvatarPreview({ settings }: { settings: AvatarSettings }) {
         src={settings.image ? "/logo.png" : undefined}
       />
       <div className="grid min-w-0 gap-1">
-        <p className="text-sm font-medium text-foreground">Maya Chen</p>
+        <p className="text-sm font-medium text-primary">Maya Chen</p>
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
           Product systems
         </p>
@@ -2564,7 +2572,7 @@ function CodePreview({ settings }: { settings: CodeSettings }) {
   return (
     <div className="grid w-full max-w-xl gap-5 px-6">
       {settings.variant === "inline" ? (
-        <p className="text-base leading-7 text-foreground">
+        <p className="text-base leading-7 text-primary">
           Use{" "}
           <Code
             copyable={settings.copyable}
@@ -2590,7 +2598,7 @@ import { Code } from "@/components/aspekt/code";`}</Code>
 function KbdPreview({ settings }: { settings: KbdSettings }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-3 px-6 text-sm text-neutral-500 dark:text-neutral-400">
-      <span className="text-foreground">Open command menu</span>
+      <span className="text-primary">Open command menu</span>
       <span className="inline-flex items-center gap-1.5">
         <Kbd
           shape={settings.shape}
@@ -2859,7 +2867,7 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
                   <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                     component
                   </span>
-                  <span className="min-w-0 break-all text-right font-mono text-foreground">
+                  <span className="min-w-0 break-all text-right font-mono text-primary">
                     drawer
                   </span>
                 </div>
@@ -2867,7 +2875,7 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
                   <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                     target
                   </span>
-                  <span className="min-w-0 break-all text-right font-mono text-foreground">
+                  <span className="min-w-0 break-all text-right font-mono text-primary">
                     @/components/aspekt/drawer
                   </span>
                 </div>
@@ -2875,7 +2883,7 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
                   <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                     install
                   </span>
-                  <span className="min-w-0 break-all text-right font-mono text-foreground">
+                  <span className="min-w-0 break-all text-right font-mono text-primary">
                     npx @aspekt/ui init
                   </span>
                 </div>
@@ -2916,7 +2924,7 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
                 <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                   package
                 </span>
-                <span className="min-w-0 break-all text-right font-mono text-foreground">
+                <span className="min-w-0 break-all text-right font-mono text-primary">
                   @aspekt/ui
                 </span>
               </div>
@@ -2924,7 +2932,7 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
                 <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                   version
                 </span>
-                <span className="min-w-0 break-all text-right font-mono text-foreground">
+                <span className="min-w-0 break-all text-right font-mono text-primary">
                   0.1.5
                 </span>
               </div>
@@ -2932,7 +2940,7 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
                 <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                   export
                 </span>
-                <span className="min-w-0 break-all text-right font-mono text-foreground">
+                <span className="min-w-0 break-all text-right font-mono text-primary">
                   @/components/aspekt/popover
                 </span>
               </div>
@@ -3101,7 +3109,7 @@ function SidebarPreview({
         onOpenChange={onOpenChange}
         side={settings.side}
         width="13rem"
-        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-background shadow-sm"
+        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface shadow-sm"
       >
         <ComponentSidebar
           variant={settings.variant}
@@ -3112,7 +3120,7 @@ function SidebarPreview({
           }
         >
           <SidebarHeader className="min-h-11">
-            <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground transition-[max-width,opacity] group-data-[state=collapsed]/sidebar:max-w-0 group-data-[state=collapsed]/sidebar:opacity-0">
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-primary transition-[max-width,opacity] group-data-[state=collapsed]/sidebar:max-w-0 group-data-[state=collapsed]/sidebar:opacity-0">
               Aspekt UI
             </span>
             <SidebarTrigger
@@ -3159,7 +3167,7 @@ function AppTabsPreview({ settings }: { settings: AppTabsSettings }) {
         shape={settings.shape}
         size={settings.size}
         variant={settings.variant}
-        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-background shadow-sm"
+        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface shadow-sm"
       >
         <SidebarRoot
           collapsedWidth="3rem"
@@ -3168,7 +3176,7 @@ function AppTabsPreview({ settings }: { settings: AppTabsSettings }) {
         >
           <ComponentSidebar variant="inset" className="h-full !min-h-full">
             <SidebarHeader className="min-h-11">
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground transition-[max-width,opacity] group-data-[state=collapsed]/sidebar:max-w-0 group-data-[state=collapsed]/sidebar:opacity-0">
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-primary transition-[max-width,opacity] group-data-[state=collapsed]/sidebar:max-w-0 group-data-[state=collapsed]/sidebar:opacity-0">
                 Aspekt UI
               </span>
               <SidebarTrigger
@@ -3337,7 +3345,7 @@ function TabsPreview({ settings }: { settings: TabsSettings }) {
         {Object.entries(tabsPreviewPanels).map(([value, panel]) => (
           <TabsPanel key={value} value={value}>
             <div className="grid gap-2">
-              <h2 className="text-sm font-semibold text-foreground">
+              <h2 className="text-sm font-semibold text-primary">
                 {panel.title}
               </h2>
               <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400">
@@ -3413,6 +3421,15 @@ const principles = [
       "Defaults matter.",
       "Most teams do not want to spend days tuning border radii, shadows, focus states, spacing, hover effects, and disabled styles before they can ship. Aspekt is opinionated by default so that every component looks and feels polished the moment it lands in your app.",
       "Customization should be available when you need it, not required before the component becomes usable.",
+    ],
+  },
+  {
+    title: "Color and text live on depth axes",
+    body: [
+      "Neutral surface color should describe depth before it describes importance.",
+      "From deepest to foremost, Aspekt uses surface-sunken, surface, surface-raised, and surface-floating. Deeper planes are darker; foremost planes are brighter.",
+      "Text follows the same idea: text-primary, text-secondary, text-tertiary, and text-disabled move from strongest to quietest.",
+      "Intent colors stay separate. Brand, status, selection, warning, and danger should not be hidden inside the surface scale.",
     ],
   },
   {
@@ -3689,84 +3706,121 @@ function PrinciplesDocumentation() {
   );
 }
 
+const surfaceDepthTokens = [
+  {
+    name: "--surface-sunken",
+    className: "bg-surface-sunken",
+    layer: "Layer 0",
+    position: "Deepest",
+    description:
+      "Inset wells, code blocks, table headers, and quiet nested regions.",
+  },
+  {
+    name: "--surface",
+    className: "bg-surface",
+    layer: "Layer 1",
+    position: "Base",
+    description: "The default app and site canvas.",
+  },
+  {
+    name: "--surface-raised",
+    className: "bg-surface-raised",
+    layer: "Layer 2",
+    position: "Raised",
+    description: "Cards, panels, sheets, and controls above the canvas.",
+  },
+  {
+    name: "--surface-floating",
+    className: "bg-surface-floating",
+    layer: "Layer 3",
+    position: "Foremost",
+    description: "Popovers, dropdowns, command menus, dialogs, and tooltips.",
+  },
+] as const;
+
+const textDepthTokens = [
+  {
+    name: "--text-primary",
+    className: "bg-primary",
+    textClassName: "text-primary",
+    layer: "Text 0",
+    position: "Primary",
+    description: "Default body, labels, headings, and high-emphasis text.",
+  },
+  {
+    name: "--text-secondary",
+    className: "bg-secondary",
+    textClassName: "text-secondary",
+    layer: "Text 1",
+    position: "Secondary",
+    description: "Supporting copy, helper text, captions, and quieter labels.",
+  },
+  {
+    name: "--text-tertiary",
+    className: "bg-tertiary",
+    textClassName: "text-tertiary",
+    layer: "Text 2",
+    position: "Tertiary",
+    description: "Low-emphasis metadata, hints, and decorative interface text.",
+  },
+  {
+    name: "--text-disabled",
+    className: "bg-disabled",
+    textClassName: "text-disabled",
+    layer: "Text 3",
+    position: "Disabled",
+    description: "Unavailable, disabled, or intentionally inactive text.",
+  },
+] as const;
+
+const textRoleTokens = [
+  {
+    name: "--text-inverse",
+    className: "bg-inverse",
+    description: "Text on inverse neutral surfaces.",
+  },
+  {
+    name: "--text-on-color",
+    className: "bg-on-color",
+    description: "Text on filled brand or action colors.",
+  },
+  {
+    name: "--text-link",
+    className: "bg-link",
+    description: "Links and navigational text affordances.",
+  },
+] as const;
+
 const colorTokenGroups = [
   {
-    title: "Surfaces",
-    tokens: [
-      {
-        name: "--background",
-        className: "bg-background",
-        description: "Page and app background.",
-      },
-      {
-        name: "--foreground",
-        className: "bg-foreground",
-        description: "Primary text color.",
-      },
-      {
-        name: "--card",
-        className: "bg-card",
-        description: "Cards, previews, and contained panels.",
-      },
-      {
-        name: "--card-foreground",
-        className: "bg-card-foreground",
-        description: "Text and icons placed on card surfaces.",
-      },
-      {
-        name: "--popover",
-        className: "bg-popover",
-        description: "Floating surfaces such as dialogs, popovers, and menus.",
-      },
-      {
-        name: "--popover-foreground",
-        className: "bg-popover-foreground",
-        description: "Text and icons placed on popover surfaces.",
-      },
-      {
-        name: "--muted",
-        className: "bg-muted",
-        description: "Subtle backgrounds and quiet controls.",
-      },
-      {
-        name: "--muted-foreground",
-        className: "bg-muted-foreground",
-        description: "Secondary text and supporting interface copy.",
-      },
-    ],
+    title: "Depth surfaces",
+    tokens: surfaceDepthTokens,
+  },
+  {
+    title: "Text depth",
+    tokens: textDepthTokens,
+  },
+  {
+    title: "Text roles",
+    tokens: textRoleTokens,
   },
   {
     title: "Actions",
     tokens: [
       {
-        name: "--primary",
-        className: "bg-primary",
+        name: "--action",
+        className: "bg-action",
         description: "Primary brand and action color.",
       },
       {
-        name: "--primary-foreground",
-        className: "bg-primary-foreground",
-        description: "Text and icons placed on primary surfaces.",
-      },
-      {
-        name: "--secondary",
-        className: "bg-secondary",
+        name: "--action-secondary",
+        className: "bg-action-secondary",
         description: "Lower-emphasis actions and neutral controls.",
-      },
-      {
-        name: "--secondary-foreground",
-        className: "bg-secondary-foreground",
-        description: "Text and icons placed on secondary surfaces.",
       },
       {
         name: "--accent",
         className: "bg-accent",
         description: "Soft emphasis and selected states.",
-      },
-      {
-        name: "--accent-foreground",
-        className: "bg-accent-foreground",
-        description: "Text and icons placed on accent surfaces.",
       },
       {
         name: "--destructive",
@@ -3782,11 +3836,6 @@ const colorTokenGroups = [
         name: "--destructive-border",
         className: "bg-destructive-border",
         description: "Lower-chroma destructive borders and outlines.",
-      },
-      {
-        name: "--destructive-foreground",
-        className: "bg-destructive-foreground",
-        description: "Text and icons placed on destructive surfaces.",
       },
     ],
   },
@@ -3809,11 +3858,6 @@ const colorTokenGroups = [
         description: "Lower-chroma success borders and outlines.",
       },
       {
-        name: "--success-foreground",
-        className: "bg-success-foreground",
-        description: "Text and icons placed on success surfaces.",
-      },
-      {
         name: "--warning",
         className: "bg-warning",
         description: "Cautionary states that need attention.",
@@ -3829,11 +3873,6 @@ const colorTokenGroups = [
         description: "Lower-chroma warning borders and outlines.",
       },
       {
-        name: "--warning-foreground",
-        className: "bg-warning-foreground",
-        description: "Text and icons placed on warning surfaces.",
-      },
-      {
         name: "--info",
         className: "bg-info",
         description: "Informational states and neutral notices.",
@@ -3847,11 +3886,6 @@ const colorTokenGroups = [
         name: "--info-border",
         className: "bg-info-border",
         description: "Lower-chroma info borders and outlines.",
-      },
-      {
-        name: "--info-foreground",
-        className: "bg-info-foreground",
-        description: "Text and icons placed on info surfaces.",
       },
     ],
   },
@@ -3869,9 +3903,20 @@ const colorTokenGroups = [
         description: "Input borders and field surfaces.",
       },
       {
+        name: "--control-track",
+        className: "bg-control-track",
+        description:
+          "Inactive rails and neutral control tracks that must remain visible on sunken surfaces.",
+      },
+      {
         name: "--ring",
         className: "bg-ring",
         description: "Focus rings and active outlines.",
+      },
+      {
+        name: "--overlay-scrim",
+        className: "bg-overlay-scrim",
+        description: "Modal and drawer scrims that dim inactive content.",
       },
     ],
   },
@@ -3880,49 +3925,49 @@ const colorTokenGroups = [
     tokens: [
       {
         name: "--radius",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-[var(--radius)]",
         description: "Base corner radius used to derive the scale.",
       },
       {
         name: "--radius-sm",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-sm",
         description: "Small controls and compact nested elements.",
       },
       {
         name: "--radius-md",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-md",
         description: "Default control radius.",
       },
       {
         name: "--radius-lg",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-lg",
         description: "Cards, previews, and larger controls.",
       },
       {
         name: "--radius-xl",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-xl",
         description: "Large surfaces and prominent panels.",
       },
       {
         name: "--radius-2xl",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-2xl",
         description: "Roomier modal and sheet surfaces.",
       },
       {
         name: "--radius-3xl",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-3xl",
         description: "Maximum radius for expressive large containers.",
       },
       {
         name: "--radius-full",
-        className: "bg-card",
+        className: "bg-surface-raised",
         previewClassName: "h-10 w-14 rounded-full",
         description: "Fully rounded pills, toggles, and circular controls.",
       },
@@ -4255,8 +4300,9 @@ function TypographyDocumentation(props: TypographyDocumentationProps) {
                 props.onActivePrimitiveChange(value as TypographyPrimitive);
               }
             }}
-            variant="soft"
+            variant="outline"
             color="neutral"
+            size="tiny"
           >
             <TabsList>
               {typographyPrimitiveIds.map((primitive) => (
@@ -4267,7 +4313,7 @@ function TypographyDocumentation(props: TypographyDocumentationProps) {
               <TabsIndicator />
             </TabsList>
           </TabsRoot>
-          <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-card px-4 py-10 dark:bg-neutral-900/70">
+          <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-surface-raised px-4 py-10 dark:bg-neutral-900/70">
             <TypographyPrimitivePreview {...props} />
           </div>
         </div>
@@ -4300,12 +4346,20 @@ function ColorsDocumentation() {
     <div className="grid gap-12">
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
         <Heading level={2} size="h5" className="max-w-3xl">
-          Token map
+          Color on the z axis
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Colors will document the theme variables that ship through
-          <Code className="mx-1">globals.css</Code>. These groups are the
-          baseline for the expanded token set.
+          Aspekt treats neutral surface tokens as planes in depth. The stack
+          runs from deepest to foremost: <Code>surface-sunken</Code>,{" "}
+          <Code>surface</Code>, <Code>surface-raised</Code>, and{" "}
+          <Code>surface-floating</Code>. Deeper planes are darker; foremost
+          planes are brighter.
+        </Text>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Text follows its own depth ramp from primary to disabled. Role tokens
+          handle inverse surfaces, colored fills, and links. Intent colors still
+          describe meaning: action, selection, success, warning, destructive,
+          and information states.
         </Text>
       </section>
 
@@ -4360,7 +4414,7 @@ function SonificationDocumentation() {
           </Text>
         </div>
 
-        <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-card px-4 py-10 dark:bg-neutral-900/70">
+        <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-surface-raised px-4 py-10 dark:bg-neutral-900/70">
           <SoundProviderPreview />
         </div>
       </section>
@@ -4687,14 +4741,14 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   }
 
   const previewStageClassName = [
-    "relative mb-12 flex items-center justify-center overflow-hidden rounded-2xl bg-card dark:bg-neutral-900/70",
+    "relative mb-12 flex items-center justify-center overflow-hidden rounded-2xl bg-surface-sunken dark:bg-surface-raised",
     activeComponent === "sidebar" || activeComponent === "app-tabs"
       ? "min-h-[38rem] sm:min-h-[40rem] lg:min-h-[42rem]"
       : "min-h-80 sm:min-h-80 lg:min-h-80",
   ].join(" ");
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <main className="min-h-screen overflow-x-hidden bg-surface text-primary">
       <MobileNavbar onMenuOpen={() => setMobileMenuOpen(true)} />
       <MobileMenu
         activePage={activePage}
@@ -4715,7 +4769,7 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
           >
             <div className="mb-14 ">
               <p className="max-w-xl text-lg text-neutral-500 dark:text-neutral-400">
-                <span className=" text-foreground">{pageCopy.title}</span>{" "}
+                <span className=" text-primary">{pageCopy.title}</span>{" "}
                 {pageCopy.description}
               </p>
             </div>

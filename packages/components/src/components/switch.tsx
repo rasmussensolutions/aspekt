@@ -20,11 +20,11 @@ const switchVariants = cva(
     variants: {
       variant: {
         solid:
-          "border-border bg-muted hover:bg-muted/80",
+          "border-border bg-surface-sunken hover:bg-surface-sunken/80",
         soft:
-          "border-transparent bg-muted hover:bg-muted/80",
+          "border-transparent bg-surface-sunken hover:bg-surface-sunken/80",
         outline:
-          "border-border bg-background hover:bg-muted",
+          "border-border bg-surface hover:bg-surface-sunken",
       },
       color: {
         accent: "",
@@ -56,7 +56,7 @@ const switchVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "data-[checked]:border-primary/15 data-[checked]:bg-primary data-[checked]:hover:bg-primary/90",
+          "data-[checked]:border-action/15 data-[checked]:bg-action data-[checked]:hover:bg-action/90",
       },
       {
         variant: "solid",
@@ -80,14 +80,14 @@ const switchVariants = cva(
         variant: "solid",
         color: "neutral",
         className:
-          "data-[checked]:border-foreground/10 data-[checked]:bg-foreground data-[checked]:hover:bg-foreground/90",
+          "data-[checked]:border-primary/10 data-[checked]:bg-primary data-[checked]:hover:bg-primary/90",
       },
 
       {
         variant: "soft",
         color: "accent",
         className:
-          "data-[checked]:bg-primary/10 data-[checked]:hover:bg-primary/15",
+          "data-[checked]:bg-action/10 data-[checked]:hover:bg-action/15",
       },
       {
         variant: "soft",
@@ -111,14 +111,14 @@ const switchVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "data-[checked]:bg-foreground/10 data-[checked]:hover:bg-foreground/15",
+          "data-[checked]:bg-primary/10 data-[checked]:hover:bg-primary/15",
       },
 
       {
         variant: "outline",
         color: "accent",
         className:
-          "data-[checked]:border-primary/25 data-[checked]:bg-primary/5 data-[checked]:hover:bg-primary/10",
+          "data-[checked]:border-action/25 data-[checked]:bg-action/5 data-[checked]:hover:bg-action/10",
       },
       {
         variant: "outline",
@@ -142,7 +142,7 @@ const switchVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "data-[checked]:border-foreground/15 data-[checked]:bg-foreground/10 data-[checked]:hover:bg-foreground/15",
+          "data-[checked]:border-primary/15 data-[checked]:bg-primary/10 data-[checked]:hover:bg-primary/15",
       },
     ],
     defaultVariants: {
@@ -157,19 +157,19 @@ const switchVariants = cva(
 const switchThumbVariants = cva(
   [
     "pointer-events-none block size-[var(--switch-thumb-size)] rounded-[var(--switch-thumb-radius)]",
-    "bg-background shadow-sm ring-1 ring-border",
+    "bg-surface shadow-sm ring-1 ring-border",
     "transition-[translate,background-color,box-shadow] duration-200 ease-out",
     "data-[checked]:translate-x-[var(--switch-thumb-translate)]",
-    "data-[checked]:bg-primary-foreground",
+    "data-[checked]:bg-on-color",
   ],
   {
     variants: {
       color: {
-        accent: "data-[checked]:bg-primary-foreground",
-        blue: "data-[checked]:bg-info-foreground",
-        red: "data-[checked]:bg-destructive-foreground",
-        amber: "data-[checked]:bg-warning-foreground",
-        neutral: "data-[checked]:bg-background",
+        accent: "data-[checked]:bg-on-color",
+        blue: "data-[checked]:bg-on-color",
+        red: "data-[checked]:bg-on-color",
+        amber: "data-[checked]:bg-on-color",
+        neutral: "data-[checked]:bg-surface",
       },
       variant: {
         solid: "",
@@ -181,7 +181,7 @@ const switchThumbVariants = cva(
       {
         variant: ["soft", "outline"],
         color: "accent",
-        className: "data-[checked]:bg-primary",
+        className: "data-[checked]:bg-action",
       },
       {
         variant: ["soft", "outline"],
@@ -201,7 +201,7 @@ const switchThumbVariants = cva(
       {
         variant: ["soft", "outline"],
         color: "neutral",
-        className: "data-[checked]:bg-foreground",
+        className: "data-[checked]:bg-primary",
       },
     ],
     defaultVariants: {

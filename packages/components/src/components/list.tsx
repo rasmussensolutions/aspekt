@@ -3,7 +3,7 @@ import { cn } from "cnfast";
 import * as React from "react";
 
 const listVariants = cva(
-  "text-pretty text-foreground marker:text-muted-foreground",
+  "text-pretty marker:text-secondary",
   {
     variants: {
       variant: {
@@ -22,9 +22,9 @@ const listVariants = cva(
         loose: "space-y-3",
       },
       tone: {
-        default: "text-foreground",
-        muted: "text-foreground/75",
-        subtle: "text-muted-foreground",
+        default: "text-primary",
+        muted: "text-secondary",
+        subtle: "text-tertiary",
       },
     },
     defaultVariants: {

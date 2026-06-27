@@ -4,7 +4,7 @@ import * as React from "react";
 
 const blockquoteVariants = cva(
   [
-    "border-l-2 pl-5 text-pretty text-foreground",
+    "border-l-2 pl-5 text-pretty",
     "[&>p]:my-0 [&>p+p]:mt-4",
   ],
   {
@@ -15,9 +15,9 @@ const blockquoteVariants = cva(
         lg: "text-lg leading-8",
       },
       tone: {
-        default: "border-border",
-        muted: "border-border text-muted-foreground",
-        accent: "border-primary",
+        default: "border-border text-primary",
+        muted: "border-border text-secondary",
+        accent: "border-action text-primary",
         danger: "border-destructive text-destructive",
         success: "border-success text-success",
         warning: "border-warning text-warning",
@@ -33,9 +33,9 @@ const blockquoteVariants = cva(
 const blockquoteSourceVariants = cva("mt-3 block text-sm not-italic", {
   variants: {
     tone: {
-      default: "text-muted-foreground",
-      muted: "text-muted-foreground",
-      accent: "text-muted-foreground",
+      default: "text-secondary",
+      muted: "text-secondary",
+      accent: "text-secondary",
       danger: "text-destructive/80",
       success: "text-success/80",
       warning: "text-warning/80",

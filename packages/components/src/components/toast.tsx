@@ -1,6 +1,7 @@
 "use client";
 
 import { Toast as ToastPrimitive } from "@base-ui/react/toast";
+import { XIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
@@ -18,7 +19,7 @@ const toastPositions = [
 
 const toastRootVariants = cva(
   [
-    "pointer-events-auto w-full overflow-hidden border-2 border-border bg-popover text-popover-foreground shadow-xl outline-none",
+    "pointer-events-auto w-full overflow-hidden border-2 border-border bg-surface-floating text-primary shadow-xl outline-none",
     "transition-[opacity,transform] duration-200 ease-out",
     "data-[limited]:pointer-events-none data-[limited]:opacity-0",
     "data-[swiping]:transition-none",
@@ -314,20 +315,6 @@ function getToastLimit(value: number | undefined, fallback: number) {
   return Math.max(1, Math.floor(value));
 }
 
-function XIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M5 5L11 11M11 5L5 11"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.75"
-      />
-    </svg>
-  );
-}
-
 function ToastProvider({
   autoClose = true,
   children,
@@ -483,7 +470,7 @@ const ToastTitle = React.forwardRef<HTMLHeadingElement, ToastTitleProps>(
         ref={ref}
         data-slot="toast-title"
         className={cn(
-          "text-sm font-medium leading-5 text-foreground",
+          "text-sm font-medium leading-5 text-primary",
           className,
         )}
         {...props}
@@ -501,7 +488,7 @@ const ToastDescription = React.forwardRef<
       ref={ref}
       data-slot="toast-description"
       className={cn(
-        "mt-0.5 text-sm leading-5 text-muted-foreground",
+        "mt-0.5 text-sm leading-5 text-secondary",
         className,
       )}
       {...props}
@@ -517,7 +504,7 @@ const ToastAction = React.forwardRef<HTMLButtonElement, ToastActionProps>(
         data-slot="toast-action"
         className={cn(
           "inline-flex h-7 shrink-0 items-center justify-center rounded-md px-2 text-sm font-medium outline-none",
-          "text-foreground hover:bg-muted focus-visible:ring-2 focus-visible:ring-current/20",
+          "text-primary hover:bg-surface-sunken focus-visible:ring-2 focus-visible:ring-current/20",
           "disabled:pointer-events-none disabled:opacity-50",
           className,
         )}
@@ -535,13 +522,15 @@ const ToastClose = React.forwardRef<HTMLButtonElement, ToastCloseProps>(
         data-slot="toast-close"
         aria-label="Dismiss notification"
         className={cn(
-          "inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none",
-          "hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-current/20",
+          "inline-flex size-7 shrink-0 items-center justify-center rounded-md text-secondary outline-none",
+          "hover:bg-surface-sunken hover:text-primary focus-visible:ring-2 focus-visible:ring-current/20",
           className,
         )}
         {...props}
       >
-        {children ?? <XIcon />}
+        {children ?? (
+          <XIcon aria-hidden="true" className="size-4" weight="bold" />
+        )}
       </ToastPrimitive.Close>
     );
   },

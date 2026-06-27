@@ -34,9 +34,9 @@ const appTabsListVariants = cva(
 const appTabsTabVariants = cva(
   [
     "group/app-tabs-tab flex max-w-60 shrink-0 items-center border border-transparent",
-    "font-medium text-muted-foreground outline-none select-none",
+    "font-medium text-secondary outline-none select-none",
     "transition-[background-color,border-color,color,box-shadow,opacity] duration-150",
-    "hover:text-foreground",
+    "hover:text-primary",
     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   ],
@@ -95,7 +95,7 @@ const appTabsTabVariants = cva(
         variant: "soft",
         color: "accent",
         className:
-          "bg-primary/5 data-[active]:bg-primary/10 data-[active]:text-primary hover:bg-primary/10",
+          "bg-action/5 data-[active]:bg-action/10 data-[active]:text-action hover:bg-action/10",
       },
       {
         variant: "soft",
@@ -119,13 +119,13 @@ const appTabsTabVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "bg-muted/50 data-[active]:bg-muted data-[active]:text-foreground hover:bg-muted",
+          "bg-surface-sunken/50 data-[active]:bg-surface-sunken data-[active]:text-primary hover:bg-surface-sunken",
       },
       {
         variant: "outline",
         color: "accent",
         className:
-          "bg-primary/[0.03] data-[active]:border-primary/25 data-[active]:bg-primary/5 data-[active]:text-primary hover:bg-primary/5",
+          "bg-action/[0.03] data-[active]:border-action/25 data-[active]:bg-action/5 data-[active]:text-action hover:bg-action/5",
       },
       {
         variant: "outline",
@@ -149,12 +149,12 @@ const appTabsTabVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "bg-muted/35 data-[active]:border-border data-[active]:bg-muted data-[active]:text-foreground hover:bg-muted/70",
+          "bg-surface-sunken/35 data-[active]:border-border data-[active]:bg-surface-sunken data-[active]:text-primary hover:bg-surface-sunken/70",
       },
       {
         variant: "line",
         color: "accent",
-        className: "data-[active]:border-b-primary data-[active]:text-primary",
+        className: "data-[active]:border-b-action data-[active]:text-action",
       },
       {
         variant: "line",
@@ -176,7 +176,7 @@ const appTabsTabVariants = cva(
         variant: "line",
         color: "neutral",
         className:
-          "data-[active]:border-b-foreground data-[active]:text-foreground",
+          "data-[active]:border-b-primary data-[active]:text-primary",
       },
     ],
     defaultVariants: {
@@ -446,7 +446,7 @@ function AppTabsRoot({
       <div
         data-slot="app-tabs-root"
         className={cn(
-          "flex min-h-dvh min-w-0 flex-1 flex-col bg-background text-foreground",
+          "flex min-h-dvh min-w-0 flex-1 flex-col bg-surface text-primary",
           className,
         )}
         {...props}
@@ -609,8 +609,8 @@ const AppTabsTabClose = React.forwardRef<
         }
       }}
       className={cn(
-        "mr-1 grid size-5 shrink-0 place-items-center rounded-md text-muted-foreground opacity-0 outline-none transition-[background-color,color,opacity] duration-150",
-        "hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-current/20",
+        "mr-1 grid size-5 shrink-0 place-items-center rounded-md text-secondary opacity-0 outline-none transition-[background-color,color,opacity] duration-150",
+        "hover:bg-surface-sunken hover:text-primary focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-current/20",
         "group-hover/app-tabs-tab:opacity-100 group-data-[active]/app-tabs-tab:opacity-100",
         className,
       )}

@@ -7,7 +7,7 @@ import * as React from "react";
 
 import { playSound, type SoundName } from "./sound";
 
-const tabsRootVariants = cva("grid w-full text-foreground", {
+const tabsRootVariants = cva("grid w-full text-primary", {
   variants: {
     orientation: {
       horizontal: "gap-4",
@@ -29,9 +29,9 @@ const tabsListVariants = cva(
     variants: {
       variant: {
         line: "data-[orientation=horizontal]:border-b data-[orientation=vertical]:border-r border-border",
-        soft: "rounded-lg bg-muted p-1 data-[orientation=vertical]:w-full",
+        soft: "rounded-lg bg-surface-sunken p-1 data-[orientation=vertical]:w-full",
         outline:
-          "rounded-lg border border-border bg-background p-1 data-[orientation=vertical]:w-full",
+          "rounded-lg border border-border bg-surface p-1 data-[orientation=vertical]:w-full",
       },
       shape: {
         square: "",
@@ -66,17 +66,17 @@ const tabsTabVariants = cva(
   {
     variants: {
       variant: {
-        line: "text-muted-foreground hover:text-foreground data-[active]:text-[var(--tabs-active-color)]",
-        soft: "text-muted-foreground hover:text-foreground data-[active]:text-[var(--tabs-active-color)]",
+        line: "text-secondary hover:text-primary data-[active]:text-[var(--tabs-active-color)]",
+        soft: "text-secondary hover:text-primary data-[active]:text-[var(--tabs-active-color)]",
         outline:
-          "text-muted-foreground hover:text-foreground data-[active]:text-[var(--tabs-active-color)]",
+          "text-secondary hover:text-primary data-[active]:text-[var(--tabs-active-color)]",
       },
       color: {
-        accent: "[--tabs-active-color:var(--primary)]",
+        accent: "[--tabs-active-color:var(--action)]",
         blue: "[--tabs-active-color:var(--info)]",
         red: "[--tabs-active-color:var(--destructive)]",
         amber: "[--tabs-active-color:var(--warning)]",
-        neutral: "[--tabs-active-color:var(--foreground)]",
+        neutral: "[--tabs-active-color:var(--text-primary)]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -121,16 +121,16 @@ const tabsIndicatorVariants = cva(
     variants: {
       variant: {
         line: "bg-[var(--tabs-indicator-color)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-0.5 data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-0.5",
-        soft: "rounded-[inherit] bg-background shadow-sm data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
+        soft: "rounded-[inherit] bg-surface-raised dark:bg-surface-floating shadow-sm data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
         outline:
-          "rounded-[inherit] bg-muted data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
+          "rounded-[inherit] bg-surface-sunken dark:bg-surface-floating data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
       },
       color: {
-        accent: "[--tabs-indicator-color:var(--primary)]",
+        accent: "[--tabs-indicator-color:var(--action)]",
         blue: "[--tabs-indicator-color:var(--info)]",
         red: "[--tabs-indicator-color:var(--destructive)]",
         amber: "[--tabs-indicator-color:var(--warning)]",
-        neutral: "[--tabs-indicator-color:var(--foreground)]",
+        neutral: "[--tabs-indicator-color:var(--text-primary)]",
       },
       shape: {
         square: "rounded-md",

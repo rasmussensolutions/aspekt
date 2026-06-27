@@ -11,7 +11,7 @@ import { playSound, type SoundName } from "./sound";
 const dialogContentVariants = cva(
   [
     "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5",
-    "border border-border bg-popover text-popover-foreground shadow-2xl outline-none",
+    "border border-border bg-surface-floating text-primary shadow-2xl outline-none",
     "transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
@@ -180,7 +180,7 @@ const DialogOverlay = React.forwardRef<HTMLDivElement, DialogOverlayProps>(
         ref={ref}
         data-slot="dialog-overlay"
         className={cn(
-          "fixed inset-0 z-50 min-h-dvh bg-foreground/40 transition-opacity duration-150",
+          "fixed inset-0 z-50 min-h-dvh bg-overlay-scrim transition-opacity duration-150",
           "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
           "supports-[-webkit-touch-callout:none]:absolute",
           className,
@@ -342,7 +342,7 @@ const DialogDescription = React.forwardRef<
       ref={ref}
       data-slot="dialog-description"
       className={cn(
-        "text-sm leading-6 text-muted-foreground",
+        "text-sm leading-6 text-secondary",
         className,
       )}
       {...props}

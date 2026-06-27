@@ -16,12 +16,12 @@ import typescript from "refractor/typescript";
 import { CodeCopyButton } from "./code-copy-button";
 
 const snippetVariants = cva(
-  "overflow-hidden border font-mono text-sm leading-6 text-foreground",
+  "overflow-hidden border font-mono text-sm leading-6 text-primary",
   {
     variants: {
       variant: {
-        outline: "border-border bg-card",
-        soft: "border-transparent bg-muted",
+        outline: "border-border bg-surface-raised",
+        soft: "border-transparent bg-surface-sunken",
       },
       shape: {
         square: "rounded-lg",
@@ -167,7 +167,7 @@ function getTokenClassName(className: unknown) {
     names.has("doctype") ||
     names.has("cdata")
   ) {
-    return "text-muted-foreground";
+    return "text-secondary";
   }
 
   if (names.has("deleted")) {
@@ -240,7 +240,7 @@ function getTokenClassName(className: unknown) {
     names.has("punctuation") ||
     names.has("script-punctuation")
   ) {
-    return "text-muted-foreground";
+    return "text-secondary";
   }
 
   return undefined;
@@ -441,7 +441,7 @@ function Snippet({
         <figcaption
           data-slot="snippet-header"
           className={cn(
-            "flex min-h-10 items-center justify-between gap-3 border-b border-border bg-muted py-2",
+            "flex min-h-10 items-center justify-between gap-3 border-b border-border bg-surface py-2",
             shape === "round" ? "px-5" : "px-3",
           )}
         >
@@ -464,8 +464,8 @@ function Snippet({
                         "inline-flex h-6 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-none transition-[background-color,color,box-shadow]",
                         "focus-visible:ring-2 focus-visible:ring-current/25",
                         selected
-                          ? "bg-background text-foreground shadow-sm ring-1 ring-border"
-                          : "text-muted-foreground hover:bg-background hover:text-foreground",
+                          ? "bg-surface text-primary shadow-sm ring-1 ring-border"
+                          : "text-secondary hover:bg-surface hover:text-primary",
                       )}
                       id={tab.tabId}
                       onClick={() => handleTabChange(tab.value)}
@@ -483,12 +483,12 @@ function Snippet({
             ) : (
               <>
                 {selectedFilename ? (
-                  <span className="truncate text-xs font-medium text-foreground">
+                  <span className="truncate text-xs font-medium text-primary">
                     {selectedFilename}
                   </span>
                 ) : null}
                 {selectedLanguage ? (
-                  <span className="inline-flex h-4 items-center rounded-md bg-background px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-muted-foreground">
+                  <span className="inline-flex h-4 items-center rounded-md bg-surface px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-secondary">
                     {normalizedLanguage}
                   </span>
                 ) : null}
@@ -536,15 +536,13 @@ function Snippet({
                   showLineNumbers
                     ? "grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4"
                     : "",
-                  highlighted
-                    ? "-mx-4 bg-primary/10 px-4"
-                    : "",
+                  highlighted ? "-mx-4 bg-action/10 px-4" : "",
                 )}
               >
                 {showLineNumbers ? (
                   <span
                     aria-hidden="true"
-                    className="select-none text-right text-muted-foreground"
+                    className="select-none text-right text-secondary"
                   >
                     {lineNumber}
                   </span>

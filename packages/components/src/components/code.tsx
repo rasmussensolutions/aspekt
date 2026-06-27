@@ -4,22 +4,22 @@ import * as React from "react";
 
 import { CodeCopyButton } from "./code-copy-button";
 
-const codeVariants = cva("font-mono tabular-nums text-foreground", {
+const codeVariants = cva("font-mono tabular-nums", {
   variants: {
     variant: {
       inline: [
-        "inline rounded-md border border-border bg-muted",
+        "inline rounded-md border border-border bg-surface-sunken",
         "px-1.5 py-0.5 text-[0.875em] leading-none",
       ],
       block: [
         "block max-w-full overflow-x-auto whitespace-pre rounded-lg border border-border",
-        "bg-muted px-4 py-3 text-sm leading-6 text-foreground shadow-sm",
+        "bg-surface-sunken px-4 py-3 text-sm leading-6 shadow-sm",
       ],
     },
     tone: {
-      default: "",
-      muted: "text-muted-foreground",
-      accent: "border-primary/25 bg-primary/10 text-foreground",
+      default: "text-primary",
+      muted: "text-secondary",
+      accent: "border-action/25 bg-action/10 text-primary",
       danger: "border-destructive/20 bg-destructive/10 text-destructive",
       success: "border-success/20 bg-success/10 text-success",
       warning: "border-warning/25 bg-warning/10 text-warning",

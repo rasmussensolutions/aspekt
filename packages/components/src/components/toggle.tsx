@@ -22,13 +22,12 @@ const toggleVariants = cva(
     variants: {
       variant: {
         solid:
-          "border border-border bg-muted text-foreground hover:bg-muted/80",
-        soft:
-          "border border-transparent bg-muted text-foreground hover:bg-muted/80",
+          "border border-border bg-surface-sunken text-primary hover:bg-surface-sunken/80",
+        soft: "border border-transparent bg-control-track text-primary hover:bg-control-track/80",
         ghost:
-          "border border-transparent bg-transparent text-foreground hover:bg-muted",
+          "border border-transparent bg-transparent text-primary hover:bg-surface-sunken",
         outline:
-          "border border-border bg-background text-foreground hover:bg-muted",
+          "border border-border bg-surface text-primary hover:bg-surface-sunken",
       },
       color: {
         accent: "",
@@ -40,7 +39,7 @@ const toggleVariants = cva(
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
         tiny: "h-7 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
-        small: "h-8 px-2 text-sm [&_svg:not([class*='size-'])]:size-4",
+        small: "h-8 px-3 text-sm [&_svg:not([class*='size-'])]:size-4",
         medium: "h-9 px-3 text-sm [&_svg:not([class*='size-'])]:size-4",
         large: "h-10 px-3 text-sm [&_svg:not([class*='size-'])]:size-4",
       },
@@ -54,38 +53,38 @@ const toggleVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "data-[pressed]:border-primary/15 data-[pressed]:bg-primary data-[pressed]:text-primary-foreground data-[pressed]:hover:bg-primary/90",
+          "data-[pressed]:border-action/15 data-[pressed]:bg-action data-[pressed]:text-on-color data-[pressed]:hover:bg-action/90",
       },
       {
         variant: "solid",
         color: "blue",
         className:
-          "data-[pressed]:border-info/20 data-[pressed]:bg-info data-[pressed]:text-info-foreground data-[pressed]:hover:bg-info/90",
+          "data-[pressed]:border-info/20 data-[pressed]:bg-info data-[pressed]:text-on-color data-[pressed]:hover:bg-info/90",
       },
       {
         variant: "solid",
         color: "red",
         className:
-          "data-[pressed]:border-destructive/20 data-[pressed]:bg-destructive data-[pressed]:text-destructive-foreground data-[pressed]:hover:bg-destructive/90",
+          "data-[pressed]:border-destructive/20 data-[pressed]:bg-destructive data-[pressed]:text-on-color data-[pressed]:hover:bg-destructive/90",
       },
       {
         variant: "solid",
         color: "amber",
         className:
-          "data-[pressed]:border-warning/25 data-[pressed]:bg-warning data-[pressed]:text-warning-foreground data-[pressed]:hover:bg-warning/90",
+          "data-[pressed]:border-warning/25 data-[pressed]:bg-warning data-[pressed]:text-on-color data-[pressed]:hover:bg-warning/90",
       },
       {
         variant: "solid",
         color: "neutral",
         className:
-          "data-[pressed]:border-foreground/10 data-[pressed]:bg-foreground data-[pressed]:text-background data-[pressed]:hover:bg-foreground/90",
+          "data-[pressed]:border-primary/10 data-[pressed]:bg-primary data-[pressed]:text-inverse data-[pressed]:hover:bg-primary/90",
       },
 
       {
         variant: "soft",
         color: "accent",
         className:
-          "data-[pressed]:bg-primary/10 data-[pressed]:text-primary data-[pressed]:hover:bg-primary/15",
+          "data-[pressed]:bg-action/10 data-[pressed]:text-action data-[pressed]:hover:bg-action/15",
       },
       {
         variant: "soft",
@@ -109,14 +108,14 @@ const toggleVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "data-[pressed]:bg-muted data-[pressed]:text-foreground data-[pressed]:hover:bg-muted/80",
+          "data-[pressed]:bg-surface-sunken data-[pressed]:text-primary data-[pressed]:hover:bg-surface-sunken/80",
       },
 
       {
         variant: "ghost",
         color: "accent",
         className:
-          "data-[pressed]:bg-primary/10 data-[pressed]:text-primary data-[pressed]:hover:bg-primary/15",
+          "data-[pressed]:bg-action/10 data-[pressed]:text-action data-[pressed]:hover:bg-action/15",
       },
       {
         variant: "ghost",
@@ -140,14 +139,14 @@ const toggleVariants = cva(
         variant: "ghost",
         color: "neutral",
         className:
-          "data-[pressed]:bg-muted data-[pressed]:text-foreground data-[pressed]:hover:bg-muted/80",
+          "data-[pressed]:bg-surface-sunken data-[pressed]:text-primary data-[pressed]:hover:bg-surface-sunken/80",
       },
 
       {
         variant: "outline",
         color: "accent",
         className:
-          "data-[pressed]:border-primary/25 data-[pressed]:bg-primary/5 data-[pressed]:text-primary data-[pressed]:hover:bg-primary/10",
+          "data-[pressed]:border-action/25 data-[pressed]:bg-action/5 data-[pressed]:text-action data-[pressed]:hover:bg-action/10",
       },
       {
         variant: "outline",
@@ -171,7 +170,7 @@ const toggleVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "data-[pressed]:border-foreground/15 data-[pressed]:bg-muted data-[pressed]:text-foreground data-[pressed]:hover:bg-muted/80",
+          "data-[pressed]:border-primary/15 data-[pressed]:bg-surface-sunken data-[pressed]:text-primary data-[pressed]:hover:bg-surface-sunken/80",
       },
     ],
     defaultVariants: {
@@ -203,15 +202,15 @@ type ToggleProps = Omit<
   TogglePrimitive.Props,
   "className" | "color" | "prefix" | "suffix"
 > & {
-    className?: string;
-    color?: ToggleColor | null;
-    prefix?: React.ReactNode;
-    shape?: ToggleShape | null;
-    size?: ToggleSize | null;
-    sound?: ToggleSound;
-    suffix?: React.ReactNode;
-    variant?: ToggleVariant | null;
-  };
+  className?: string;
+  color?: ToggleColor | null;
+  prefix?: React.ReactNode;
+  shape?: ToggleShape | null;
+  size?: ToggleSize | null;
+  sound?: ToggleSound;
+  suffix?: React.ReactNode;
+  variant?: ToggleVariant | null;
+};
 
 const toggleIndicatorSizes = {
   micro: "size-3",

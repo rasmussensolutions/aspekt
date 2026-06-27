@@ -9,11 +9,11 @@ import { playSound, type SoundName } from "./sound";
 
 const selectTriggerVariants = cva(
   [
-    "group/select inline-flex w-full shrink-0 cursor-pointer items-center border bg-[var(--select-background)] [--select-background:var(--background)]",
+    "group/select inline-flex w-full shrink-0 cursor-pointer items-center border bg-[var(--select-background)] [--select-background:var(--surface)]",
     "[--select-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
-    "text-foreground shadow-[0_0_0_1px_transparent] outline-none select-none",
+    "text-primary shadow-[0_0_0_1px_transparent] outline-none select-none",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
-    "hover:[--select-background:color-mix(in_oklab,var(--foreground)_4%,var(--background))]",
+    "hover:[--select-background:color-mix(in_oklab,var(--text-primary)_4%,var(--surface))]",
     "focus-visible:shadow-[0_0_0_1px_var(--select-ring)]",
     "data-[popup-open]:shadow-[0_0_0_1px_var(--select-ring)]",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
@@ -25,9 +25,9 @@ const selectTriggerVariants = cva(
       variant: {
         outline: "border-border",
         soft:
-          "border-transparent [--select-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] hover:[--select-background:color-mix(in_oklab,var(--foreground)_8%,var(--background))] dark:[--select-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))] dark:hover:[--select-background:color-mix(in_oklab,var(--foreground)_12%,var(--background))]",
+          "border-transparent [--select-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] hover:[--select-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--select-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--select-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
         ghost:
-          "border-transparent [--select-background:transparent] hover:[--select-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] data-[popup-open]:[--select-background:color-mix(in_oklab,var(--foreground)_5%,var(--background))] dark:hover:[--select-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))] dark:data-[popup-open]:[--select-background:color-mix(in_oklab,var(--foreground)_10%,var(--background))]",
+          "border-transparent [--select-background:transparent] hover:[--select-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] data-[popup-open]:[--select-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] dark:hover:[--select-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:data-[popup-open]:[--select-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -51,7 +51,7 @@ const selectTriggerVariants = cva(
 
 const selectPopupVariants = cva(
   [
-    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border bg-popover text-popover-foreground shadow-xl outline-none",
+    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border bg-surface-floating text-primary shadow-xl outline-none",
     "origin-[var(--transform-origin)] transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
@@ -267,9 +267,9 @@ function SelectAffix({
       data-slot={isPrefix ? "select-prefix" : "select-suffix"}
       data-visible={show ? "" : undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden text-muted-foreground",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden text-secondary",
         "transition-[width,max-width,opacity,margin] duration-200 ease-out",
-        "group-focus-visible/select:text-foreground/70 group-data-[popup-open]/select:text-foreground/70",
+        "group-focus-visible/select:text-primary/70 group-data-[popup-open]/select:text-primary/70",
         show ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -346,7 +346,7 @@ const SelectLabel = React.forwardRef<HTMLDivElement, SelectLabelProps>(
       <SelectPrimitive.Label
         ref={ref}
         data-slot="select-label"
-        className={cn("text-sm font-medium text-foreground", className)}
+        className={cn("text-sm font-medium text-primary", className)}
         {...props}
       />
     );
@@ -361,7 +361,7 @@ const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
         data-slot="select-value"
         className={cn(
           "min-w-0 flex-1 truncate text-left",
-          "data-[placeholder]:text-muted-foreground",
+          "data-[placeholder]:text-secondary",
           className,
         )}
         {...props}
@@ -436,7 +436,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         <SelectPrimitive.Icon
           data-slot="select-icon"
           className={cn(
-            "ml-2 inline-flex shrink-0 items-center justify-center text-muted-foreground",
+            "ml-2 inline-flex shrink-0 items-center justify-center text-secondary",
             "transition-transform duration-200 group-data-[popup-open]/select:rotate-180",
           )}
         >
@@ -556,7 +556,7 @@ const SelectItem = React.forwardRef<HTMLElement, SelectItemProps>(
           "grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 px-2.5 py-1.5 text-sm outline-none select-none",
           inheritedShape === "round" ? "rounded-full" : "rounded-md",
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-          "data-[highlighted]:bg-foreground data-[highlighted]:text-background",
+          "data-[highlighted]:bg-primary data-[highlighted]:text-inverse",
           className,
         )}
         {...props}
@@ -579,7 +579,7 @@ const SelectScrollUpArrow = React.forwardRef<
       ref={ref}
       data-slot="select-scroll-up-arrow"
       className={cn(
-        "flex h-5 cursor-default items-center justify-center bg-popover text-muted-foreground",
+        "flex h-5 cursor-default items-center justify-center bg-surface-floating text-secondary",
         className,
       )}
       {...props}
@@ -602,7 +602,7 @@ const SelectScrollDownArrow = React.forwardRef<
       ref={ref}
       data-slot="select-scroll-down-arrow"
       className={cn(
-        "flex h-5 cursor-default items-center justify-center bg-popover text-muted-foreground",
+        "flex h-5 cursor-default items-center justify-center bg-surface-floating text-secondary",
         className,
       )}
       {...props}
@@ -623,7 +623,7 @@ const SelectGroupLabel = React.forwardRef<HTMLDivElement, SelectGroupLabelProps>
         ref={ref}
         data-slot="select-group-label"
         className={cn(
-          "px-2.5 py-1.5 text-xs font-medium text-muted-foreground",
+          "px-2.5 py-1.5 text-xs font-medium text-secondary",
           className,
         )}
         {...props}

@@ -316,6 +316,7 @@
       "description": "A Base UI toast system with provider, viewport, manager hook, styled notifications, actions, and dismissal.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -582,6 +583,7 @@
       "description": "Base install for the current Aspekt UI components.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast",
         "refractor"

@@ -5,118 +5,107 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: oklch(0.985 0.0053 106.5);
-  --foreground: #171717;
-  --card: oklch(0.97 0.0068 100.36);
-  --card-foreground: #171717;
-  --popover: #ffffff;
-  --popover-foreground: #171717;
-  --background-rgb: 255 255 255;
-  --foreground-rgb: 23 23 23;
-  --primary: #171717;
-  --primary-foreground: #ffffff;
-  --secondary: oklch(0.94 0.006 100.36);
-  --secondary-foreground: #171717;
-  --accent: oklch(0.94 0.006 100.36);
-  --accent-foreground: #171717;
+  --surface-sunken: oklch(0.9461 0 0);
+  --surface: oklch(0.9791 0 0);
+  --surface-raised: oklch(1 0 0);
+  --surface-floating: #ffffff;
+  --overlay-scrim: rgb(0 0 0 / 40%);
+  --text-primary: #171717;
+  --text-secondary: #737373;
+  --text-tertiary: #a3a3a3;
+  --text-disabled: #b8b8b8;
+  --text-inverse: #ededed;
+  --text-on-color: #ffffff;
+  --text-link: oklch(0.5282 0.2628 262.87);
+  --action: #171717;
+  --action-secondary: oklch(94.8% 0.006 250);
+  --accent: oklch(94.8% 0.006 250);
+  --control-track: color-mix(in oklab, var(--text-primary) 10%, var(--surface));
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-surface: oklch(0.97 0.025 27.325);
   --destructive-border: oklch(0.78 0.09 27.325);
-  --destructive-foreground: #ffffff;
-  --muted: oklch(0.94 0.006 100.36);
-  --muted-foreground: #737373;
-  --border: oklch(0.88 0.006 100.36);
-  --input: oklch(0.88 0.006 100.36);
+  --border: oklch(88% 0.006 250);
+  --input: oklch(88% 0.006 250);
   --ring: #737373;
   --success: oklch(0.8118 0.2245 134.56);
   --success-surface: oklch(0.96 0.04 145);
   --success-border: oklch(0.76 0.09 145);
-  --success-foreground: #ffffff;
   --warning: oklch(0.7824 0.1703 68.82);
   --warning-surface: oklch(0.96 0.045 68.82);
   --warning-border: oklch(0.8 0.1 68.82);
-  --warning-foreground: #ffffff;
   --info: oklch(0.5282 0.2628 262.87);
   --info-surface: oklch(0.96 0.035 262.87);
   --info-border: oklch(0.76 0.09 262.87);
-  --info-foreground: #ffffff;
   --radius: 0.625rem;
   color-scheme: light;
 }
 
 :root.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card: #171717;
-  --card-foreground: #ededed;
-  --popover: #171717;
-  --popover-foreground: #ededed;
-  --background-rgb: 10 10 10;
-  --foreground-rgb: 237 237 237;
-  --primary: #ededed;
-  --primary-foreground: #171717;
-  --secondary: #262626;
-  --secondary-foreground: #ededed;
+  --surface-sunken: #0a0a0a;
+  --surface: #111111;
+  --surface-raised: #171717;
+  --surface-floating: #1f1f1f;
+  --overlay-scrim: rgb(0 0 0 / 64%);
+  --text-primary: #ededed;
+  --text-secondary: #a1a1a1;
+  --text-tertiary: #737373;
+  --text-disabled: #525252;
+  --text-inverse: #171717;
+  --text-on-color: #171717;
+  --text-link: oklch(0.72 0.15 250);
+  --action: #ededed;
+  --action-secondary: #262626;
   --accent: #262626;
-  --accent-foreground: #ededed;
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-surface: oklch(0.22 0.045 22.216);
   --destructive-border: oklch(0.62 0.11 22.216);
-  --destructive-foreground: #ffffff;
-  --muted: #262626;
-  --muted-foreground: #a1a1a1;
   --border: rgb(255 255 255 / 15%);
   --input: rgb(255 255 255 / 15%);
   --ring: #a1a1a1;
   --success: oklch(0.7 0.16 145);
   --success-surface: oklch(0.22 0.04 145);
   --success-border: oklch(0.62 0.1 145);
-  --success-foreground: #07130a;
   --warning: oklch(0.7824 0.1703 68.82);
   --warning-surface: oklch(0.23 0.045 68.82);
   --warning-border: oklch(0.66 0.11 68.82);
-  --warning-foreground: #ffffff;
   --info: oklch(0.72 0.15 250);
   --info-surface: oklch(0.22 0.045 250);
   --info-border: oklch(0.62 0.1 250);
-  --info-foreground: #07111f;
   color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-floating: var(--surface-floating);
+  --color-overlay-scrim: var(--overlay-scrim);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-disabled: var(--text-disabled);
+  --color-inverse: var(--text-inverse);
+  --color-on-color: var(--text-on-color);
+  --color-link: var(--text-link);
+  --color-action: var(--action);
+  --color-action-secondary: var(--action-secondary);
   --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
+  --color-control-track: var(--control-track);
   --color-destructive: var(--destructive);
   --color-destructive-surface: var(--destructive-surface);
   --color-destructive-border: var(--destructive-border);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-success: var(--success);
   --color-success-surface: var(--success-surface);
   --color-success-border: var(--success-border);
-  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-surface: var(--warning-surface);
   --color-warning-border: var(--warning-border);
-  --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info);
   --color-info-surface: var(--info-surface);
   --color-info-border: var(--info-border);
-  --color-info-foreground: var(--info-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -127,6 +116,12 @@
   --default-font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
 }
 
 @keyframes aspekt-button-shake {

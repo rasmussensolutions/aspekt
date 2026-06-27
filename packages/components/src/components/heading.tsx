@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 const headingVariants = cva(
-  "scroll-m-20 text-balance tracking-tight text-foreground",
+  "scroll-m-20 text-balance tracking-tight",
   {
     variants: {
       size: {
@@ -17,10 +17,10 @@ const headingVariants = cva(
         h6: "text-base leading-snug",
       },
       tone: {
-        default: "text-foreground",
-        muted: "text-foreground/75",
-        subtle: "text-foreground/50",
-        accent: "text-foreground font-medium",
+        default: "text-primary",
+        muted: "text-secondary",
+        subtle: "text-tertiary",
+        accent: "text-primary font-medium",
       },
     },
     defaultVariants: {

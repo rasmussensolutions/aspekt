@@ -8,7 +8,7 @@ import * as React from "react";
 const avatarRootVariants = cva(
   [
     "relative inline-flex shrink-0 overflow-hidden align-middle",
-    "bg-muted text-foreground ring-1 ring-border/70 select-none",
+    "bg-surface-sunken text-primary ring-1 ring-border/70 select-none",
   ],
   {
     variants: {
@@ -34,7 +34,7 @@ const avatarRootVariants = cva(
 const avatarFallbackVariants = cva(
   [
     "flex size-full items-center justify-center",
-    "bg-muted font-medium text-muted-foreground uppercase",
+    "bg-surface-sunken font-medium text-secondary uppercase",
   ],
   {
     variants: {

@@ -50,38 +50,38 @@ const buttonVariants = cva(
         variant: "solid",
         color: "accent",
         className:
-          "bg-primary text-primary-foreground border border-primary/15 hover:bg-primary/90",
+          "bg-action text-on-color border border-action/15 hover:bg-action/90",
       },
       {
         variant: "solid",
         color: "blue",
         className:
-          "bg-info text-info-foreground border border-info/20 hover:bg-info/90",
+          "bg-info text-on-color border border-info/20 hover:bg-info/90",
       },
       {
         variant: "solid",
         color: "red",
         className:
-          "bg-destructive text-destructive-foreground border border-destructive/20 hover:bg-destructive/90",
+          "bg-destructive text-on-color border border-destructive/20 hover:bg-destructive/90",
       },
       {
         variant: "solid",
         color: "amber",
         className:
-          "bg-warning text-warning-foreground border border-warning/25 hover:bg-warning/90",
+          "bg-warning text-on-color border border-warning/25 hover:bg-warning/90",
       },
       {
         variant: "solid",
         color: "neutral",
         className:
-          "bg-foreground text-background border border-foreground/10 hover:bg-foreground/90",
+          "bg-primary text-inverse border border-primary/10 hover:bg-primary/90",
       },
 
       {
         variant: "soft",
         color: "accent",
         className:
-          "bg-primary/10 text-primary border border-transparent hover:bg-primary/15",
+          "bg-action/10 text-action border border-transparent hover:bg-action/15",
       },
       {
         variant: "soft",
@@ -105,13 +105,13 @@ const buttonVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "bg-muted text-foreground border border-transparent hover:bg-muted/80",
+          "bg-surface-sunken text-primary border border-transparent hover:bg-surface-sunken/80",
       },
 
       {
         variant: "ghost",
         color: "accent",
-        className: "text-primary border border-transparent hover:bg-primary/10",
+        className: "text-action border border-transparent hover:bg-action/10",
       },
       {
         variant: "ghost",
@@ -133,14 +133,14 @@ const buttonVariants = cva(
         variant: "ghost",
         color: "neutral",
         className:
-          "text-foreground border border-transparent hover:bg-muted",
+          "text-primary border border-transparent hover:bg-surface-sunken",
       },
 
       {
         variant: "outline",
         color: "accent",
         className:
-          "bg-primary/5 text-primary border border-primary/25 hover:bg-primary/10",
+          "bg-action/5 text-action border border-action/25 hover:bg-action/10",
       },
       {
         variant: "outline",
@@ -164,7 +164,7 @@ const buttonVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "bg-background text-foreground border border-border hover:bg-muted",
+          "bg-surface text-primary border border-border hover:bg-surface-sunken",
       },
     ],
     defaultVariants: {

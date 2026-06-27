@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "cnfast";
 
-const textVariants = cva("text-pretty text-foreground", {
+const textVariants = cva("text-pretty", {
   variants: {
     size: {
       lg: "text-lg leading-8",
@@ -12,10 +12,10 @@ const textVariants = cva("text-pretty text-foreground", {
       xs: "text-xs leading-5",
     },
     tone: {
-      default: "text-foreground",
-      muted: "text-foreground/75",
-      subtle: "text-foreground/50",
-      accent: "text-accent-foreground",
+      default: "text-primary",
+      muted: "text-secondary",
+      subtle: "text-tertiary",
+      accent: "text-action",
       danger: "text-destructive",
       success: "text-success",
       warning: "text-warning",
