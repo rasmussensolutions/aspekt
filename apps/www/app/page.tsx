@@ -463,6 +463,10 @@ type OverflowEdge = "top" | "right" | "bottom" | "left";
 
 type ScrollOverflowState = Record<OverflowEdge, boolean>;
 
+type UseScrollOverflowOptions = {
+  initialOverflow?: Partial<ScrollOverflowState>;
+};
+
 const emptyOverflowState = {
   top: false,
   right: false,
@@ -470,7 +474,14 @@ const emptyOverflowState = {
   left: false,
 } satisfies ScrollOverflowState;
 
+const initialBottomOverflowState = {
+  ...emptyOverflowState,
+  bottom: true,
+} satisfies ScrollOverflowState;
+
 const scrollOverflowThreshold = 2;
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? React.useEffect : React.useLayoutEffect;
 
 const introIds = ["getting-started", "principles"] as const;
 const foundationIds = ["typography", "colors", "sonification"] as const;
@@ -1730,10 +1741,14 @@ function areOverflowStatesEqual(
   );
 }
 
-function useScrollOverflow<TElement extends HTMLElement>() {
+function useScrollOverflow<TElement extends HTMLElement>({
+  initialOverflow,
+}: UseScrollOverflowOptions = {}) {
   const ref = React.useRef<TElement>(null);
-  const [overflow, setOverflow] =
-    React.useState<ScrollOverflowState>(emptyOverflowState);
+  const [overflow, setOverflow] = React.useState<ScrollOverflowState>(() => ({
+    ...emptyOverflowState,
+    ...initialOverflow,
+  }));
 
   const updateOverflow = React.useCallback(() => {
     const element = ref.current;
@@ -1759,7 +1774,7 @@ function useScrollOverflow<TElement extends HTMLElement>() {
     );
   }, []);
 
-  React.useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const element = ref.current;
     if (!element) return;
 
@@ -1769,7 +1784,7 @@ function useScrollOverflow<TElement extends HTMLElement>() {
       animationFrame = window.requestAnimationFrame(updateOverflow);
     };
 
-    requestUpdate();
+    updateOverflow();
     element.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
 
@@ -2015,8 +2030,11 @@ function Sidebar({
   activePage: DocsPage;
   onPageChange: (page: DocsPage) => void;
 }) {
-  const { ref: sidebarScrollRef, overflow } =
-    useScrollOverflow<HTMLDivElement>();
+  const { ref: sidebarScrollRef, overflow } = useScrollOverflow<HTMLDivElement>(
+    {
+      initialOverflow: initialBottomOverflowState,
+    },
+  );
 
   return (
     <aside className="relative hidden w-full shrink-0 lg:sticky lg:top-0 lg:block lg:h-screen lg:w-72">
@@ -4822,7 +4840,9 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [mobileMenuSearch, setMobileMenuSearch] = React.useState("");
   const fakeLoadingTimeoutRef = React.useRef<number | null>(null);
   const { ref: previewScrollRef, overflow: previewOverflow } =
-    useScrollOverflow<HTMLElement>();
+    useScrollOverflow<HTMLElement>({
+      initialOverflow: initialBottomOverflowState,
+    });
   const activeComponent = isComponentPreview(activePage) ? activePage : null;
   const activeIntroPage = isIntroPage(activePage) ? activePage : null;
   const activeFoundationPage = isFoundationPage(activePage) ? activePage : null;

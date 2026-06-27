@@ -177,7 +177,7 @@ const toggleVariants = cva(
     ],
     defaultVariants: {
       variant: "soft",
-      color: "info",
+      color: "neutral",
       size: "medium",
       shape: "square",
     },

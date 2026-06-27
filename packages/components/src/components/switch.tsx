@@ -148,7 +148,7 @@ const switchVariants = cva(
     ],
     defaultVariants: {
       variant: "outline",
-      color: "info",
+      color: "neutral",
       size: "medium",
       shape: "round",
     },
@@ -206,7 +206,7 @@ const switchThumbVariants = cva(
       },
     ],
     defaultVariants: {
-      color: "info",
+      color: "neutral",
       variant: "outline",
     },
   },

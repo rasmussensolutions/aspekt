@@ -150,7 +150,7 @@ const checkboxVariants = cva(
     ],
     defaultVariants: {
       variant: "outline",
-      color: "info",
+      color: "neutral",
       size: "medium",
       shape: "square",
     },

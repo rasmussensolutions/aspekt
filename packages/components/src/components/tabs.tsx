@@ -105,7 +105,7 @@ const tabsTabVariants = cva(
     ],
     defaultVariants: {
       variant: "line",
-      color: "info",
+      color: "neutral",
       size: "medium",
       shape: "square",
     },
@@ -140,7 +140,7 @@ const tabsIndicatorVariants = cva(
     },
     defaultVariants: {
       variant: "line",
-      color: "info",
+      color: "neutral",
       shape: "square",
     },
   },
@@ -246,7 +246,7 @@ type TabsContextValue = {
 };
 
 const TabsContext = React.createContext<TabsContextValue>({
-  color: "info",
+  color: "neutral",
   shape: aspektConfig.shape,
   size: "medium",
   variant: "line",
@@ -261,7 +261,7 @@ function getTabsSound(sound: TabsSound | undefined) {
 
 function TabsRoot({
   className,
-  color = "info",
+  color = "neutral",
   onValueChange,
   orientation = "horizontal",
   shape,

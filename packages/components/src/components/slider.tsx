@@ -105,7 +105,7 @@ const sliderIndicatorVariants = cva(
       },
     },
     defaultVariants: {
-      color: "info",
+      color: "neutral",
       variant: "outline",
     },
   },
@@ -169,7 +169,7 @@ const sliderThumbVariants = cva(
       },
     ],
     defaultVariants: {
-      color: "info",
+      color: "neutral",
       shape: "round",
       variant: "outline",
     },
