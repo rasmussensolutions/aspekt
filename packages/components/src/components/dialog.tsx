@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 import { Button, ButtonShapeProvider } from "./button";
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const dialogContentVariants = cva(
@@ -19,13 +20,13 @@ const dialogContentVariants = cva(
   {
     variants: {
       size: {
-        small: "max-w-sm p-6",
-        medium: "max-w-lg p-8",
-        large: "max-w-2xl p-8",
+        small: "max-w-sm p-[var(--overlay-padding-sm)]",
+        medium: "max-w-lg p-[var(--overlay-padding-md)]",
+        large: "max-w-2xl p-[var(--overlay-padding-md)]",
       },
       shape: {
-        square: "rounded-xl",
-        round: "rounded-3xl",
+        square: "rounded-[var(--overlay-radius-square)]",
+        round: "rounded-[var(--overlay-radius-round)]",
       },
     },
     defaultVariants: {
@@ -46,7 +47,9 @@ type DialogSize = "small" | "medium" | "large";
 
 type DialogShape = "square" | "round";
 
-const DialogShapeContext = React.createContext<DialogShape>("square");
+const DialogShapeContext = React.createContext<DialogShape>(
+  aspektConfig.shape,
+);
 
 type DialogRootPrimitiveProps = React.ComponentProps<
   typeof DialogPrimitive.Root
@@ -137,10 +140,11 @@ function DialogRoot({
   disablePointerDismissal,
   dismissible = true,
   onOpenChange,
-  shape = "square",
+  shape,
   sound,
   ...props
 }: DialogRootProps) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const handleOpenChange = React.useCallback<
     NonNullable<DialogRootPrimitiveProps["onOpenChange"]>
   >(
@@ -157,8 +161,8 @@ function DialogRoot({
   );
 
   return (
-    <DialogShapeContext.Provider value={shape}>
-      <ButtonShapeProvider shape={shape}>
+    <DialogShapeContext.Provider value={resolvedShape}>
+      <ButtonShapeProvider shape={resolvedShape}>
         <DialogPrimitive.Root
           disablePointerDismissal={disablePointerDismissal ?? !dismissible}
           onOpenChange={handleOpenChange}

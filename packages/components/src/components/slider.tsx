@@ -5,6 +5,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const sliderRootVariants = cva(
@@ -92,9 +93,9 @@ const sliderIndicatorVariants = cva(
     variants: {
       color: {
         accent: "bg-action",
-        blue: "bg-info",
-        red: "bg-destructive",
-        amber: "bg-warning",
+        info: "bg-info",
+        destructive: "bg-destructive",
+        warning: "bg-warning",
         neutral: "bg-primary",
       },
       variant: {
@@ -104,7 +105,7 @@ const sliderIndicatorVariants = cva(
       },
     },
     defaultVariants: {
-      color: "blue",
+      color: "info",
       variant: "outline",
     },
   },
@@ -125,9 +126,9 @@ const sliderThumbVariants = cva(
     variants: {
       color: {
         accent: "",
-        blue: "",
-        red: "",
-        amber: "",
+        info: "",
+        destructive: "",
+        warning: "",
         neutral: "",
       },
       shape: {
@@ -147,17 +148,17 @@ const sliderThumbVariants = cva(
         className: "border-action/25",
       },
       {
-        color: "blue",
+        color: "info",
         variant: ["soft", "outline"],
         className: "border-info/25",
       },
       {
-        color: "red",
+        color: "destructive",
         variant: ["soft", "outline"],
         className: "border-destructive/25",
       },
       {
-        color: "amber",
+        color: "warning",
         variant: ["soft", "outline"],
         className: "border-warning/35",
       },
@@ -168,7 +169,7 @@ const sliderThumbVariants = cva(
       },
     ],
     defaultVariants: {
-      color: "blue",
+      color: "info",
       shape: "round",
       variant: "outline",
     },
@@ -180,7 +181,7 @@ type SliderRootProps = SliderPrimitive.Root.Props<SliderValue>;
 type SliderOrientation = NonNullable<SliderRootProps["orientation"]>;
 type SliderElasticEdge = "before" | "after" | null;
 type SliderVariant = "solid" | "soft" | "outline";
-type SliderColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type SliderColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 type SliderSize = "micro" | "tiny" | "small" | "medium" | "large";
 type SliderShape = "square" | "round";
 
@@ -434,6 +435,7 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
     "--slider-elastic-thumb-x": `${elasticState.x}px`,
     "--slider-elastic-thumb-y": `${elasticState.y}px`,
   } satisfies SliderElasticStyle;
+  const resolvedShape = shape ?? aspektConfig.shape;
 
   const updateElasticState = React.useCallback((next: SliderElasticState) => {
     setElasticState((current) =>
@@ -593,7 +595,11 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
             data-slot="slider-track"
             data-invalid={invalid ? "" : undefined}
             className={cn(
-              sliderTrackVariants({ variant, shape, className: trackClassName }),
+              sliderTrackVariants({
+                variant,
+                shape: resolvedShape,
+                className: trackClassName,
+              }),
             )}
           >
             <SliderPrimitive.Indicator
@@ -629,7 +635,7 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(function Slider(
                   sliderThumbVariants({
                     variant,
                     color,
-                    shape,
+                    shape: resolvedShape,
                     className: thumbClassName,
                   }),
                 )}

@@ -3,6 +3,22 @@
   "homepage": "https://www.aspekt.systems",
   "items": [
     {
+      "name": "aspekt-config",
+      "kind": "base",
+      "title": "Aspekt Config",
+      "description": "Static project defaults used by copied Aspekt UI components.",
+      "dependencies": [],
+      "files": [
+        {
+          "path": "packages/components/src/components/config.ts",
+          "target": "components/aspekt/config.ts"
+        }
+      ],
+      "categories": [
+        "base"
+      ]
+    },
+    {
       "name": "avatar",
       "kind": "component",
       "title": "Avatar",
@@ -29,6 +45,7 @@
       "title": "Button",
       "description": "A native button with variants, sizes, loading state, affixes, and optional interaction sounds.",
       "dependencies": [
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -54,6 +71,7 @@
       "description": "A Base UI input with sizes, variants, clearable state, loading state, affixes, and optional interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -79,6 +97,7 @@
       "description": "A Base UI checkbox with sizes, variants, indeterminate state, validation styling, and optional interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -104,6 +123,7 @@
       "description": "A Base UI select with sizes, variants, popup styling, item indicators, and optional interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -129,6 +149,7 @@
       "description": "A Base UI combobox with searchable input, popup styling, item indicators, empty state, and optional interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -204,6 +225,7 @@
       "description": "A Base UI toggle button with variants, sizes, affixes, pressed state styling, and optional interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -229,6 +251,7 @@
       "description": "A Base UI dialog with Aspekt styling, dismissal, focus management, and interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -258,6 +281,7 @@
       "description": "A Base UI drawer with Aspekt styling, edge placement, optional backdrop, detached spacing, swipe dismissal, and interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -287,6 +311,7 @@
       "description": "A Base UI popover with anchored positioning, Aspekt styling, optional arrow, modal backdrop support, and interaction sounds.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -324,6 +349,10 @@
         {
           "path": "packages/components/src/components/toast.tsx",
           "target": "components/aspekt/toast.tsx"
+        },
+        {
+          "path": "packages/components/src/components/sound.ts",
+          "target": "components/aspekt/sound.ts"
         }
       ],
       "categories": [
@@ -338,6 +367,7 @@
       "description": "A composable application sidebar with controlled collapse state, drag resizing, grouped navigation, and inset layout.",
       "dependencies": [
         "@base-ui/react",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -366,6 +396,7 @@
       "title": "App Tabs",
       "description": "Application-shell tabs for opening, closing, switching, and preserving mounted page panels.",
       "dependencies": [
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -412,6 +443,7 @@
       "description": "A TanStack Table-powered data table with Aspekt styling, sorting, density, empty states, and responsive overflow.",
       "dependencies": [
         "@tanstack/react-table",
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -432,6 +464,7 @@
       "title": "Code",
       "description": "Inline code and code block typography for Aspekt UI.",
       "dependencies": [
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast"
       ],
@@ -456,6 +489,7 @@
       "title": "Snippet",
       "description": "Formatted code examples with language-aware highlighting, headers, copy, line numbers, and wrapping.",
       "dependencies": [
+        "@phosphor-icons/react",
         "class-variance-authority",
         "cnfast",
         "refractor"

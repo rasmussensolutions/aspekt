@@ -1,9 +1,11 @@
 "use client";
 
+import { CheckIcon, CircleNotchIcon, XIcon } from "@phosphor-icons/react";
 import * as React from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const buttonVariants = cva(
@@ -28,9 +30,9 @@ const buttonVariants = cva(
       },
       color: {
         accent: "",
-        blue: "",
-        red: "",
-        amber: "",
+        info: "",
+        destructive: "",
+        warning: "",
         neutral: "",
       },
       size: {
@@ -54,19 +56,19 @@ const buttonVariants = cva(
       },
       {
         variant: "solid",
-        color: "blue",
+        color: "info",
         className:
           "bg-info text-on-color border border-info/20 hover:bg-info/90",
       },
       {
         variant: "solid",
-        color: "red",
+        color: "destructive",
         className:
           "bg-destructive text-on-color border border-destructive/20 hover:bg-destructive/90",
       },
       {
         variant: "solid",
-        color: "amber",
+        color: "warning",
         className:
           "bg-warning text-on-color border border-warning/25 hover:bg-warning/90",
       },
@@ -85,19 +87,19 @@ const buttonVariants = cva(
       },
       {
         variant: "soft",
-        color: "blue",
+        color: "info",
         className:
           "bg-info/10 text-info border border-transparent hover:bg-info/15",
       },
       {
         variant: "soft",
-        color: "red",
+        color: "destructive",
         className:
           "bg-destructive/10 text-destructive border border-transparent hover:bg-destructive/15",
       },
       {
         variant: "soft",
-        color: "amber",
+        color: "warning",
         className:
           "bg-warning/15 text-warning border border-transparent hover:bg-warning/20",
       },
@@ -115,18 +117,18 @@ const buttonVariants = cva(
       },
       {
         variant: "ghost",
-        color: "blue",
+        color: "info",
         className: "text-info border border-transparent hover:bg-info/10",
       },
       {
         variant: "ghost",
-        color: "red",
+        color: "destructive",
         className:
           "text-destructive border border-transparent hover:bg-destructive/10",
       },
       {
         variant: "ghost",
-        color: "amber",
+        color: "warning",
         className: "text-warning border border-transparent hover:bg-warning/15",
       },
       {
@@ -144,19 +146,19 @@ const buttonVariants = cva(
       },
       {
         variant: "outline",
-        color: "blue",
+        color: "info",
         className:
           "bg-info/5 text-info border border-info/30 hover:bg-info/10",
       },
       {
         variant: "outline",
-        color: "red",
+        color: "destructive",
         className:
           "bg-destructive/5 text-destructive border border-destructive/30 hover:bg-destructive/10",
       },
       {
         variant: "outline",
-        color: "amber",
+        color: "warning",
         className:
           "bg-warning/10 text-warning border border-warning/35 hover:bg-warning/15",
       },
@@ -169,7 +171,7 @@ const buttonVariants = cva(
     ],
     defaultVariants: {
       variant: "solid",
-      color: "blue",
+      color: "info",
       size: "medium",
       shape: "square",
     },
@@ -178,7 +180,7 @@ const buttonVariants = cva(
 
 type ButtonVariant = "solid" | "soft" | "ghost" | "outline";
 
-type ButtonColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type ButtonColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 
 type ButtonSize = "micro" | "tiny" | "small" | "medium" | "large";
 
@@ -243,32 +245,11 @@ const buttonSuffixPadding = {
 function Spinner({ className }: { className?: string }) {
   return (
     <span className={cn("relative inline-flex shrink-0", className)}>
-      <svg
+      <CircleNotchIcon
         className="size-full animate-spin motion-reduce:animate-none"
-        viewBox="0 0 24 24"
-        fill="none"
         aria-hidden="true"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="9"
-          stroke="currentColor"
-          strokeWidth="3"
-        />
-
-        <circle
-          cx="12"
-          cy="12"
-          r="9"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray="36 56"
-          strokeDashoffset="8"
-        />
-      </svg>
+        weight="bold"
+      />
     </span>
   );
 }
@@ -281,39 +262,10 @@ function ButtonStatusIcon({
   status: ButtonStatus;
 }) {
   if (status === "success") {
-    return (
-      <svg
-        aria-hidden="true"
-        className={className}
-        viewBox="0 0 20 20"
-        fill="none"
-      >
-        <path
-          d="M4.5 10.25 8.25 14 15.5 6"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2.25"
-        />
-      </svg>
-    );
+    return <CheckIcon aria-hidden="true" className={className} weight="bold" />;
   }
 
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      viewBox="0 0 20 20"
-      fill="none"
-    >
-      <path
-        d="m6 6 8 8M14 6l-8 8"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.25"
-      />
-    </svg>
-  );
+  return <XIcon aria-hidden="true" className={className} weight="bold" />;
 }
 
 function ButtonAffix({
@@ -423,10 +375,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 ) {
   const inheritedShape = React.useContext(ButtonShapeContext);
   const resolvedVariant = variant ?? "solid";
-  const resolvedColor = color ?? "blue";
+  const resolvedColor = color ?? "info";
   const resolvedSize = size ?? "medium";
-  const resolvedShape = shape ?? inheritedShape ?? "square";
-  const effectiveColor = status === "fail" ? "red" : resolvedColor;
+  const resolvedShape = shape ?? inheritedShape ?? aspektConfig.shape;
+  const effectiveColor = status === "fail" ? "destructive" : resolvedColor;
 
   const isDisabled = Boolean(disabled);
   const isInteractionBlocked = isDisabled || loading;

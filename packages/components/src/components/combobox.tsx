@@ -1,10 +1,12 @@
 "use client";
 
 import { Combobox as ComboboxPrimitive } from "@base-ui/react/combobox";
+import { CaretDownIcon, CheckIcon, XIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const comboboxInputGroupVariants = cva(
@@ -58,8 +60,8 @@ const comboboxPopupVariants = cva(
   {
     variants: {
       shape: {
-        square: "rounded-lg",
-        round: "rounded-2xl",
+        square: "rounded-[var(--overlay-radius-square)]",
+        round: "rounded-[var(--overlay-radius-round)]",
       },
     },
     defaultVariants: {
@@ -203,7 +205,9 @@ type ComboboxIconProps = Omit<
 };
 
 const ComboboxSizeContext = React.createContext<ComboboxSize>("medium");
-const ComboboxShapeContext = React.createContext<ComboboxShape>("square");
+const ComboboxShapeContext = React.createContext<ComboboxShape>(
+  aspektConfig.shape,
+);
 
 const comboboxSlotWidths = {
   micro: "0.875rem",
@@ -234,48 +238,6 @@ function getComboboxSound(
   }
 
   return sound[event];
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M4 6L8 10L12 6"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.75"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3.5 8.5L6.5 11.5L12.5 4.5"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.75"
-      />
-    </svg>
-  );
-}
-
-function XIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M5 5L11 11M11 5L5 11"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.75"
-      />
-    </svg>
-  );
 }
 
 function ComboboxAffix({
@@ -323,11 +285,12 @@ function ComboboxRoot<
 >({
   onOpenChange,
   onValueChange,
-  shape = "square",
+  shape,
   size = "medium",
   sound,
   ...props
 }: ComboboxRootProps<Value, Multiple>) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const handleOpenChange = React.useCallback<
     NonNullable<
       ComboboxPrimitive.Root.Props<Value, Multiple>["onOpenChange"]
@@ -364,7 +327,7 @@ function ComboboxRoot<
 
   return (
     <ComboboxSizeContext.Provider value={size}>
-      <ComboboxShapeContext.Provider value={shape}>
+      <ComboboxShapeContext.Provider value={resolvedShape}>
         <ComboboxPrimitive.Root
           onOpenChange={handleOpenChange}
           onValueChange={handleValueChange}
@@ -489,7 +452,7 @@ const ComboboxTrigger = React.forwardRef<
       )}
       {...props}
     >
-      {children ?? <ChevronDownIcon />}
+      {children ?? <CaretDownIcon aria-hidden="true" weight="bold" />}
     </ComboboxPrimitive.Trigger>
   );
 });
@@ -509,7 +472,7 @@ const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearProps>(
         )}
         {...props}
       >
-        {children ?? <XIcon />}
+        {children ?? <XIcon aria-hidden="true" weight="bold" />}
       </ComboboxPrimitive.Clear>
     );
   },
@@ -536,17 +499,20 @@ const ComboboxPositioner = React.forwardRef<
 const ComboboxPopup = React.forwardRef<HTMLDivElement, ComboboxPopupProps>(
   function ComboboxPopup({ className, shape, ...props }, ref) {
     const inheritedShape = React.useContext(ComboboxShapeContext);
+    const resolvedShape = shape ?? inheritedShape;
 
     return (
-      <ComboboxPrimitive.Popup
-        ref={ref}
-        data-slot="combobox-popup"
-        className={cn(
-          comboboxPopupVariants({ shape: shape ?? inheritedShape }),
-          className,
-        )}
-        {...props}
-      />
+      <ComboboxShapeContext.Provider value={resolvedShape}>
+        <ComboboxPrimitive.Popup
+          ref={ref}
+          data-slot="combobox-popup"
+          className={cn(
+            comboboxPopupVariants({ shape: resolvedShape }),
+            className,
+          )}
+          {...props}
+        />
+      </ComboboxShapeContext.Provider>
     );
   },
 );
@@ -582,19 +548,22 @@ const ComboboxItemIndicator = React.forwardRef<
       )}
       {...props}
     >
-      {children ?? <CheckIcon />}
+      {children ?? <CheckIcon aria-hidden="true" weight="bold" />}
     </ComboboxPrimitive.ItemIndicator>
   );
 });
 
 const ComboboxItem = React.forwardRef<HTMLDivElement, ComboboxItemProps>(
   function ComboboxItem({ children, className, indicator, ...props }, ref) {
+    const inheritedShape = React.useContext(ComboboxShapeContext);
+
     return (
       <ComboboxPrimitive.Item
         ref={ref}
         data-slot="combobox-item"
         className={cn(
-          "grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none select-none",
+          "grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 px-2.5 py-1.5 text-sm outline-none select-none",
+          inheritedShape === "round" ? "rounded-full" : "rounded-md",
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           "data-[highlighted]:bg-primary data-[highlighted]:text-inverse",
           className,
@@ -666,7 +635,7 @@ const ComboboxIcon = React.forwardRef<HTMLSpanElement, ComboboxIconProps>(
         className={cn("inline-flex shrink-0 items-center justify-center", className)}
         {...props}
       >
-        {children ?? <ChevronDownIcon />}
+        {children ?? <CaretDownIcon aria-hidden="true" weight="bold" />}
       </ComboboxPrimitive.Icon>
     );
   },

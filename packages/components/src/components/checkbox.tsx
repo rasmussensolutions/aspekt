@@ -1,10 +1,12 @@
 "use client";
 
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
+import { CheckIcon, MinusIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const checkboxVariants = cva(
@@ -31,9 +33,9 @@ const checkboxVariants = cva(
       },
       color: {
         accent: "",
-        blue: "",
-        red: "",
-        amber: "",
+        info: "",
+        destructive: "",
+        warning: "",
         neutral: "",
       },
       size: {
@@ -61,19 +63,19 @@ const checkboxVariants = cva(
       },
       {
         variant: "solid",
-        color: "blue",
+        color: "info",
         className:
           "data-[checked]:border-info/20 data-[checked]:bg-info data-[checked]:text-on-color data-[checked]:hover:bg-info/90 data-[indeterminate]:border-info/20 data-[indeterminate]:bg-info data-[indeterminate]:text-on-color",
       },
       {
         variant: "solid",
-        color: "red",
+        color: "destructive",
         className:
           "data-[checked]:border-destructive/20 data-[checked]:bg-destructive data-[checked]:text-on-color data-[checked]:hover:bg-destructive/90 data-[indeterminate]:border-destructive/20 data-[indeterminate]:bg-destructive data-[indeterminate]:text-on-color",
       },
       {
         variant: "solid",
-        color: "amber",
+        color: "warning",
         className:
           "data-[checked]:border-warning/25 data-[checked]:bg-warning data-[checked]:text-on-color data-[checked]:hover:bg-warning/90 data-[indeterminate]:border-warning/25 data-[indeterminate]:bg-warning data-[indeterminate]:text-on-color",
       },
@@ -92,19 +94,19 @@ const checkboxVariants = cva(
       },
       {
         variant: "soft",
-        color: "blue",
+        color: "info",
         className:
           "data-[checked]:bg-info/10 data-[checked]:text-info data-[checked]:hover:bg-info/15 data-[indeterminate]:bg-info/10 data-[indeterminate]:text-info",
       },
       {
         variant: "soft",
-        color: "red",
+        color: "destructive",
         className:
           "data-[checked]:bg-destructive/10 data-[checked]:text-destructive data-[checked]:hover:bg-destructive/15 data-[indeterminate]:bg-destructive/10 data-[indeterminate]:text-destructive",
       },
       {
         variant: "soft",
-        color: "amber",
+        color: "warning",
         className:
           "data-[checked]:bg-warning/15 data-[checked]:text-warning data-[checked]:hover:bg-warning/20 data-[indeterminate]:bg-warning/15 data-[indeterminate]:text-warning",
       },
@@ -123,19 +125,19 @@ const checkboxVariants = cva(
       },
       {
         variant: "outline",
-        color: "blue",
+        color: "info",
         className:
           "data-[checked]:border-info/30 data-[checked]:bg-info/5 data-[checked]:text-info data-[checked]:hover:bg-info/10 data-[indeterminate]:border-info/30 data-[indeterminate]:bg-info/5 data-[indeterminate]:text-info",
       },
       {
         variant: "outline",
-        color: "red",
+        color: "destructive",
         className:
           "data-[checked]:border-destructive/30 data-[checked]:bg-destructive/5 data-[checked]:text-destructive data-[checked]:hover:bg-destructive/10 data-[indeterminate]:border-destructive/30 data-[indeterminate]:bg-destructive/5 data-[indeterminate]:text-destructive",
       },
       {
         variant: "outline",
-        color: "amber",
+        color: "warning",
         className:
           "data-[checked]:border-warning/35 data-[checked]:bg-warning/10 data-[checked]:text-warning data-[checked]:hover:bg-warning/15 data-[indeterminate]:border-warning/35 data-[indeterminate]:bg-warning/10 data-[indeterminate]:text-warning",
       },
@@ -148,7 +150,7 @@ const checkboxVariants = cva(
     ],
     defaultVariants: {
       variant: "outline",
-      color: "blue",
+      color: "info",
       size: "medium",
       shape: "square",
     },
@@ -161,7 +163,7 @@ type CheckboxRootProps = React.ComponentPropsWithoutRef<
 
 type CheckboxVariant = "solid" | "soft" | "outline";
 
-type CheckboxColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type CheckboxColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 
 type CheckboxSize = "micro" | "tiny" | "small" | "medium" | "large";
 
@@ -202,33 +204,6 @@ function getCheckboxSound(sound: CheckboxSound | undefined, checked: boolean) {
   return checked ? sound.on : sound.off;
 }
 
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path
-        d="M3.5 8.5L6.5 11.5L12.5 4.5"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function MinusIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path
-        d="M4 8H12"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 const Checkbox = React.forwardRef<HTMLElement, CheckboxProps>(
   function Checkbox(
     {
@@ -247,6 +222,7 @@ const Checkbox = React.forwardRef<HTMLElement, CheckboxProps>(
     },
     ref,
   ) {
+    const resolvedShape = shape ?? aspektConfig.shape;
     const handleCheckedChange = React.useCallback<
       NonNullable<CheckboxRootProps["onCheckedChange"]>
     >(
@@ -273,7 +249,7 @@ const Checkbox = React.forwardRef<HTMLElement, CheckboxProps>(
             variant,
             color,
             size,
-            shape,
+            shape: resolvedShape,
             className,
           }),
         )}
@@ -290,11 +266,13 @@ const Checkbox = React.forwardRef<HTMLElement, CheckboxProps>(
           )}
         >
           <span className="col-start-1 row-start-1 inline-flex size-full scale-100 items-center justify-center opacity-100 transition-[opacity,scale] duration-150 group-data-[indeterminate]/checkbox:scale-50 group-data-[indeterminate]/checkbox:opacity-0">
-            {indicator ?? <CheckIcon />}
+            {indicator ?? <CheckIcon aria-hidden="true" weight="bold" />}
           </span>
 
           <span className="col-start-1 row-start-1 inline-flex size-full scale-50 items-center justify-center opacity-0 transition-[opacity,scale] duration-150 group-data-[indeterminate]/checkbox:scale-100 group-data-[indeterminate]/checkbox:opacity-100">
-            {indeterminateIndicator ?? <MinusIcon />}
+            {indeterminateIndicator ?? (
+              <MinusIcon aria-hidden="true" weight="bold" />
+            )}
           </span>
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>

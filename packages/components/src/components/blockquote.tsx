@@ -18,7 +18,7 @@ const blockquoteVariants = cva(
         default: "border-border text-primary",
         muted: "border-border text-secondary",
         accent: "border-action text-primary",
-        danger: "border-destructive text-destructive",
+        destructive: "border-destructive text-destructive",
         success: "border-success text-success",
         warning: "border-warning text-warning",
       },
@@ -36,7 +36,7 @@ const blockquoteSourceVariants = cva("mt-3 block text-sm not-italic", {
       default: "text-secondary",
       muted: "text-secondary",
       accent: "text-secondary",
-      danger: "text-destructive/80",
+      destructive: "text-destructive/80",
       success: "text-success/80",
       warning: "text-warning/80",
     },
@@ -52,7 +52,7 @@ type BlockquoteTone =
   | "default"
   | "muted"
   | "accent"
-  | "danger"
+  | "destructive"
   | "success"
   | "warning";
 

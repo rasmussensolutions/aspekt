@@ -5,6 +5,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const switchVariants = cva(
@@ -28,9 +29,9 @@ const switchVariants = cva(
       },
       color: {
         accent: "",
-        blue: "",
-        red: "",
-        amber: "",
+        info: "",
+        destructive: "",
+        warning: "",
         neutral: "",
       },
       size: {
@@ -60,19 +61,19 @@ const switchVariants = cva(
       },
       {
         variant: "solid",
-        color: "blue",
+        color: "info",
         className:
           "data-[checked]:border-info/20 data-[checked]:bg-info data-[checked]:hover:bg-info/90",
       },
       {
         variant: "solid",
-        color: "red",
+        color: "destructive",
         className:
           "data-[checked]:border-destructive/20 data-[checked]:bg-destructive data-[checked]:hover:bg-destructive/90",
       },
       {
         variant: "solid",
-        color: "amber",
+        color: "warning",
         className:
           "data-[checked]:border-warning/25 data-[checked]:bg-warning data-[checked]:hover:bg-warning/90",
       },
@@ -91,19 +92,19 @@ const switchVariants = cva(
       },
       {
         variant: "soft",
-        color: "blue",
+        color: "info",
         className:
           "data-[checked]:bg-info/10 data-[checked]:hover:bg-info/15",
       },
       {
         variant: "soft",
-        color: "red",
+        color: "destructive",
         className:
           "data-[checked]:bg-destructive/10 data-[checked]:hover:bg-destructive/15",
       },
       {
         variant: "soft",
-        color: "amber",
+        color: "warning",
         className:
           "data-[checked]:bg-warning/15 data-[checked]:hover:bg-warning/20",
       },
@@ -122,19 +123,19 @@ const switchVariants = cva(
       },
       {
         variant: "outline",
-        color: "blue",
+        color: "info",
         className:
           "data-[checked]:border-info/30 data-[checked]:bg-info/5 data-[checked]:hover:bg-info/10",
       },
       {
         variant: "outline",
-        color: "red",
+        color: "destructive",
         className:
           "data-[checked]:border-destructive/30 data-[checked]:bg-destructive/5 data-[checked]:hover:bg-destructive/10",
       },
       {
         variant: "outline",
-        color: "amber",
+        color: "warning",
         className:
           "data-[checked]:border-warning/35 data-[checked]:bg-warning/10 data-[checked]:hover:bg-warning/15",
       },
@@ -147,7 +148,7 @@ const switchVariants = cva(
     ],
     defaultVariants: {
       variant: "outline",
-      color: "blue",
+      color: "info",
       size: "medium",
       shape: "round",
     },
@@ -166,9 +167,9 @@ const switchThumbVariants = cva(
     variants: {
       color: {
         accent: "data-[checked]:bg-on-color",
-        blue: "data-[checked]:bg-on-color",
-        red: "data-[checked]:bg-on-color",
-        amber: "data-[checked]:bg-on-color",
+        info: "data-[checked]:bg-on-color",
+        destructive: "data-[checked]:bg-on-color",
+        warning: "data-[checked]:bg-on-color",
         neutral: "data-[checked]:bg-surface",
       },
       variant: {
@@ -185,17 +186,17 @@ const switchThumbVariants = cva(
       },
       {
         variant: ["soft", "outline"],
-        color: "blue",
+        color: "info",
         className: "data-[checked]:bg-info",
       },
       {
         variant: ["soft", "outline"],
-        color: "red",
+        color: "destructive",
         className: "data-[checked]:bg-destructive",
       },
       {
         variant: ["soft", "outline"],
-        color: "amber",
+        color: "warning",
         className: "data-[checked]:bg-warning",
       },
       {
@@ -205,7 +206,7 @@ const switchThumbVariants = cva(
       },
     ],
     defaultVariants: {
-      color: "blue",
+      color: "info",
       variant: "outline",
     },
   },
@@ -217,7 +218,7 @@ type SwitchRootProps = React.ComponentPropsWithoutRef<
 
 type SwitchVariant = "solid" | "soft" | "outline";
 
-type SwitchColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type SwitchColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 
 type SwitchSize = "micro" | "tiny" | "small" | "medium" | "large";
 
@@ -275,6 +276,7 @@ const Switch = React.forwardRef<HTMLElement, SwitchProps>(function Switch(
   },
   ref,
 ) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const handleCheckedChange = React.useCallback<
     NonNullable<SwitchRootProps["onCheckedChange"]>
   >(
@@ -301,7 +303,7 @@ const Switch = React.forwardRef<HTMLElement, SwitchProps>(function Switch(
           variant,
           color,
           size,
-          shape,
+          shape: resolvedShape,
           className,
         }),
       )}

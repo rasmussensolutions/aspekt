@@ -15,6 +15,7 @@ const docsPages = [
   "select",
   "combobox",
   "slider",
+  "inline-slider",
   "switch",
   "toggle",
   "dialog",

@@ -1,6 +1,7 @@
 "use client";
 
 import { Separator } from "@base-ui/react/separator";
+import { SidebarSimpleIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
@@ -63,9 +64,9 @@ const sidebarMenuButtonVariants = cva(
     "group/sidebar-menu-button relative flex w-full min-w-0 items-center gap-2 rounded-lg",
     "font-medium text-secondary outline-none select-none",
     "transition-[background-color,color,box-shadow,opacity] duration-150 ease-out",
-    "hover:bg-surface-sunken/70 hover:text-primary",
+    "dark:hover:bg-surface-floating/50 hover:bg-surface-sunken/50 hover:text-primary",
     "focus-visible:ring-2 focus-visible:ring-current/20",
-    "data-[active]:bg-surface-sunken data-[active]:text-primary",
+    "dark:data-[active]:bg-surface-floating data-[active]:bg-surface-sunken data-[active]:text-primary",
     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
     "group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:gap-0 group-data-[state=collapsed]/sidebar:px-0",
@@ -101,6 +102,7 @@ type SidebarStyle = React.CSSProperties & {
 type SidebarContextValue = {
   collapseThreshold: number;
   collapsible: boolean;
+  currentWidth: number;
   maxWidth: number;
   minWidth: number;
   open: boolean;
@@ -192,6 +194,21 @@ const SidebarContext = React.createContext<SidebarContextValue | null>(null);
 
 function clampSidebarWidth(width: number, minWidth: number, maxWidth: number) {
   return Math.min(Math.max(width, minWidth), maxWidth);
+}
+
+function getSidebarWidthValue(width: string, fallback: number) {
+  const value = Number.parseFloat(width);
+  if (!Number.isFinite(value)) return fallback;
+
+  if (width.trim().endsWith("rem")) {
+    return value * 16;
+  }
+
+  if (width.trim().endsWith("px") || /^[\d.]+$/.test(width.trim())) {
+    return value;
+  }
+
+  return fallback;
 }
 
 function setForwardedRef<T>(ref: React.ForwardedRef<T>, value: T | null) {
@@ -378,6 +395,9 @@ function SidebarRoot({
     () => ({
       collapseThreshold,
       collapsible,
+      currentWidth: resolvedOpen
+        ? (resizedWidth ?? getSidebarWidthValue(width, minWidth))
+        : 0,
       maxWidth,
       minWidth,
       open: resolvedOpen,
@@ -396,11 +416,13 @@ function SidebarRoot({
       minWidth,
       resizable,
       resizeBy,
+      resizedWidth,
       resolvedOpen,
       setOpen,
       side,
       startResize,
       toggle,
+      width,
     ],
   );
 
@@ -719,7 +741,9 @@ const SidebarRail = React.forwardRef<HTMLButtonElement, SidebarRailProps>(
   ) {
     const {
       collapsible,
+      currentWidth,
       maxWidth,
+      minWidth,
       open,
       resizable,
       resizeBy,
@@ -741,12 +765,24 @@ const SidebarRail = React.forwardRef<HTMLButtonElement, SidebarRailProps>(
         data-side={side}
         data-state={open ? "expanded" : "collapsed"}
         type={type}
+        role={resizable ? "separator" : undefined}
         aria-label={
           resizable
             ? "Resize sidebar"
             : open
               ? "Collapse sidebar"
               : "Expand sidebar"
+        }
+        aria-orientation={resizable ? "vertical" : undefined}
+        aria-valuemax={resizable ? maxWidth : undefined}
+        aria-valuemin={resizable ? (collapsible ? 0 : minWidth) : undefined}
+        aria-valuenow={resizable ? Math.round(currentWidth) : undefined}
+        aria-valuetext={
+          resizable
+            ? open
+              ? `${Math.round(currentWidth)} pixels`
+              : "Collapsed"
+            : undefined
         }
         onClick={(event) => {
           onClick?.(event);
@@ -813,21 +849,7 @@ const SidebarRail = React.forwardRef<HTMLButtonElement, SidebarRailProps>(
 );
 
 function SidebarTriggerIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3.5 3.5H12.5C13.0523 3.5 13.5 3.94772 13.5 4.5V11.5C13.5 12.0523 13.0523 12.5 12.5 12.5H3.5C2.94772 12.5 2.5 12.0523 2.5 11.5V4.5C2.5 3.94772 2.94772 3.5 3.5 3.5Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <path
-        d="M6 4V12"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.5"
-      />
-    </svg>
-  );
+  return <SidebarSimpleIcon aria-hidden="true" weight="bold" />;
 }
 
 const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(

@@ -5,6 +5,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const tabsRootVariants = cva("grid w-full text-primary", {
@@ -73,9 +74,9 @@ const tabsTabVariants = cva(
       },
       color: {
         accent: "[--tabs-active-color:var(--action)]",
-        blue: "[--tabs-active-color:var(--info)]",
-        red: "[--tabs-active-color:var(--destructive)]",
-        amber: "[--tabs-active-color:var(--warning)]",
+        info: "[--tabs-active-color:var(--info)]",
+        destructive: "[--tabs-active-color:var(--destructive)]",
+        warning: "[--tabs-active-color:var(--warning)]",
         neutral: "[--tabs-active-color:var(--text-primary)]",
       },
       size: {
@@ -104,7 +105,7 @@ const tabsTabVariants = cva(
     ],
     defaultVariants: {
       variant: "line",
-      color: "blue",
+      color: "info",
       size: "medium",
       shape: "square",
     },
@@ -127,9 +128,9 @@ const tabsIndicatorVariants = cva(
       },
       color: {
         accent: "[--tabs-indicator-color:var(--action)]",
-        blue: "[--tabs-indicator-color:var(--info)]",
-        red: "[--tabs-indicator-color:var(--destructive)]",
-        amber: "[--tabs-indicator-color:var(--warning)]",
+        info: "[--tabs-indicator-color:var(--info)]",
+        destructive: "[--tabs-indicator-color:var(--destructive)]",
+        warning: "[--tabs-indicator-color:var(--warning)]",
         neutral: "[--tabs-indicator-color:var(--text-primary)]",
       },
       shape: {
@@ -139,7 +140,7 @@ const tabsIndicatorVariants = cva(
     },
     defaultVariants: {
       variant: "line",
-      color: "blue",
+      color: "info",
       shape: "square",
     },
   },
@@ -168,7 +169,7 @@ const tabsPanelVariants = cva(
 
 type TabsValue = React.ComponentProps<typeof TabsPrimitive.Tab>["value"];
 type TabsVariant = "line" | "soft" | "outline";
-type TabsColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type TabsColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 type TabsSize = "micro" | "tiny" | "small" | "medium" | "large";
 type TabsShape = "square" | "round";
 type TabsOrientation = NonNullable<
@@ -245,8 +246,8 @@ type TabsContextValue = {
 };
 
 const TabsContext = React.createContext<TabsContextValue>({
-  color: "blue",
-  shape: "square",
+  color: "info",
+  shape: aspektConfig.shape,
   size: "medium",
   variant: "line",
 });
@@ -260,18 +261,19 @@ function getTabsSound(sound: TabsSound | undefined) {
 
 function TabsRoot({
   className,
-  color = "blue",
+  color = "info",
   onValueChange,
   orientation = "horizontal",
-  shape = "square",
+  shape,
   size = "medium",
   sound,
   variant = "line",
   ...props
 }: TabsRootProps) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const context = React.useMemo(
-    () => ({ color, shape, size, variant }),
-    [color, shape, size, variant],
+    () => ({ color, shape: resolvedShape, size, variant }),
+    [color, resolvedShape, size, variant],
   );
 
   const handleValueChange = React.useCallback<

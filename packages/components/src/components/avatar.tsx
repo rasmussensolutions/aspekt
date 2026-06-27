@@ -5,6 +5,8 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
+
 const avatarRootVariants = cva(
   [
     "relative inline-flex shrink-0 overflow-hidden align-middle",
@@ -105,6 +107,7 @@ function getAvatarInitials(value: string) {
 const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(
   function AvatarRoot({ className, shape, size, ...props }, ref) {
     const resolvedSize = size ?? "medium";
+    const resolvedShape = shape ?? aspektConfig.shape;
 
     return (
       <AvatarSizeContext.Provider value={resolvedSize}>
@@ -112,7 +115,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(
           ref={ref}
           data-slot="avatar-root"
           className={cn(
-            avatarRootVariants({ shape, size: resolvedSize }),
+            avatarRootVariants({ shape: resolvedShape, size: resolvedSize }),
             className,
           )}
           {...props}

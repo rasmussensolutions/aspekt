@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "cnfast";
+import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
 import * as React from "react";
 
 type CodeCopyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -10,53 +11,6 @@ type CodeCopyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   timeout?: number;
   value: string;
 };
-
-function CopyIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      viewBox="0 0 16 16"
-    >
-      <path
-        d="M5.25 4.25V3.5A1.75 1.75 0 0 1 7 1.75h5.5a1.75 1.75 0 0 1 1.75 1.75V9A1.75 1.75 0 0 1 12.5 10.75h-.75"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.5"
-      />
-      <rect
-        height="9"
-        rx="1.75"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        width="9"
-        x="1.75"
-        y="5.25"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      viewBox="0 0 16 16"
-    >
-      <path
-        d="m3.25 8.25 3 3 6.5-6.5"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.75"
-      />
-    </svg>
-  );
-}
 
 async function writeClipboardText(value: string) {
   if (navigator.clipboard?.writeText) {
@@ -145,9 +99,13 @@ function CodeCopyButton({
       {...props}
     >
       {copied ? (
-        <CheckIcon className={iconClassName} />
+        <CheckIcon
+          aria-hidden="true"
+          className={iconClassName}
+          weight="bold"
+        />
       ) : (
-        <CopyIcon className={iconClassName} />
+        <CopyIcon aria-hidden="true" className={iconClassName} />
       )}
     </button>
   );

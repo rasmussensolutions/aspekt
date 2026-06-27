@@ -16,7 +16,7 @@ const textVariants = cva("text-pretty", {
       muted: "text-secondary",
       subtle: "text-tertiary",
       accent: "text-action",
-      danger: "text-destructive",
+      destructive: "text-destructive",
       success: "text-success",
       warning: "text-warning",
     },
@@ -40,7 +40,7 @@ type TextTone =
   | "muted"
   | "subtle"
   | "accent"
-  | "danger"
+  | "destructive"
   | "success"
   | "warning";
 

@@ -1,8 +1,11 @@
 "use client";
 
+import { XIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
+
+import { aspektConfig } from "./config";
 
 const appTabsListVariants = cva(
   "flex shrink-0 items-center overflow-x-auto bg-transparent py-1",
@@ -51,9 +54,9 @@ const appTabsTabVariants = cva(
       },
       color: {
         accent: "",
-        blue: "",
-        red: "",
-        amber: "",
+        info: "",
+        destructive: "",
+        warning: "",
         neutral: "",
       },
       size: {
@@ -99,19 +102,19 @@ const appTabsTabVariants = cva(
       },
       {
         variant: "soft",
-        color: "blue",
+        color: "info",
         className:
           "bg-info/5 data-[active]:bg-info/10 data-[active]:text-info hover:bg-info/10",
       },
       {
         variant: "soft",
-        color: "red",
+        color: "destructive",
         className:
           "bg-destructive/5 data-[active]:bg-destructive/10 data-[active]:text-destructive hover:bg-destructive/10",
       },
       {
         variant: "soft",
-        color: "amber",
+        color: "warning",
         className:
           "bg-warning/10 data-[active]:bg-warning/15 data-[active]:text-warning hover:bg-warning/15",
       },
@@ -129,19 +132,19 @@ const appTabsTabVariants = cva(
       },
       {
         variant: "outline",
-        color: "blue",
+        color: "info",
         className:
           "bg-info/[0.03] data-[active]:border-info/30 data-[active]:bg-info/5 data-[active]:text-info hover:bg-info/5",
       },
       {
         variant: "outline",
-        color: "red",
+        color: "destructive",
         className:
           "bg-destructive/[0.03] data-[active]:border-destructive/30 data-[active]:bg-destructive/5 data-[active]:text-destructive hover:bg-destructive/5",
       },
       {
         variant: "outline",
-        color: "amber",
+        color: "warning",
         className:
           "bg-warning/[0.06] data-[active]:border-warning/35 data-[active]:bg-warning/10 data-[active]:text-warning hover:bg-warning/10",
       },
@@ -158,18 +161,18 @@ const appTabsTabVariants = cva(
       },
       {
         variant: "line",
-        color: "blue",
+        color: "info",
         className: "data-[active]:border-b-info data-[active]:text-info",
       },
       {
         variant: "line",
-        color: "red",
+        color: "destructive",
         className:
           "data-[active]:border-b-destructive data-[active]:text-destructive",
       },
       {
         variant: "line",
-        color: "amber",
+        color: "warning",
         className: "data-[active]:border-b-warning data-[active]:text-warning",
       },
       {
@@ -221,7 +224,7 @@ const appTabsTabPrefixVariants = cva("grid shrink-0 place-items-center", {
 });
 
 type AppTabsVariant = "soft" | "line" | "outline";
-type AppTabsColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type AppTabsColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 type AppTabsSize = "small" | "medium" | "large";
 type AppTabsShape = "square" | "round";
 
@@ -239,6 +242,7 @@ type AppTabsContextValue = {
   color: AppTabsColor;
   isTabOpen: (value: string) => boolean;
   openTab: (tab: AppTabsTabData) => void;
+  rootId: string;
   setActiveValue: (value: string) => void;
   shape: AppTabsShape;
   size: AppTabsSize;
@@ -309,6 +313,18 @@ function getFirstEnabledTab(tabs: readonly AppTabsTabData[]) {
   return tabs.find((tab) => !tab.disabled)?.value ?? "";
 }
 
+function getAppTabsIdPart(value: string) {
+  return encodeURIComponent(value || "empty");
+}
+
+function getAppTabsTabId(rootId: string, value: string) {
+  return `${rootId}-tab-${getAppTabsIdPart(value)}`;
+}
+
+function getAppTabsPanelId(rootId: string, value: string) {
+  return `${rootId}-panel-${getAppTabsIdPart(value)}`;
+}
+
 function AppTabsRoot({
   children,
   className,
@@ -317,13 +333,14 @@ function AppTabsRoot({
   defaultValue,
   onTabsChange,
   onValueChange,
-  shape = "round",
+  shape,
   size = "medium",
   tabs: controlledTabs,
   value,
   variant = "soft",
   ...props
 }: AppTabsRootProps) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const [uncontrolledTabs, setUncontrolledTabs] = React.useState<
     AppTabsTabData[]
   >(() => [...defaultTabs]);
@@ -334,6 +351,8 @@ function AppTabsRoot({
   );
   const isValueControlled = value !== undefined;
   const activeValue = value ?? uncontrolledValue;
+  const generatedRootId = React.useId();
+  const rootId = `aspekt-app-tabs-${generatedRootId.replace(/:/g, "")}`;
 
   const commitTabs = React.useCallback(
     (nextTabs: AppTabsTabData[]) => {
@@ -421,8 +440,9 @@ function AppTabsRoot({
       color: color ?? "neutral",
       isTabOpen,
       openTab,
+      rootId,
       setActiveValue: commitValue,
-      shape: shape ?? "round",
+      shape: resolvedShape,
       size: size ?? "medium",
       tabs,
       variant: variant ?? "soft",
@@ -434,7 +454,8 @@ function AppTabsRoot({
       commitValue,
       isTabOpen,
       openTab,
-      shape,
+      rootId,
+      resolvedShape,
       size,
       tabs,
       variant,
@@ -459,7 +480,7 @@ function AppTabsRoot({
 
 const AppTabsList = React.forwardRef<HTMLDivElement, AppTabsListProps>(
   function AppTabsList(
-    { children, className, shape, size, variant, ...props },
+    { children, className, onKeyDown, shape, size, variant, ...props },
     ref,
   ) {
     const context = useAppTabs("AppTabsList");
@@ -475,6 +496,58 @@ const AppTabsList = React.forwardRef<HTMLDivElement, AppTabsListProps>(
         data-size={resolvedSize}
         data-variant={resolvedVariant}
         role="tablist"
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (event.defaultPrevented) return;
+
+          if (!(event.target instanceof Element)) return;
+
+          const currentTrigger = event.target.closest<HTMLButtonElement>(
+            "[data-slot='app-tabs-tab-trigger']",
+          );
+
+          if (!currentTrigger || !event.currentTarget.contains(currentTrigger)) {
+            return;
+          }
+
+          const triggers = Array.from(
+            event.currentTarget.querySelectorAll<HTMLButtonElement>(
+              "[data-slot='app-tabs-tab-trigger']",
+            ),
+          ).filter((trigger) => !trigger.disabled);
+          const currentIndex = triggers.indexOf(currentTrigger);
+          if (currentIndex === -1) return;
+
+          let nextIndex: number | null = null;
+
+          switch (event.key) {
+            case "ArrowDown":
+            case "ArrowRight":
+              nextIndex = (currentIndex + 1) % triggers.length;
+              break;
+            case "ArrowLeft":
+            case "ArrowUp":
+              nextIndex =
+                (currentIndex - 1 + triggers.length) % triggers.length;
+              break;
+            case "End":
+              nextIndex = triggers.length - 1;
+              break;
+            case "Home":
+              nextIndex = 0;
+              break;
+            default:
+              return;
+          }
+
+          const nextTrigger = triggers[nextIndex];
+          const nextValue = nextTrigger?.dataset.value;
+          if (nextValue === undefined) return;
+
+          event.preventDefault();
+          nextTrigger.focus();
+          context.setActiveValue(nextValue);
+        }}
         className={cn(
           appTabsListVariants({
             shape: resolvedShape,
@@ -530,6 +603,9 @@ const AppTabsTab = React.forwardRef<HTMLDivElement, AppTabsTabProps>(
     const resolvedSize = size ?? context.size;
     const resolvedVariant = variant ?? context.variant;
     const active = context.activeValue === value;
+    const tabId = getAppTabsTabId(context.rootId, value);
+    const panelId = getAppTabsPanelId(context.rootId, value);
+    const closeLabel = typeof resolvedLabel === "string" ? resolvedLabel : value;
 
     return (
       <AppTabsTabContext.Provider value={{ value }}>
@@ -554,10 +630,15 @@ const AppTabsTab = React.forwardRef<HTMLDivElement, AppTabsTabProps>(
           {...props}
         >
           <button
+            id={tabId}
             type="button"
             role="tab"
+            data-slot="app-tabs-tab-trigger"
+            data-value={value}
+            aria-controls={panelId}
             aria-selected={active}
             disabled={resolvedDisabled}
+            tabIndex={active ? 0 : -1}
             onClick={() => context.setActiveValue(value)}
             className={appTabsTabTriggerVariants({ size: resolvedSize })}
           >
@@ -570,7 +651,7 @@ const AppTabsTab = React.forwardRef<HTMLDivElement, AppTabsTabProps>(
           </button>
 
           {resolvedCloseable && (
-            <AppTabsTabClose aria-label={`Close ${value}`} />
+            <AppTabsTabClose aria-label={`Close ${closeLabel}`} />
           )}
         </div>
       </AppTabsTabContext.Provider>
@@ -616,19 +697,7 @@ const AppTabsTabClose = React.forwardRef<
       )}
       {...props}
     >
-      <svg
-        viewBox="0 0 16 16"
-        fill="none"
-        aria-hidden="true"
-        className="size-3"
-      >
-        <path
-          d="M4.5 4.5L11.5 11.5M11.5 4.5L4.5 11.5"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.5"
-        />
-      </svg>
+      <XIcon aria-hidden="true" className="size-3" weight="bold" />
     </button>
   );
 });
@@ -638,9 +707,11 @@ const AppTabsPanel = React.forwardRef<HTMLDivElement, AppTabsPanelProps>(
     { children, className, forceMount = false, value, ...props },
     ref,
   ) {
-    const { activeValue, isTabOpen } = useAppTabs("AppTabsPanel");
+    const { activeValue, isTabOpen, rootId } = useAppTabs("AppTabsPanel");
     const open = isTabOpen(value);
     const active = activeValue === value;
+    const tabId = getAppTabsTabId(rootId, value);
+    const panelId = getAppTabsPanelId(rootId, value);
 
     if (!open && !forceMount) return null;
 
@@ -648,10 +719,12 @@ const AppTabsPanel = React.forwardRef<HTMLDivElement, AppTabsPanelProps>(
       <React.Activity mode={active ? "visible" : "hidden"} name={value}>
         <div
           ref={ref}
+          id={panelId}
           data-slot="app-tabs-panel"
           data-active={active ? "" : undefined}
           hidden={!active}
           role="tabpanel"
+          aria-labelledby={tabId}
           className={cn("min-h-0 min-w-0 flex-1", className)}
           {...props}
         >

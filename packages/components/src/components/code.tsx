@@ -20,7 +20,7 @@ const codeVariants = cva("font-mono tabular-nums", {
       default: "text-primary",
       muted: "text-secondary",
       accent: "border-action/25 bg-action/10 text-primary",
-      danger: "border-destructive/20 bg-destructive/10 text-destructive",
+      destructive: "border-destructive/20 bg-destructive/10 text-destructive",
       success: "border-success/20 bg-success/10 text-success",
       warning: "border-warning/25 bg-warning/10 text-warning",
     },
@@ -37,7 +37,7 @@ type CodeTone =
   | "default"
   | "muted"
   | "accent"
-  | "danger"
+  | "destructive"
   | "success"
   | "warning";
 

@@ -78,6 +78,14 @@ const outputVolumeBoost = 4;
 let audioContext: AudioContext | null = null;
 let soundProviderCount = 0;
 
+type AudioContextConstructor = new (
+  contextOptions?: AudioContextOptions,
+) => AudioContext;
+
+type AudioContextWindow = Window & {
+  webkitAudioContext?: AudioContextConstructor;
+};
+
 export function getSoundDepthSettings(depths?: SoundDepthInput) {
   const nextDepths: SoundDepthSettings = { ...defaultSoundDepthSettings };
 
@@ -111,8 +119,12 @@ export function getSoundDepthSettings(depths?: SoundDepthInput) {
 function isMobileDevice() {
   if (typeof window === "undefined") return false;
 
+  const hasCoarsePointer =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(pointer: coarse)").matches;
+
   return (
-    window.matchMedia("(pointer: coarse)").matches ||
+    hasCoarsePointer ||
     (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0)
   );
 }
@@ -120,7 +132,12 @@ function isMobileDevice() {
 function getAudioContext() {
   if (typeof window === "undefined") return null;
 
-  audioContext ??= new AudioContext();
+  const AudioContextClass =
+    window.AudioContext ?? (window as AudioContextWindow).webkitAudioContext;
+
+  if (!AudioContextClass) return null;
+
+  audioContext ??= new AudioContextClass();
 
   return audioContext;
 }

@@ -18,6 +18,8 @@ const manifestPath = join(templatesRoot, "manifest.json");
 const themeCssPath = join(templatesRoot, "theme.css");
 const packageJsonPath = join(packageRoot, "package.json");
 const statePath = ".aspekt/components.json";
+const configItemName = "aspekt-config";
+const shapePresets = ["square", "round"];
 
 const themeStart = "/* aspekt:start */";
 const themeEnd = "/* aspekt:end */";
@@ -89,12 +91,14 @@ function printHelp() {
 Usage:
   npx @aspekt/ui init [options]
   npx @aspekt/ui add <component...> [options]
+  npx @aspekt/ui preset <square|round> [options]
   npx @aspekt/ui update [component...] [options]
   npx @aspekt/ui list
 
 Commands:
   init                 Add Aspekt theme tokens and install shared dependencies.
   add                  Copy one or more components into your project.
+  preset               Change static Aspekt project defaults.
   update               Detect installed components and replace outdated templates.
   list                 Show available components.
 
@@ -102,6 +106,7 @@ Options:
   --cwd <path>         Project root. Defaults to the current directory.
   --path <path>        Component output directory. Defaults to components/aspekt.
   --css <path>         CSS file to update during init.
+  --preset <name>      Config preset to use when creating Aspekt config.
   --all                Add all components.
   -f, --force          Overwrite existing files.
   -y, --yes            Skip confirmation prompts.
@@ -122,6 +127,7 @@ function parseArgv(argv) {
     force: false,
     install: true,
     path: undefined,
+    preset: undefined,
     yes: false,
   };
 
@@ -134,6 +140,8 @@ function parseArgv(argv) {
       options.path = rest[++index] ?? fail("Missing value for --path.");
     } else if (value === "--css") {
       options.css = rest[++index] ?? fail("Missing value for --css.");
+    } else if (value === "--preset") {
+      options.preset = rest[++index] ?? fail("Missing value for --preset.");
     } else if (value === "--all") {
       options.all = true;
     } else if (value === "--dry-run") {
@@ -177,6 +185,7 @@ function loadState(cwd) {
     return {
       components: {},
       path: "components/aspekt",
+      settings: {},
       version: getVersion(),
     };
   }
@@ -186,6 +195,7 @@ function loadState(cwd) {
   return {
     components: state.components ?? {},
     path: state.path ?? "components/aspekt",
+    settings: state.settings ?? {},
     version: state.version ?? getVersion(),
   };
 }
@@ -244,6 +254,71 @@ function getTemplate(file) {
     hash: file.hash ?? hashContent(content),
     sourcePath,
   };
+}
+
+function getShapePreset(value, fallback = "square") {
+  const preset = value ?? fallback;
+
+  if (shapePresets.includes(preset)) {
+    return preset;
+  }
+
+  fail(
+    `Unknown preset "${preset}". Available presets: ${shapePresets.join(
+      ", ",
+    )}.`,
+  );
+}
+
+function getConfigContent(content, shape) {
+  return content.replace(
+    /shape:\s*"(square|round)"/,
+    `shape: "${shape}"`,
+  );
+}
+
+function getConfigWrite(manifest, options, shape = "square") {
+  const item = getItem(manifest, configItemName);
+  const file = item?.files?.[0];
+
+  if (!file) return null;
+
+  const template = getTemplate(file);
+  const target = getTargetPath(file, options);
+
+  return {
+    sourceContent: getConfigContent(template.content, shape),
+    target,
+    targetPath: resolve(options.cwd, target),
+  };
+}
+
+function writeConfigFile(write, options, overwrite = false) {
+  if (!write || options.dryRun) {
+    return false;
+  }
+
+  const current = existsSync(write.targetPath)
+    ? readFileSync(write.targetPath, "utf8")
+    : undefined;
+
+  if (current === write.sourceContent || (current !== undefined && !overwrite)) {
+    return false;
+  }
+
+  mkdirSync(dirname(write.targetPath), { recursive: true });
+  writeFileSync(write.targetPath, write.sourceContent);
+  return true;
+}
+
+function rememberPreset(cwd, shape, options) {
+  const state = loadState(cwd);
+  state.path = options.path ?? state.path ?? "components/aspekt";
+  state.settings = {
+    ...state.settings,
+    shape,
+  };
+  saveState(cwd, state, options);
 }
 
 function collectItemFiles(item, options) {
@@ -344,9 +419,12 @@ function addComponents(manifest, names, options) {
   const cwd = resolve(options.cwd);
   ensureProject(cwd, options);
 
+  const state = loadState(cwd);
+  const configShape = getShapePreset(options.preset ?? state.settings.shape);
   const { dependencies, files, items } = collectItems(manifest, requestedNames);
   const cssPath = findCssFile(cwd, options.css);
   const targetDir = getDefaultTargetDir(cwd, options);
+  const configWrite = getConfigWrite(manifest, { ...options, cwd }, configShape);
   const writes = files.map((file) => {
     const target = getTargetPath(file, options);
     const targetPath = resolve(cwd, target);
@@ -376,6 +454,14 @@ function addComponents(manifest, names, options) {
     console.log("Would add:");
     for (const item of items) console.log(`  ${item.name}`);
     console.log("\nWould write:");
+    if (configWrite) {
+      const suffix = existsSync(configWrite.targetPath)
+        ? options.preset
+          ? " (exists, would update)"
+          : " (exists, left untouched)"
+        : "";
+      console.log(`  ${configWrite.target}${suffix}`);
+    }
     for (const write of writes) {
       const suffix = write.isUnchanged
         ? " (exists, unchanged)"
@@ -410,6 +496,14 @@ function addComponents(manifest, names, options) {
     writeFileSync(write.targetPath, write.sourceContent);
   }
 
+  const wroteConfig = writeConfigFile(
+    configWrite,
+    options,
+    Boolean(options.preset),
+  );
+  if (wroteConfig || options.preset) {
+    rememberPreset(cwd, configShape, options);
+  }
   rememberInstalledItems(cwd, items, options);
   updateCssFile(cssPath, targetDir);
 
@@ -451,9 +545,19 @@ function initProject(manifest, options) {
   const cssPath = findCssFile(cwd, options.css);
   const baseItem = getItem(manifest, "aspekt-ui");
   const dependencies = baseItem?.dependencies ?? [];
+  const configShape = getShapePreset(options.preset);
+  const configWrite = getConfigWrite(manifest, { ...options, cwd }, configShape);
 
   if (options.dryRun) {
     console.log(`Would create ${targetDir}`);
+    if (configWrite) {
+      const action = existsSync(configWrite.targetPath)
+        ? options.preset
+          ? "Would update"
+          : "Would keep"
+        : "Would write";
+      console.log(`${action} ${configWrite.target}`);
+    }
     console.log(`Would update ${cssPath}`);
     if (dependencies.length > 0) {
       console.log(`Would install ${dependencies.join(" ")}`);
@@ -462,7 +566,18 @@ function initProject(manifest, options) {
   }
 
   mkdirSync(targetDir, { recursive: true });
+  const wroteConfig = writeConfigFile(
+    configWrite,
+    options,
+    Boolean(options.preset),
+  );
+  if (wroteConfig || options.preset) {
+    rememberPreset(cwd, configShape, options);
+  }
   updateCssFile(cssPath, targetDir);
+  if (wroteConfig && configWrite) {
+    console.log(`Created Aspekt config in ${configWrite.target}.`);
+  }
   console.log(`Initialized Aspekt in ${cwd}.`);
 
   if (dependencies.length > 0) {
@@ -471,6 +586,46 @@ function initProject(manifest, options) {
 
   console.log("\nNext:");
   console.log("  npx @aspekt/ui add button");
+}
+
+function setPreset(manifest, names, options) {
+  const [name] = names;
+
+  if (!name) {
+    fail(
+      `Pass a preset name, for example \`npx @aspekt/ui preset round\`. Available presets: ${shapePresets.join(
+        ", ",
+      )}.`,
+    );
+  }
+
+  const cwd = resolve(options.cwd);
+  ensureProject(cwd, options);
+
+  const state = loadState(cwd);
+  const installOptions = {
+    ...options,
+    path: options.path ?? state.path,
+  };
+  const shape = getShapePreset(name);
+  const configWrite = getConfigWrite(
+    manifest,
+    { ...installOptions, cwd },
+    shape,
+  );
+
+  if (options.dryRun) {
+    console.log(`Would set Aspekt preset to ${shape}.`);
+    if (configWrite) {
+      console.log(`Would write ${configWrite.target}`);
+    }
+    console.log(`Would update ${getStateFilePath(cwd)}`);
+    return;
+  }
+
+  writeConfigFile(configWrite, installOptions, true);
+  rememberPreset(cwd, shape, installOptions);
+  console.log(`Set Aspekt preset to ${shape} in ${cwd}.`);
 }
 
 function writeCssFile(cssPath, current, next, messages) {
@@ -810,6 +965,14 @@ async function updateComponents(manifest, names, options) {
   };
   const cssPath = findCssFile(cwd, options.css);
   const targetDir = getDefaultTargetDir(cwd, installOptions);
+  const configShape = getShapePreset(
+    options.preset ?? state.settings.shape,
+  );
+  const configWrite = getConfigWrite(
+    manifest,
+    { ...installOptions, cwd },
+    configShape,
+  );
   const items = getUpdateItems(manifest, names, installOptions, cwd, state);
 
   if (items.length === 0) {
@@ -851,11 +1014,23 @@ async function updateComponents(manifest, names, options) {
 
     console.log("\nWould update:");
     console.log(`  ${cssPath}`);
+    if (configWrite && !existsSync(configWrite.targetPath)) {
+      console.log("\nWould write:");
+      console.log(`  ${configWrite.target}`);
+    }
     return;
   }
 
   if (actionable.length === 0) {
     rememberUpdatedItems(cwd, analyses, installOptions);
+    const wroteConfig = writeConfigFile(
+      configWrite,
+      installOptions,
+      Boolean(options.preset),
+    );
+    if (wroteConfig || options.preset) {
+      rememberPreset(cwd, configShape, installOptions);
+    }
     updateCssFile(cssPath, targetDir);
     return;
   }
@@ -878,6 +1053,14 @@ async function updateComponents(manifest, names, options) {
   }
 
   rememberUpdatedItems(cwd, analyses, installOptions);
+  const wroteConfig = writeConfigFile(
+    configWrite,
+    installOptions,
+    Boolean(options.preset),
+  );
+  if (wroteConfig || options.preset) {
+    rememberPreset(cwd, configShape, installOptions);
+  }
   updateCssFile(cssPath, targetDir);
 
   console.log(
@@ -919,6 +1102,8 @@ async function main() {
     listItems(manifest);
   } else if (command === "add") {
     addComponents(manifest, args, options);
+  } else if (command === "preset") {
+    setPreset(manifest, args, options);
   } else if (command === "update") {
     await updateComponents(manifest, args, options);
   } else if (command === "init") {

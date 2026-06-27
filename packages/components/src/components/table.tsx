@@ -12,9 +12,16 @@ import {
   type SortingState,
   type TableOptions,
 } from "@tanstack/react-table";
+import {
+  CaretDownIcon,
+  CaretUpDownIcon,
+  CaretUpIcon,
+} from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
+
+import { aspektConfig } from "./config";
 
 const tableWrapperVariants = cva(
   [
@@ -113,33 +120,22 @@ type TableProps<TData extends RowData> = Omit<
   };
 
 function SortIndicator({ direction }: { direction: false | "asc" | "desc" }) {
+  const Icon =
+    direction === "asc"
+      ? CaretUpIcon
+      : direction === "desc"
+        ? CaretDownIcon
+        : CaretUpDownIcon;
+
   return (
-    <svg
+    <Icon
       aria-hidden="true"
       className={cn(
         "size-3.5 shrink-0 transition-colors",
         direction ? "text-primary" : "text-secondary",
       )}
-      viewBox="0 0 16 16"
-      fill="none"
-    >
-      <path
-        d="M5 6.5L8 3.5L11 6.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity={direction === "desc" ? 0.35 : 1}
-      />
-      <path
-        d="M5 9.5L8 12.5L11 9.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity={direction === "asc" ? 0.35 : 1}
-      />
-    </svg>
+      weight="bold"
+    />
   );
 }
 
@@ -215,11 +211,15 @@ function Table<TData extends RowData>({
 
   const rows = table.getRowModel().rows;
   const columnCount = getColumnCount(table);
+  const resolvedShape = shape ?? aspektConfig.shape;
 
   return (
     <div
       data-slot="table-wrapper"
-      className={cn(tableWrapperVariants({ shape, size, variant }), className)}
+      className={cn(
+        tableWrapperVariants({ shape: resolvedShape, size, variant }),
+        className,
+      )}
       {...props}
     >
       <div data-slot="table-scroll" className="max-w-full overflow-auto">

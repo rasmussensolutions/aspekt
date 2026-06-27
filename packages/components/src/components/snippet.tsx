@@ -14,6 +14,7 @@ import tsx from "refractor/tsx";
 import typescript from "refractor/typescript";
 
 import { CodeCopyButton } from "./code-copy-button";
+import { aspektConfig } from "./config";
 
 const snippetVariants = cva(
   "overflow-hidden border font-mono text-sm leading-6 text-primary",
@@ -24,8 +25,8 @@ const snippetVariants = cva(
         soft: "border-transparent bg-surface-sunken",
       },
       shape: {
-        square: "rounded-lg",
-        round: "rounded-3xl",
+        square: "rounded-[var(--overlay-radius-square)]",
+        round: "rounded-[var(--overlay-radius-round)]",
       },
     },
     defaultVariants: {
@@ -388,6 +389,7 @@ function Snippet({
     showHeader &&
     Boolean(hasTabs || selectedFilename || selectedLanguage || copyable);
   const hasFloatingCopyButton = copyable && !hasHeader;
+  const resolvedShape = shape ?? aspektConfig.shape;
 
   function handleTabChange(nextValue: string) {
     if (activeTab === undefined) {
@@ -434,7 +436,11 @@ function Snippet({
     <figure
       data-slot="snippet"
       data-tab={hasTabs ? selectedTabValue : undefined}
-      className={cn("relative", snippetVariants({ variant, shape }), className)}
+      className={cn(
+        "relative",
+        snippetVariants({ variant, shape: resolvedShape }),
+        className,
+      )}
       {...props}
     >
       {hasHeader ? (
@@ -442,7 +448,7 @@ function Snippet({
           data-slot="snippet-header"
           className={cn(
             "flex min-h-10 items-center justify-between gap-3 border-b border-border bg-surface py-2",
-            shape === "round" ? "px-5" : "px-3",
+            resolvedShape === "round" ? "px-5" : "px-3",
           )}
         >
           <div className="flex min-w-0 flex-1 items-center gap-2">

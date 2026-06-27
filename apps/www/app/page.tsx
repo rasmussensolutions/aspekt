@@ -100,6 +100,7 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@aspekt/components-source/sidebar";
+import { InlineSlider } from "@aspekt/components-source/inline-slider";
 import { Slider } from "@aspekt/components-source/slider";
 import { Snippet } from "@aspekt/components-source/snippet";
 import {
@@ -147,6 +148,7 @@ type ComponentPreview =
   | "select"
   | "combobox"
   | "slider"
+  | "inline-slider"
   | "switch"
   | "toggle"
   | "dialog"
@@ -176,7 +178,7 @@ type DocsAppProps = {
 };
 type ButtonVariant = "solid" | "soft" | "ghost" | "outline";
 type ButtonSize = "micro" | "tiny" | "small" | "medium" | "large";
-type ButtonColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type ButtonColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 type ButtonShape = "square" | "round";
 type DialogSize = "small" | "medium" | "large";
 type DrawerSide = "top" | "right" | "bottom" | "left";
@@ -194,7 +196,7 @@ type SwitchVariant = "solid" | "soft" | "outline";
 type SelectPreviewValue = "react" | "next" | "svelte" | "vue" | "astro";
 type ComboboxPreviewValue = "React" | "Next.js" | "Svelte" | "Vue" | "Astro";
 type ToastMaxToasts = "1" | "3" | "6" | "9";
-type ToastType = "default" | "success" | "error" | "warning" | "info";
+type ToastType = "default" | "success" | "destructive" | "warning" | "info";
 type HeadingSize = "display" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 type HeadingTone = "default" | "muted" | "subtle" | "accent";
 type HeadingLevelOption = "1" | "2" | "3" | "4" | "5" | "6";
@@ -205,7 +207,7 @@ type TextTone =
   | "muted"
   | "subtle"
   | "accent"
-  | "danger"
+  | "destructive"
   | "success"
   | "warning";
 type TextWeight = "normal" | "medium" | "semibold";
@@ -215,7 +217,7 @@ type CodeTone =
   | "default"
   | "muted"
   | "accent"
-  | "danger"
+  | "destructive"
   | "success"
   | "warning";
 type KbdVariant = "outline" | "soft";
@@ -326,6 +328,7 @@ type SliderSettings = {
   invalid: boolean;
   disabled: boolean;
 };
+type InlineSliderSettings = SliderSettings;
 
 type ToggleSettings = {
   variant: ButtonVariant;
@@ -489,6 +492,7 @@ const componentIds = [
   "select",
   "combobox",
   "slider",
+  "inline-slider",
   "switch",
   "toggle",
   "dialog",
@@ -516,6 +520,7 @@ const docsComponentIds = [
   "select",
   "combobox",
   "slider",
+  "inline-slider",
   "switch",
   "toggle",
   "dialog",
@@ -558,6 +563,7 @@ const navGroups = [
       { label: "Select", page: "select" },
       { label: "Combobox", page: "combobox" },
       { label: "Slider", page: "slider" },
+      { label: "Inline Slider", page: "inline-slider" },
       { label: "Switch", page: "switch" },
       { label: "Toggle", page: "toggle" },
     ],
@@ -585,7 +591,7 @@ const navGroups = [
 const buttonOptions = {
   variant: ["solid", "soft", "ghost", "outline"],
   size: ["micro", "tiny", "small", "medium", "large"],
-  color: ["accent", "blue", "red", "amber", "neutral"],
+  color: ["accent", "info", "destructive", "warning", "neutral"],
   shape: ["square", "round"],
   status: ["none", "success", "fail"],
 } as const;
@@ -662,7 +668,7 @@ const toastOptions = {
   maxToasts: ["1", "3", "6", "9"],
   position: toastPositions,
   shape: buttonOptions.shape,
-  type: ["default", "success", "error", "warning", "info"],
+  type: ["default", "success", "destructive", "warning", "info"],
 } as const;
 
 const tabsOptions = {
@@ -704,7 +710,7 @@ const textOptions = {
     "muted",
     "subtle",
     "accent",
-    "danger",
+    "destructive",
     "success",
     "warning",
   ],
@@ -714,7 +720,7 @@ const textOptions = {
 
 const codeOptions = {
   variant: ["inline", "block"],
-  tone: ["default", "muted", "accent", "danger", "success", "warning"],
+  tone: ["default", "muted", "accent", "destructive", "success", "warning"],
 } as const;
 
 const kbdOptions = {
@@ -749,6 +755,11 @@ const snippetOptions = {
 const soundVariantOptions = ["soft", "click", "snap", "pop", "thock"] as const;
 
 const sliderFeedbackSound = { change: "change", commit: false } as const;
+const sliderMinuteFormat = {
+  style: "unit",
+  unit: "minute",
+  unitDisplay: "short",
+} satisfies Intl.NumberFormatOptions;
 
 const soundDepthCopy = {
   interactions: {
@@ -807,6 +818,11 @@ const componentCopy = {
   slider: {
     title: "Slider",
     description: "is used to select a value from a range.",
+  },
+  "inline-slider": {
+    title: "Inline Slider",
+    description:
+      "is used to adjust a compact labeled value from inside the control surface.",
   },
   switch: {
     title: "Switch",
@@ -894,6 +910,8 @@ const componentImportExamples = {
   combobox:
     'import { ComboboxRoot, ComboboxInput } from "@/components/aspekt/combobox";',
   slider: 'import { Slider } from "@/components/aspekt/slider";',
+  "inline-slider":
+    'import { InlineSlider } from "@/components/aspekt/inline-slider";',
   switch: 'import { Switch } from "@/components/aspekt/switch";',
   toggle: 'import { Toggle } from "@/components/aspekt/toggle";',
   dialog:
@@ -998,6 +1016,13 @@ const componentUsageExamples = {
   defaultValue={64}
   showValue
 />`,
+  "inline-slider": `<InlineSlider
+  aria-label="Minutes"
+  label="Minutes"
+  defaultValue={35}
+  format={{ style: "unit", unit: "minute", unitDisplay: "short" }}
+  showValue
+/>`,
   switch: `<Switch defaultChecked aria-label="Enable notifications" />`,
   toggle: `<Toggle defaultPressed>
   Bold
@@ -1098,7 +1123,7 @@ const componentUsageExamples = {
   try {
     await publishReleaseById(releaseId);
   } catch {
-    toast.error("Publish failed", {
+    toast.destructive("Publish failed", {
       description: "Check the build output before trying again.",
     });
   }
@@ -1235,7 +1260,7 @@ const defaultButtonSettings = {
   variant: "solid",
   size: "medium",
   color: "neutral",
-  shape: "square",
+  shape: "round",
   prefix: false,
   suffix: false,
   loading: false,
@@ -1244,9 +1269,9 @@ const defaultButtonSettings = {
 } satisfies ButtonSettings;
 
 const defaultInputSettings = {
-  variant: "outline",
+  variant: "soft",
   size: "medium",
-  shape: "square",
+  shape: "round",
   prefix: true,
   suffix: false,
   loading: false,
@@ -1257,9 +1282,9 @@ const defaultInputSettings = {
 } satisfies InputSettings;
 
 const defaultSelectSettings = {
-  variant: "outline",
+  variant: "soft",
   size: "medium",
-  shape: "square",
+  shape: "round",
   prefix: true,
   suffix: false,
   invalid: false,
@@ -1268,9 +1293,9 @@ const defaultSelectSettings = {
 } satisfies SelectSettings;
 
 const defaultComboboxSettings = {
-  variant: "outline",
+  variant: "soft",
   size: "medium",
-  shape: "square",
+  shape: "round",
   prefix: true,
   clearable: true,
   invalid: false,
@@ -1279,9 +1304,9 @@ const defaultComboboxSettings = {
 } satisfies ComboboxSettings;
 
 const defaultCheckboxSettings = {
-  variant: "outline",
-  size: "medium",
-  color: "blue",
+  variant: "solid",
+  size: "small",
+  color: "accent",
   shape: "square",
   checked: true,
   indeterminate: false,
@@ -1312,10 +1337,21 @@ const defaultSliderSettings = {
   disabled: false,
 } satisfies SliderSettings;
 
+const defaultInlineSliderSettings = {
+  variant: "solid",
+  size: "small",
+  color: "neutral",
+  shape: "round",
+  value: 35,
+  showValue: true,
+  invalid: false,
+  disabled: false,
+} satisfies InlineSliderSettings;
+
 const defaultToggleSettings = {
   variant: "soft",
   size: "medium",
-  color: "blue",
+  color: "info",
   shape: "square",
   prefix: true,
   suffix: false,
@@ -1367,7 +1403,7 @@ const defaultTabsSettings = {
 const defaultAppTabsSettings = {
   variant: "soft",
   size: "small",
-  color: "neutral",
+  color: "accent",
   shape: "square",
 } satisfies AppTabsSettings;
 
@@ -1472,10 +1508,9 @@ type Invoice = {
 };
 
 const invoiceStatusClasses = {
-  Paid: "border-emerald-600/20 bg-emerald-600/10 text-emerald-700 dark:text-emerald-300",
-  Pending:
-    "border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-300",
-  Overdue: "border-red-600/20 bg-red-600/10 text-red-700 dark:text-red-300",
+  Paid: "border-success-border bg-success-surface text-success",
+  Pending: "border-warning-border bg-warning-surface text-warning",
+  Overdue: "border-destructive-border bg-destructive-surface text-destructive",
 } satisfies Record<InvoiceStatus, string>;
 
 const tablePreviewData = [
@@ -1623,22 +1658,22 @@ const snippetHighlightedLines = {
 const initCommandTabs = [
   {
     label: "pnpm",
-    code: "pnpm dlx @aspekt/ui init",
+    code: "pnpm dlx @aspekt/ui init --preset square",
     language: "bash",
   },
   {
     label: "npm",
-    code: "npx @aspekt/ui init",
+    code: "npx @aspekt/ui init --preset square",
     language: "bash",
   },
   {
     label: "yarn",
-    code: "yarn dlx @aspekt/ui init",
+    code: "yarn dlx @aspekt/ui init --preset square",
     language: "bash",
   },
   {
     label: "bun",
-    code: "bunx @aspekt/ui init",
+    code: "bunx @aspekt/ui init --preset square",
     language: "bash",
   },
 ] as const;
@@ -1677,9 +1712,9 @@ const headingLevelValues = {
 
 const buttonColorDots = {
   accent: "bg-action",
-  blue: "bg-info",
-  red: "bg-destructive",
-  amber: "bg-warning",
+  info: "bg-info",
+  destructive: "bg-destructive",
+  warning: "bg-warning",
   neutral: "bg-primary",
 } satisfies Record<ButtonColor, string>;
 
@@ -2200,6 +2235,100 @@ function BooleanOptionRow({
   );
 }
 
+function SliderOptionsPanel({
+  settings,
+  onSettingsChange,
+}: {
+  settings: SliderSettings;
+  onSettingsChange: React.Dispatch<React.SetStateAction<SliderSettings>>;
+}) {
+  return (
+    <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+      <OptionRow
+        label="variant"
+        values={sliderOptions.variant}
+        active={settings.variant}
+        onValueChange={(variant) =>
+          onSettingsChange((current) => ({
+            ...current,
+            variant,
+          }))
+        }
+      />
+
+      <OptionRow
+        label="size"
+        values={sliderOptions.size}
+        active={settings.size}
+        onValueChange={(size) =>
+          onSettingsChange((current) => ({
+            ...current,
+            size,
+          }))
+        }
+      />
+
+      <OptionRow
+        label="color"
+        values={sliderOptions.color}
+        active={settings.color}
+        dots={buttonColorDots}
+        onValueChange={(color) =>
+          onSettingsChange((current) => ({
+            ...current,
+            color,
+          }))
+        }
+      />
+
+      <OptionRow
+        label="shape"
+        values={sliderOptions.shape}
+        active={settings.shape}
+        onValueChange={(shape) =>
+          onSettingsChange((current) => ({
+            ...current,
+            shape,
+          }))
+        }
+      />
+
+      <BooleanOptionRow
+        label="showValue"
+        checked={settings.showValue}
+        onCheckedChange={(showValue) =>
+          onSettingsChange((current) => ({
+            ...current,
+            showValue,
+          }))
+        }
+      />
+
+      <BooleanOptionRow
+        label="invalid"
+        checked={settings.invalid}
+        onCheckedChange={(invalid) =>
+          onSettingsChange((current) => ({
+            ...current,
+            invalid,
+          }))
+        }
+      />
+
+      <BooleanOptionRow
+        label="disabled"
+        checked={settings.disabled}
+        onCheckedChange={(disabled) =>
+          onSettingsChange((current) => ({
+            ...current,
+            disabled,
+          }))
+        }
+      />
+    </div>
+  );
+}
+
 function ImportExample({
   activeComponent,
 }: {
@@ -2386,7 +2515,7 @@ function SoundProviderControls() {
         </Button>
         <Button
           type="button"
-          color="red"
+          color="destructive"
           variant="outline"
           sound={false}
           onClick={() => play("error")}
@@ -2491,6 +2620,33 @@ function SliderPreview({
             onValueChange(value);
           }
         }}
+        variant={settings.variant}
+        color={settings.color}
+        size={settings.size}
+        shape={settings.shape}
+        showValue={settings.showValue}
+        invalid={settings.invalid}
+        disabled={settings.disabled}
+      />
+    </div>
+  );
+}
+
+function InlineSliderPreview({
+  settings,
+  onValueChange,
+}: {
+  settings: InlineSliderSettings;
+  onValueChange: (value: number) => void;
+}) {
+  return (
+    <div className="w-full max-w-sm px-6">
+      <InlineSlider
+        aria-label="Minutes"
+        label="Minutes"
+        format={sliderMinuteFormat}
+        value={settings.value}
+        onValueChange={onValueChange}
         variant={settings.variant}
         color={settings.color}
         size={settings.size}
@@ -3227,7 +3383,7 @@ const toastPreviewCopy = {
     title: "Saved",
     description: "Your changes are now live in the component library.",
   },
-  error: {
+  destructive: {
     title: "Publish failed",
     description: "Check the build output before trying again.",
   },
@@ -3429,7 +3585,7 @@ const principles = [
       "Neutral surface color should describe depth before it describes importance.",
       "From deepest to foremost, Aspekt uses surface-sunken, surface, surface-raised, and surface-floating. Deeper planes are darker; foremost planes are brighter.",
       "Text follows the same idea: text-primary, text-secondary, text-tertiary, and text-disabled move from strongest to quietest.",
-      "Intent colors stay separate. Brand, status, selection, warning, and danger should not be hidden inside the surface scale.",
+      "Intent colors stay separate. Brand, status, selection, warning, and destructive states should not be hidden inside the surface scale.",
     ],
   },
   {
@@ -3525,9 +3681,28 @@ function GettingStartedDocumentation() {
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
           Run the CLI in a React and Tailwind project. It adds the Aspekt theme
-          tokens and prepares your project for copied source components.
+          tokens, creates your project defaults, and prepares your project for
+          copied source components.
         </Text>
         <Snippet className="max-w-3xl" tabs={initCommandTabs} />
+      </section>
+
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <Heading level={2} size="h5" className="max-w-3xl">
+          Choose project shape
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Use square or round as the default shape for installed components.
+          Aspekt stores the setting in components/aspekt/config.ts, and direct
+          component props like shape=&quot;round&quot; still override it.
+        </Text>
+        <Snippet
+          className="max-w-3xl"
+          code={`npx @aspekt/ui init --preset round
+npx @aspekt/ui preset square`}
+          filename="terminal"
+          language="bash"
+        />
       </section>
 
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
@@ -4584,6 +4759,8 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [sliderSettings, setSliderSettings] = React.useState<SliderSettings>(
     defaultSliderSettings,
   );
+  const [inlineSliderSettings, setInlineSliderSettings] =
+    React.useState<InlineSliderSettings>(defaultInlineSliderSettings);
   const [inputSettings, setInputSettings] =
     React.useState<InputSettings>(defaultInputSettings);
   const [selectSettings, setSelectSettings] = React.useState<SelectSettings>(
@@ -4880,6 +5057,16 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                       settings={sliderSettings}
                       onValueChange={(value) =>
                         setSliderSettings((settings) => ({
+                          ...settings,
+                          value,
+                        }))
+                      }
+                    />
+                  ) : activeComponent === "inline-slider" ? (
+                    <InlineSliderPreview
+                      settings={inlineSliderSettings}
+                      onValueChange={(value) =>
+                        setInlineSliderSettings((settings) => ({
                           ...settings,
                           value,
                         }))
@@ -5627,89 +5814,17 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     )}
 
                     {activeComponent === "slider" && (
-                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
-                        <OptionRow
-                          label="variant"
-                          values={sliderOptions.variant}
-                          active={sliderSettings.variant}
-                          onValueChange={(variant) =>
-                            setSliderSettings((settings) => ({
-                              ...settings,
-                              variant,
-                            }))
-                          }
-                        />
+                      <SliderOptionsPanel
+                        settings={sliderSettings}
+                        onSettingsChange={setSliderSettings}
+                      />
+                    )}
 
-                        <OptionRow
-                          label="size"
-                          values={sliderOptions.size}
-                          active={sliderSettings.size}
-                          onValueChange={(size) =>
-                            setSliderSettings((settings) => ({
-                              ...settings,
-                              size,
-                            }))
-                          }
-                        />
-
-                        <OptionRow
-                          label="color"
-                          values={sliderOptions.color}
-                          active={sliderSettings.color}
-                          dots={buttonColorDots}
-                          onValueChange={(color) =>
-                            setSliderSettings((settings) => ({
-                              ...settings,
-                              color,
-                            }))
-                          }
-                        />
-
-                        <OptionRow
-                          label="shape"
-                          values={sliderOptions.shape}
-                          active={sliderSettings.shape}
-                          onValueChange={(shape) =>
-                            setSliderSettings((settings) => ({
-                              ...settings,
-                              shape,
-                            }))
-                          }
-                        />
-
-                        <BooleanOptionRow
-                          label="showValue"
-                          checked={sliderSettings.showValue}
-                          onCheckedChange={(showValue) =>
-                            setSliderSettings((settings) => ({
-                              ...settings,
-                              showValue,
-                            }))
-                          }
-                        />
-
-                        <BooleanOptionRow
-                          label="invalid"
-                          checked={sliderSettings.invalid}
-                          onCheckedChange={(invalid) =>
-                            setSliderSettings((settings) => ({
-                              ...settings,
-                              invalid,
-                            }))
-                          }
-                        />
-
-                        <BooleanOptionRow
-                          label="disabled"
-                          checked={sliderSettings.disabled}
-                          onCheckedChange={(disabled) =>
-                            setSliderSettings((settings) => ({
-                              ...settings,
-                              disabled,
-                            }))
-                          }
-                        />
-                      </div>
+                    {activeComponent === "inline-slider" && (
+                      <SliderOptionsPanel
+                        settings={inlineSliderSettings}
+                        onSettingsChange={setInlineSliderSettings}
+                      />
                     )}
 
                     {activeComponent === "toggle" && (

@@ -1,10 +1,12 @@
 "use client";
 
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
+import { CheckIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const toggleVariants = cva(
@@ -31,9 +33,9 @@ const toggleVariants = cva(
       },
       color: {
         accent: "",
-        blue: "",
-        red: "",
-        amber: "",
+        info: "",
+        destructive: "",
+        warning: "",
         neutral: "",
       },
       size: {
@@ -57,19 +59,19 @@ const toggleVariants = cva(
       },
       {
         variant: "solid",
-        color: "blue",
+        color: "info",
         className:
           "data-[pressed]:border-info/20 data-[pressed]:bg-info data-[pressed]:text-on-color data-[pressed]:hover:bg-info/90",
       },
       {
         variant: "solid",
-        color: "red",
+        color: "destructive",
         className:
           "data-[pressed]:border-destructive/20 data-[pressed]:bg-destructive data-[pressed]:text-on-color data-[pressed]:hover:bg-destructive/90",
       },
       {
         variant: "solid",
-        color: "amber",
+        color: "warning",
         className:
           "data-[pressed]:border-warning/25 data-[pressed]:bg-warning data-[pressed]:text-on-color data-[pressed]:hover:bg-warning/90",
       },
@@ -88,19 +90,19 @@ const toggleVariants = cva(
       },
       {
         variant: "soft",
-        color: "blue",
+        color: "info",
         className:
           "data-[pressed]:bg-info/10 data-[pressed]:text-info data-[pressed]:hover:bg-info/15",
       },
       {
         variant: "soft",
-        color: "red",
+        color: "destructive",
         className:
           "data-[pressed]:bg-destructive/10 data-[pressed]:text-destructive data-[pressed]:hover:bg-destructive/15",
       },
       {
         variant: "soft",
-        color: "amber",
+        color: "warning",
         className:
           "data-[pressed]:bg-warning/15 data-[pressed]:text-warning data-[pressed]:hover:bg-warning/20",
       },
@@ -119,19 +121,19 @@ const toggleVariants = cva(
       },
       {
         variant: "ghost",
-        color: "blue",
+        color: "info",
         className:
           "data-[pressed]:bg-info/10 data-[pressed]:text-info data-[pressed]:hover:bg-info/15",
       },
       {
         variant: "ghost",
-        color: "red",
+        color: "destructive",
         className:
           "data-[pressed]:bg-destructive/10 data-[pressed]:text-destructive data-[pressed]:hover:bg-destructive/15",
       },
       {
         variant: "ghost",
-        color: "amber",
+        color: "warning",
         className:
           "data-[pressed]:bg-warning/15 data-[pressed]:text-warning data-[pressed]:hover:bg-warning/20",
       },
@@ -150,19 +152,19 @@ const toggleVariants = cva(
       },
       {
         variant: "outline",
-        color: "blue",
+        color: "info",
         className:
           "data-[pressed]:border-info/30 data-[pressed]:bg-info/5 data-[pressed]:text-info data-[pressed]:hover:bg-info/10",
       },
       {
         variant: "outline",
-        color: "red",
+        color: "destructive",
         className:
           "data-[pressed]:border-destructive/30 data-[pressed]:bg-destructive/5 data-[pressed]:text-destructive data-[pressed]:hover:bg-destructive/10",
       },
       {
         variant: "outline",
-        color: "amber",
+        color: "warning",
         className:
           "data-[pressed]:border-warning/35 data-[pressed]:bg-warning/10 data-[pressed]:text-warning data-[pressed]:hover:bg-warning/15",
       },
@@ -175,7 +177,7 @@ const toggleVariants = cva(
     ],
     defaultVariants: {
       variant: "soft",
-      color: "blue",
+      color: "info",
       size: "medium",
       shape: "square",
     },
@@ -184,7 +186,7 @@ const toggleVariants = cva(
 
 type ToggleVariant = "solid" | "soft" | "ghost" | "outline";
 
-type ToggleColor = "accent" | "blue" | "red" | "amber" | "neutral";
+type ToggleColor = "accent" | "info" | "destructive" | "warning" | "neutral";
 
 type ToggleSize = "micro" | "tiny" | "small" | "medium" | "large";
 
@@ -248,20 +250,6 @@ function getToggleSound(sound: ToggleSound | undefined, pressed: boolean) {
   return pressed ? sound.on : sound.off;
 }
 
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path
-        d="M3.5 8.5L6.5 11.5L12.5 4.5"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function ToggleIndicator({ className }: { className?: string }) {
   return (
     <span
@@ -270,7 +258,11 @@ function ToggleIndicator({ className }: { className?: string }) {
       className={cn("grid shrink-0 place-items-center", className)}
     >
       <span className="col-start-1 row-start-1 size-1.5 rounded-full bg-current opacity-45 transition-[opacity,scale] duration-150 group-data-[pressed]/toggle:scale-50 group-data-[pressed]/toggle:opacity-0" />
-      <CheckIcon className="col-start-1 row-start-1 size-full scale-50 opacity-0 transition-[opacity,scale] duration-150 group-data-[pressed]/toggle:scale-100 group-data-[pressed]/toggle:opacity-100" />
+      <CheckIcon
+        aria-hidden="true"
+        className="col-start-1 row-start-1 size-full scale-50 opacity-0 transition-[opacity,scale] duration-150 group-data-[pressed]/toggle:scale-100 group-data-[pressed]/toggle:opacity-100"
+        weight="bold"
+      />
     </span>
   );
 }
@@ -331,6 +323,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(function Toggle(
   ref,
 ) {
   const resolvedSize = size ?? "medium";
+  const resolvedShape = shape ?? aspektConfig.shape;
   const hasLabel = Boolean(children);
   const hasPrefix = Boolean(prefix);
   const hasSuffix = Boolean(suffix);
@@ -362,7 +355,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(function Toggle(
           variant,
           color,
           size: resolvedSize,
-          shape,
+          shape: resolvedShape,
           className,
         }),
       )}

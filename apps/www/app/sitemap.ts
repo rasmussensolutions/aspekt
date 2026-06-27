@@ -15,6 +15,7 @@ const routes = [
   { path: "/select", priority: 0.7 },
   { path: "/combobox", priority: 0.7 },
   { path: "/slider", priority: 0.7 },
+  { path: "/inline-slider", priority: 0.7 },
   { path: "/switch", priority: 0.7 },
   { path: "/toggle", priority: 0.7 },
   { path: "/avatar", priority: 0.7 },

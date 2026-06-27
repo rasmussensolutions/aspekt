@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 import { Button, ButtonShapeProvider } from "./button";
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const drawerViewportVariants = cva(
@@ -73,9 +74,9 @@ const drawerContentVariants = cva(
         ],
       },
       size: {
-        small: "p-6",
-        medium: "p-8",
-        large: "p-8",
+        small: "p-[var(--overlay-padding-sm)]",
+        medium: "p-[var(--overlay-padding-md)]",
+        large: "p-[var(--overlay-padding-md)]",
       },
       shape: {
         square: "",
@@ -144,59 +145,59 @@ const drawerContentVariants = cva(
         side: "top",
         shape: "square",
         detached: false,
-        className: "rounded-b-xl",
+        className: "rounded-b-[var(--overlay-radius-square)]",
       },
       {
         side: "top",
         shape: "round",
         detached: false,
-        className: "rounded-b-3xl",
+        className: "rounded-b-[var(--overlay-radius-round)]",
       },
       {
         side: "right",
         shape: "square",
         detached: false,
-        className: "rounded-l-xl",
+        className: "rounded-l-[var(--overlay-radius-square)]",
       },
       {
         side: "right",
         shape: "round",
         detached: false,
-        className: "rounded-l-3xl",
+        className: "rounded-l-[var(--overlay-radius-round)]",
       },
       {
         side: "bottom",
         shape: "square",
         detached: false,
-        className: "rounded-t-xl",
+        className: "rounded-t-[var(--overlay-radius-square)]",
       },
       {
         side: "bottom",
         shape: "round",
         detached: false,
-        className: "rounded-t-3xl",
+        className: "rounded-t-[var(--overlay-radius-round)]",
       },
       {
         side: "left",
         shape: "square",
         detached: false,
-        className: "rounded-r-xl",
+        className: "rounded-r-[var(--overlay-radius-square)]",
       },
       {
         side: "left",
         shape: "round",
         detached: false,
-        className: "rounded-r-3xl",
+        className: "rounded-r-[var(--overlay-radius-round)]",
       },
       {
         shape: "square",
         detached: true,
-        className: "rounded-xl",
+        className: "rounded-[var(--overlay-radius-square)]",
       },
       {
         shape: "round",
         detached: true,
-        className: "rounded-3xl",
+        className: "rounded-[var(--overlay-radius-round)]",
       },
     ],
     defaultVariants: {
@@ -228,7 +229,9 @@ type DrawerDetached = boolean;
 const DrawerBackdropContext = React.createContext<DrawerBackdrop>(true);
 const DrawerDetachedContext = React.createContext<DrawerDetached>(false);
 const DrawerSideContext = React.createContext<DrawerSide>("bottom");
-const DrawerShapeContext = React.createContext<DrawerShape>("square");
+const DrawerShapeContext = React.createContext<DrawerShape>(
+  aspektConfig.shape,
+);
 
 type DrawerRootPrimitiveProps = React.ComponentProps<
   typeof DrawerPrimitive.Root
@@ -353,12 +356,13 @@ function DrawerRoot({
   disablePointerDismissal,
   dismissible = true,
   onOpenChange,
-  shape = "square",
+  shape,
   side = "bottom",
   sound,
   swipeDirection,
   ...props
 }: DrawerRootProps) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const handleOpenChange = React.useCallback<
     NonNullable<DrawerRootPrimitiveProps["onOpenChange"]>
   >(
@@ -378,8 +382,8 @@ function DrawerRoot({
     <DrawerBackdropContext.Provider value={backdrop}>
       <DrawerDetachedContext.Provider value={detached}>
         <DrawerSideContext.Provider value={side}>
-          <DrawerShapeContext.Provider value={shape}>
-            <ButtonShapeProvider shape={shape}>
+          <DrawerShapeContext.Provider value={resolvedShape}>
+            <ButtonShapeProvider shape={resolvedShape}>
               <DrawerPrimitive.Root
                 disablePointerDismissal={
                   disablePointerDismissal ?? !dismissible

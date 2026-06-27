@@ -1,10 +1,12 @@
 "use client";
 
 import { Input as InputPrimitive } from "@base-ui/react/input";
+import { CircleNotchIcon, XIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const inputVariants = cva(
@@ -21,8 +23,7 @@ const inputVariants = cva(
     variants: {
       variant: {
         outline: "border-border",
-        soft:
-          "border-transparent [--input-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] hover:[--input-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--input-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--input-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
+        soft: "border-transparent [--input-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface-floating))] hover:[--input-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--input-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--input-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
         ghost:
           "border-transparent [--input-background:transparent] hover:[--input-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] focus-within:[--input-background:transparent] dark:hover:[--input-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))]",
       },
@@ -64,23 +65,23 @@ type InputFocusEvent = Parameters<
 >[0];
 
 type InputProps = Omit<InputPrimitiveProps, "prefix" | "size" | "suffix"> & {
-    clearable?: boolean;
-    invalid?: boolean;
-    loading?: boolean;
-    onClear?: () => void;
-    prefix?: React.ReactNode;
-    shape?: InputShape | null;
-    size?: InputSize | null;
-    sound?:
-      | false
-        | {
-          blur?: SoundName | false;
-          clear?: SoundName | false;
-          focus?: SoundName | false;
-        };
-    suffix?: React.ReactNode;
-    variant?: InputVariant | null;
-  };
+  clearable?: boolean;
+  invalid?: boolean;
+  loading?: boolean;
+  onClear?: () => void;
+  prefix?: React.ReactNode;
+  shape?: InputShape | null;
+  size?: InputSize | null;
+  sound?:
+    | false
+    | {
+        blur?: SoundName | false;
+        clear?: SoundName | false;
+        focus?: SoundName | false;
+      };
+  suffix?: React.ReactNode;
+  variant?: InputVariant | null;
+};
 
 const inputSlotWidths = {
   micro: "0.875rem",
@@ -115,76 +116,12 @@ function getTextValue(value: InputPrimitiveProps["value"] | undefined) {
 function InputSpinner({ className }: { className?: string }) {
   return (
     <span className={cn("relative inline-flex shrink-0", className)}>
-      <style>
-        {`
-          @keyframes input-spinner-rotate {
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-
-          @keyframes input-spinner-dash {
-            0% {
-              stroke-dasharray: 1 56;
-              stroke-dashoffset: 0;
-            }
-
-            50% {
-              stroke-dasharray: 34 56;
-              stroke-dashoffset: -14;
-            }
-
-            100% {
-              stroke-dasharray: 34 56;
-              stroke-dashoffset: -52;
-            }
-          }
-        `}
-      </style>
-
-      <svg
-        className="size-full"
-        viewBox="0 0 24 24"
-        fill="none"
+      <CircleNotchIcon
+        className="size-full animate-spin motion-reduce:animate-none"
         aria-hidden="true"
-        style={{
-          animation: "input-spinner-rotate 1.35s linear infinite",
-        }}
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="9"
-          stroke="currentColor"
-          strokeWidth="3"
-        />
-        <circle
-          cx="12"
-          cy="12"
-          r="9"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          style={{
-            animation: "input-spinner-dash 1.35s ease-in-out infinite",
-          }}
-        />
-      </svg>
-    </span>
-  );
-}
-
-function ClearIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M4.5 4.5L11.5 11.5M11.5 4.5L4.5 11.5"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
+        weight="bold"
       />
-    </svg>
+    </span>
   );
 }
 
@@ -328,6 +265,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
   );
 
   const currentValue = isControlled ? getTextValue(value) : uncontrolledValue;
+  const resolvedShape = shape ?? aspektConfig.shape;
   const hasValue = currentValue.length > 0;
   const isDisabled = Boolean(disabled);
   const isReadOnly = Boolean(readOnly);
@@ -423,7 +361,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
         inputVariants({
           variant,
           size: resolvedSize,
-          shape,
+          shape: resolvedShape,
           className,
         }),
       )}
@@ -485,7 +423,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
               inputSpinnerSizes[resolvedSize],
             )}
           >
-            <ClearIcon />
+            <XIcon aria-hidden="true" weight="bold" />
           </button>
         </InputSuffixSlot>
 

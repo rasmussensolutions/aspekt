@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 import { Button, ButtonShapeProvider } from "./button";
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const popoverPopupVariants = cva(
@@ -23,8 +24,8 @@ const popoverPopupVariants = cva(
         large: "w-96 p-5",
       },
       shape: {
-        square: "rounded-lg",
-        round: "rounded-3xl",
+        square: "rounded-[var(--overlay-radius-square)]",
+        round: "rounded-[var(--overlay-radius-round)]",
       },
     },
     defaultVariants: {
@@ -45,7 +46,9 @@ type PopoverSize = "small" | "medium" | "large";
 
 type PopoverShape = "square" | "round";
 
-const PopoverShapeContext = React.createContext<PopoverShape>("square");
+const PopoverShapeContext = React.createContext<PopoverShape>(
+  aspektConfig.shape,
+);
 
 type PopoverRootPrimitiveProps<Payload = unknown> =
   PopoverPrimitive.Root.Props<Payload>;
@@ -152,10 +155,11 @@ function getPopoverSound(sound: PopoverSound | undefined, open: boolean) {
 
 function PopoverRoot<Payload = unknown>({
   onOpenChange,
-  shape = "square",
+  shape,
   sound,
   ...props
 }: PopoverRootProps<Payload>) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const handleOpenChange = React.useCallback<
     NonNullable<PopoverRootPrimitiveProps<Payload>["onOpenChange"]>
   >(
@@ -172,8 +176,8 @@ function PopoverRoot<Payload = unknown>({
   );
 
   return (
-    <PopoverShapeContext.Provider value={shape}>
-      <ButtonShapeProvider shape={shape}>
+    <PopoverShapeContext.Provider value={resolvedShape}>
+      <ButtonShapeProvider shape={resolvedShape}>
         <PopoverPrimitive.Root onOpenChange={handleOpenChange} {...props} />
       </ButtonShapeProvider>
     </PopoverShapeContext.Provider>

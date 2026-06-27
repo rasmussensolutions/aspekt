@@ -2,6 +2,8 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
+
 const kbdVariants = cva(
   [
     "inline-flex items-center justify-center border font-mono font-medium tabular-nums",
@@ -44,10 +46,15 @@ type KbdProps = React.HTMLAttributes<HTMLElement> & {
 };
 
 function Kbd({ className, shape, size, variant, ...props }: KbdProps) {
+  const resolvedShape = shape ?? aspektConfig.shape;
+
   return (
     <kbd
       data-slot="kbd"
-      className={cn(kbdVariants({ variant, size, shape }), className)}
+      className={cn(
+        kbdVariants({ variant, size, shape: resolvedShape }),
+        className,
+      )}
       {...props}
     />
   );

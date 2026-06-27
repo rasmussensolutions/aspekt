@@ -41,6 +41,10 @@
       "types": "./src/combobox.ts",
       "import": "./src/combobox.ts"
     },
+    "./config": {
+      "types": "./src/config.ts",
+      "import": "./src/config.ts"
+    },
     "./code": {
       "types": "./src/code.ts",
       "import": "./src/code.ts"
@@ -80,6 +84,10 @@
     "./input": {
       "types": "./src/input.ts",
       "import": "./src/input.ts"
+    },
+    "./inline-slider": {
+      "types": "./src/inline-slider.ts",
+      "import": "./src/inline-slider.ts"
     },
     "./select": {
       "types": "./src/select.ts",
@@ -150,6 +158,9 @@
       "combobox": [
         "src/combobox.ts"
       ],
+      "config": [
+        "src/config.ts"
+      ],
       "code": [
         "src/code.ts"
       ],
@@ -164,6 +175,9 @@
       ],
       "input": [
         "src/input.ts"
+      ],
+      "inline-slider": [
+        "src/inline-slider.ts"
       ],
       "kbd": [
         "src/kbd.ts"

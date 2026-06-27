@@ -1,10 +1,12 @@
 "use client";
 
 import { Select as SelectPrimitive } from "@base-ui/react/select";
+import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react";
 import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
 
 const selectTriggerVariants = cva(
@@ -59,8 +61,8 @@ const selectPopupVariants = cva(
   {
     variants: {
       shape: {
-        square: "rounded-lg",
-        round: "rounded-2xl",
+        square: "rounded-[var(--overlay-radius-square)]",
+        round: "rounded-[var(--overlay-radius-round)]",
       },
     },
     defaultVariants: {
@@ -186,7 +188,9 @@ type SelectGroupLabelProps = Omit<
 };
 
 const SelectSizeContext = React.createContext<SelectSize>("medium");
-const SelectShapeContext = React.createContext<SelectShape>("square");
+const SelectShapeContext = React.createContext<SelectShape>(
+  aspektConfig.shape,
+);
 
 const selectSlotWidths = {
   micro: "0.875rem",
@@ -217,34 +221,6 @@ function getSelectSound(
   }
 
   return sound[event];
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M4 6L8 10L12 6"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3.5 8.5L6.5 11.5L12.5 4.5"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
 }
 
 function SelectAffix({
@@ -292,11 +268,12 @@ function SelectRoot<
 >({
   onOpenChange,
   onValueChange,
-  shape = "square",
+  shape,
   size = "medium",
   sound,
   ...props
 }: SelectRootProps<Value, Multiple>) {
+  const resolvedShape = shape ?? aspektConfig.shape;
   const handleOpenChange = React.useCallback<
     NonNullable<SelectPrimitive.Root.Props<Value, Multiple>["onOpenChange"]>
   >(
@@ -329,7 +306,7 @@ function SelectRoot<
 
   return (
     <SelectSizeContext.Provider value={size}>
-      <SelectShapeContext.Provider value={shape}>
+      <SelectShapeContext.Provider value={resolvedShape}>
         <SelectPrimitive.Root
           onOpenChange={handleOpenChange}
           onValueChange={handleValueChange}
@@ -440,7 +417,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
             "transition-transform duration-200 group-data-[popup-open]/select:rotate-180",
           )}
         >
-          <ChevronDownIcon />
+          <CaretDownIcon aria-hidden="true" weight="bold" />
         </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
     );
@@ -526,7 +503,7 @@ const SelectItemIndicator = React.forwardRef<
       )}
       {...props}
     >
-      {children ?? <CheckIcon />}
+      {children ?? <CheckIcon aria-hidden="true" weight="bold" />}
     </SelectPrimitive.ItemIndicator>
   );
 });
@@ -586,7 +563,7 @@ const SelectScrollUpArrow = React.forwardRef<
     >
       {children ?? (
         <span className="rotate-180">
-          <ChevronDownIcon />
+          <CaretDownIcon aria-hidden="true" weight="bold" />
         </span>
       )}
     </SelectPrimitive.ScrollUpArrow>
@@ -607,7 +584,7 @@ const SelectScrollDownArrow = React.forwardRef<
       )}
       {...props}
     >
-      {children ?? <ChevronDownIcon />}
+      {children ?? <CaretDownIcon aria-hidden="true" weight="bold" />}
     </SelectPrimitive.ScrollDownArrow>
   );
 });

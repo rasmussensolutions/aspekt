@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 import * as React from "react";
 
+import { aspektConfig } from "./config";
 import { playSound } from "./sound";
 
 const toastPositions = [
@@ -31,8 +32,8 @@ const toastRootVariants = cva(
         true: [
           "data-[type=success]:[background-color:var(--success-surface)]",
           "data-[type=success]:[border-color:var(--success-border)]",
-          "data-[type=error]:[background-color:var(--destructive-surface)]",
-          "data-[type=error]:[border-color:var(--destructive-border)]",
+          "data-[type=destructive]:[background-color:var(--destructive-surface)]",
+          "data-[type=destructive]:[border-color:var(--destructive-border)]",
           "data-[type=warning]:[background-color:var(--warning-surface)]",
           "data-[type=warning]:[border-color:var(--warning-border)]",
           "data-[type=info]:[background-color:var(--info-surface)]",
@@ -41,8 +42,8 @@ const toastRootVariants = cva(
         false: "",
       },
       shape: {
-        square: "rounded-lg",
-        round: "rounded-2xl",
+        square: "rounded-[var(--overlay-radius-square)]",
+        round: "rounded-[var(--overlay-radius-round)]",
       },
       stacked: {
         true: [
@@ -96,7 +97,7 @@ type ToastShortcut = (
 type ToastFunction = {
   (input: ToastInput, options?: ToastBaseOptions): string;
   close: ToastManager["close"];
-  error: ToastShortcut;
+  destructive: ToastShortcut;
   info: ToastShortcut;
   manager: ToastManager;
   promise: ToastManager["promise"];
@@ -284,7 +285,7 @@ function addToastWithType(type: string): ToastShortcut {
 
 const toast = Object.assign(addToast, {
   close: globalToastManager.close,
-  error: addToastWithType("error"),
+  destructive: addToastWithType("destructive"),
   info: addToastWithType("info"),
   manager: globalToastManager,
   promise: globalToastManager.promise,
@@ -300,7 +301,11 @@ function getToastSide(position: ToastPosition): ToastSide {
 function getToastSound(
   type: React.ComponentProps<typeof ToastPrimitive.Root>["toast"]["type"],
 ) {
-  if (type === "success" || type === "error" || type === "warning") {
+  if (type === "destructive") {
+    return "error";
+  }
+
+  if (type === "success" || type === "warning") {
     return type;
   }
 
@@ -396,6 +401,7 @@ const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(
     const stacked = toast.positionerProps?.anchor === undefined;
     const playedSoundKeyRef = React.useRef<string | null>(null);
     const sound = getToastSound(toast.type);
+    const resolvedShape = shape ?? aspektConfig.shape;
 
     React.useEffect(() => {
       if (!sound || toast.limited || toast.transitionStatus === "ending") {
@@ -419,7 +425,7 @@ const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(
         className={cn(
           toastRootVariants({
             colorful,
-            shape,
+            shape: resolvedShape,
             side: stacked ? getToastSide(position) : null,
             stacked,
           }),
@@ -555,10 +561,11 @@ function ToastList({
   className,
   colorful = false,
   renderToast,
-  shape = "square",
+  shape,
 }: ToastListProps) {
   const { close, toasts } = ToastPrimitive.useToastManager();
   const maxToasts = React.useContext(ToastMaxToastsContext);
+  const resolvedShape = shape ?? aspektConfig.shape;
 
   React.useEffect(() => {
     const liveToasts = toasts.filter(
@@ -580,7 +587,7 @@ function ToastList({
           <ToastRoot
             toast={toast}
             colorful={colorful}
-            shape={shape}
+            shape={resolvedShape}
             className={className}
           >
             <ToastDefaultContent />
@@ -606,7 +613,7 @@ function Toaster({
   placement,
   position,
   renderToast,
-  shape = "square",
+  shape,
   toastClassName,
   viewportClassName,
   viewportStyle,
