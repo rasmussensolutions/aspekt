@@ -107,7 +107,7 @@ const buttonVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "bg-surface-sunken text-primary border border-transparent hover:bg-surface-sunken/80",
+          "bg-control-soft text-primary border border-transparent hover:bg-control-soft/80",
       },
 
       {

@@ -606,7 +606,10 @@ const ComboboxEmpty = React.forwardRef<HTMLDivElement, ComboboxEmptyProps>(
       <ComboboxPrimitive.Empty
         ref={ref}
         data-slot="combobox-empty"
-        className={cn("px-2.5 py-6 text-center text-sm text-secondary", className)}
+        className={cn(
+          "px-2.5 py-6 text-center text-sm text-secondary empty:py-0",
+          className,
+        )}
         {...props}
       />
     );

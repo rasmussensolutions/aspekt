@@ -67,8 +67,8 @@ const sliderTrackVariants = cva(
   {
     variants: {
       variant: {
-        solid: "border border-transparent bg-control-track",
-        soft: "border border-transparent bg-control-track/80",
+        solid: "border border-transparent bg-control-soft",
+        soft: "border border-transparent bg-control-soft/80",
         outline: "border border-border bg-surface",
       },
       shape: {

@@ -1362,8 +1362,8 @@ const defaultInlineSliderSettings = {
 const defaultToggleSettings = {
   variant: "soft",
   size: "medium",
-  color: "info",
-  shape: "square",
+  color: "neutral",
+  shape: "round",
   prefix: true,
   suffix: false,
   pressed: false,
@@ -3800,8 +3800,8 @@ export function SaveButton() {
         <Text size="base" tone="muted" className="max-w-3xl">
           Aspekt stays silent unless you opt in. Add SoundProvider when you want
           components to play sound, subscribe to specific sound depths, change
-          the sound variant, or tune the volume across your app. Mobile
-          playback stays muted unless you pass <Code>mobileEnabled</Code>.
+          the sound variant, or tune the volume across your app. Mobile playback
+          stays muted unless you pass <Code>mobileEnabled</Code>.
         </Text>
         <Snippet
           className="max-w-3xl"
@@ -4105,10 +4105,10 @@ const colorTokenGroups = [
         description: "Input borders and field surfaces.",
       },
       {
-        name: "--control-track",
-        className: "bg-control-track",
+        name: "--control-soft",
+        className: "bg-control-soft",
         description:
-          "Inactive rails and neutral control tracks that must remain visible on sunken surfaces.",
+          "Soft neutral control fills for buttons, toggles, and inactive rails.",
       },
       {
         name: "--ring",

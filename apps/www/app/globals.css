@@ -20,7 +20,7 @@
     --action: #171717;
     --action-secondary: oklch(94.8% 0.006 250);
     --accent: oklch(94.8% 0.006 250);
-    --control-track: color-mix(in oklab, var(--text-primary) 10%, var(--surface));
+    --control-soft: color-mix(in oklab, var(--text-primary) 10%, var(--surface));
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-surface: oklch(0.97 0.025 27.325);
     --destructive-border: oklch(0.78 0.09 27.325);
@@ -98,7 +98,7 @@
     --color-action: var(--action);
     --color-action-secondary: var(--action-secondary);
     --color-accent: var(--accent);
-    --color-control-track: var(--control-track);
+    --color-control-soft: var(--control-soft);
     --color-destructive: var(--destructive);
     --color-destructive-surface: var(--destructive-surface);
     --color-destructive-border: var(--destructive-border);

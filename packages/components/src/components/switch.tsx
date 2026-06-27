@@ -20,12 +20,9 @@ const switchVariants = cva(
   {
     variants: {
       variant: {
-        solid:
-          "border-border bg-surface-sunken hover:bg-surface-sunken/80",
-        soft:
-          "border-transparent bg-surface-sunken hover:bg-surface-sunken/80",
-        outline:
-          "border-border bg-surface hover:bg-surface-sunken",
+        solid: "border-border bg-surface hover:bg-surface-sunken/80",
+        soft: "border-transparent bg-control-soft hover:bg-control-soft/80",
+        outline: "border-border bg-surface hover:bg-surface-sunken",
       },
       color: {
         accent: "",
@@ -37,8 +34,7 @@ const switchVariants = cva(
       size: {
         micro:
           "h-4 w-7 p-0.5 [--switch-thumb-radius:calc(var(--radius-sm)*0.8)] [--switch-thumb-size:0.75rem] [--switch-thumb-translate:0.75rem] [--switch-track-radius:var(--radius-sm)]",
-        tiny:
-          "h-4.5 w-8 p-0.5 [--switch-thumb-radius:var(--radius-sm)] [--switch-thumb-size:0.875rem] [--switch-thumb-translate:0.875rem] [--switch-track-radius:var(--radius-md)]",
+        tiny: "h-4.5 w-8 p-0.5 [--switch-thumb-radius:var(--radius-sm)] [--switch-thumb-size:0.875rem] [--switch-thumb-translate:0.875rem] [--switch-track-radius:var(--radius-md)]",
         small:
           "h-5 w-9 p-0.5 [--switch-thumb-radius:var(--radius-sm)] [--switch-thumb-size:1rem] [--switch-thumb-translate:1rem] [--switch-track-radius:var(--radius-md)]",
         medium:
@@ -93,8 +89,7 @@ const switchVariants = cva(
       {
         variant: "soft",
         color: "info",
-        className:
-          "data-[checked]:bg-info/10 data-[checked]:hover:bg-info/15",
+        className: "data-[checked]:bg-info/10 data-[checked]:hover:bg-info/15",
       },
       {
         variant: "soft",
@@ -232,20 +227,17 @@ type SwitchSound =
       on?: SoundName | false;
     };
 
-type SwitchProps = Omit<
-  SwitchRootProps,
-  "children" | "className" | "color"
-> & {
-    className?: string;
-    color?: SwitchColor | null;
-    invalid?: boolean;
-    shape?: SwitchShape | null;
-    size?: SwitchSize | null;
-    sound?: SwitchSound;
-    thumb?: React.ReactNode;
-    thumbClassName?: string;
-    variant?: SwitchVariant | null;
-  };
+type SwitchProps = Omit<SwitchRootProps, "children" | "className" | "color"> & {
+  className?: string;
+  color?: SwitchColor | null;
+  invalid?: boolean;
+  shape?: SwitchShape | null;
+  size?: SwitchSize | null;
+  sound?: SwitchSound;
+  thumb?: React.ReactNode;
+  thumbClassName?: string;
+  variant?: SwitchVariant | null;
+};
 
 function getSwitchSound(sound: SwitchSound | undefined, checked: boolean) {
   if (sound === false) return false;

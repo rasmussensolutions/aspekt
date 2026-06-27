@@ -25,7 +25,7 @@ const toggleVariants = cva(
       variant: {
         solid:
           "border border-border bg-surface-sunken text-primary hover:bg-surface-sunken/80",
-        soft: "border border-transparent bg-control-track text-primary hover:bg-control-track/80",
+        soft: "border border-transparent bg-control-soft text-primary hover:bg-control-soft/80",
         ghost:
           "border border-transparent bg-transparent text-primary hover:bg-surface-sunken",
         outline:
