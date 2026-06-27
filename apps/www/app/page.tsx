@@ -3519,7 +3519,8 @@ function GettingStartedDocumentation() {
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
           Add only the components you need. The CLI copies the component source
-          into your project so you can edit it directly.
+          into your project so you can edit it directly, and refreshes the
+          Aspekt CSS theme block if needed.
         </Text>
         <Snippet className="max-w-3xl" tabs={addButtonCommandTabs} />
       </section>

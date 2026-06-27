@@ -504,7 +504,8 @@ const SidebarHeader = React.forwardRef<HTMLDivElement, SidebarHeaderProps>(
         ref={ref}
         data-slot="sidebar-header"
         className={cn(
-          "flex min-h-10 shrink-0 items-center gap-2 pl-4 py-1.5",
+          "flex min-h-10 shrink-0 items-center gap-2 px-4 py-1.5",
+          "group-data-[variant=inset]/sidebar:pr-0",
           "group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
           className,
         )}

@@ -8,7 +8,7 @@ import {
   readFileSync,
   writeFileSync,
 } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
 
@@ -44,6 +44,38 @@ function loadThemeCss() {
   }
 
   return readFileSync(themeCssPath, "utf8").trimEnd();
+}
+
+function getDefaultTargetDir(cwd, options) {
+  return resolve(cwd, options.path ?? "components/aspekt");
+}
+
+function getCssSourcePath(cssPath, targetDir) {
+  let sourcePath = relative(dirname(cssPath), targetDir) || ".";
+  sourcePath = sourcePath.replace(/\\/g, "/");
+
+  if (!sourcePath.startsWith(".") && !sourcePath.startsWith("/")) {
+    sourcePath = `./${sourcePath}`;
+  }
+
+  return sourcePath;
+}
+
+function escapeCssString(value) {
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+function getThemeCss(cssPath, targetDir) {
+  const themeCss = loadThemeCss();
+  const sourceDirective = `@source "${escapeCssString(
+    getCssSourcePath(cssPath, targetDir),
+  )}";`;
+
+  if (!themeCss.startsWith(themeStart)) {
+    return `${sourceDirective}\n${themeCss}`;
+  }
+
+  return themeCss.replace(themeStart, `${themeStart}\n${sourceDirective}`);
 }
 
 function fail(message) {
@@ -313,6 +345,8 @@ function addComponents(manifest, names, options) {
   ensureProject(cwd, options);
 
   const { dependencies, files, items } = collectItems(manifest, requestedNames);
+  const cssPath = findCssFile(cwd, options.css);
+  const targetDir = getDefaultTargetDir(cwd, options);
   const writes = files.map((file) => {
     const target = getTargetPath(file, options);
     const targetPath = resolve(cwd, target);
@@ -356,6 +390,8 @@ function addComponents(manifest, names, options) {
       console.log("\nWould install:");
       console.log(`  ${dependencies.join(" ")}`);
     }
+    console.log("\nWould update:");
+    console.log(`  ${cssPath}`);
     return;
   }
 
@@ -375,6 +411,7 @@ function addComponents(manifest, names, options) {
   }
 
   rememberInstalledItems(cwd, items, options);
+  updateCssFile(cssPath, targetDir);
 
   console.log(
     `Added ${items.map((item) => item.name).join(", ")} to ${cwd}.`,
@@ -410,7 +447,7 @@ function initProject(manifest, options) {
   const cwd = resolve(options.cwd);
   ensureProject(cwd, options);
 
-  const targetDir = resolve(cwd, options.path ?? "components/aspekt");
+  const targetDir = getDefaultTargetDir(cwd, options);
   const cssPath = findCssFile(cwd, options.css);
   const baseItem = getItem(manifest, "aspekt-ui");
   const dependencies = baseItem?.dependencies ?? [];
@@ -425,7 +462,7 @@ function initProject(manifest, options) {
   }
 
   mkdirSync(targetDir, { recursive: true });
-  updateCssFile(cssPath);
+  updateCssFile(cssPath, targetDir);
   console.log(`Initialized Aspekt in ${cwd}.`);
 
   if (dependencies.length > 0) {
@@ -436,10 +473,23 @@ function initProject(manifest, options) {
   console.log("  npx @aspekt/ui add button");
 }
 
-function updateCssFile(cssPath) {
+function writeCssFile(cssPath, current, next, messages) {
+  const normalizedNext = next.endsWith("\n") ? next : `${next}\n`;
+
+  if (normalizedNext === current) {
+    console.log(messages.current);
+    return;
+  }
+
+  mkdirSync(dirname(cssPath), { recursive: true });
+  writeFileSync(cssPath, normalizedNext);
+  console.log(messages.updated);
+}
+
+function updateCssFile(cssPath, targetDir) {
   const fileExists = existsSync(cssPath);
   const current = fileExists ? readFileSync(cssPath, "utf8") : "";
-  const themeCss = loadThemeCss();
+  const themeCss = getThemeCss(cssPath, targetDir);
 
   if (current.includes(themeStart)) {
     const themeBlockPattern = new RegExp(
@@ -452,8 +502,10 @@ function updateCssFile(cssPath) {
 
     const next = current.replace(themeBlockPattern, themeCss);
 
-    writeFileSync(cssPath, next.endsWith("\n") ? next : `${next}\n`);
-    console.log(`Updated Aspekt theme tokens in ${cssPath}.`);
+    writeCssFile(cssPath, current, next, {
+      current: `Aspekt theme tokens are current in ${cssPath}.`,
+      updated: `Updated Aspekt theme tokens in ${cssPath}.`,
+    });
     return;
   }
 
@@ -466,9 +518,10 @@ function updateCssFile(cssPath) {
   const body = current.trimEnd();
   const next = `${prefix}${body}${body ? "\n\n" : ""}${themeCss}\n`;
 
-  mkdirSync(dirname(cssPath), { recursive: true });
-  writeFileSync(cssPath, next);
-  console.log(`Updated ${cssPath}.`);
+  writeCssFile(cssPath, current, next, {
+    current: `Aspekt theme tokens are current in ${cssPath}.`,
+    updated: `Updated ${cssPath}.`,
+  });
 }
 
 function escapeRegExp(value) {
@@ -751,14 +804,22 @@ async function updateComponents(manifest, names, options) {
   ensureProject(cwd, options);
 
   const state = loadState(cwd);
-  const items = getUpdateItems(manifest, names, options, cwd, state);
+  const installOptions = {
+    ...options,
+    path: options.path ?? state.path,
+  };
+  const cssPath = findCssFile(cwd, options.css);
+  const targetDir = getDefaultTargetDir(cwd, installOptions);
+  const items = getUpdateItems(manifest, names, installOptions, cwd, state);
 
   if (items.length === 0) {
     console.log("No Aspekt components detected.");
     return;
   }
 
-  const analyses = items.map((item) => analyzeUpdateItem(item, state, options, cwd));
+  const analyses = items.map((item) =>
+    analyzeUpdateItem(item, state, installOptions, cwd),
+  );
   const installedAnalyses = analyses.filter(
     (analysis) => analysis.status !== "not installed",
   );
@@ -788,11 +849,14 @@ async function updateComponents(manifest, names, options) {
       console.log(`  ${[...dependencies].join(" ")}`);
     }
 
+    console.log("\nWould update:");
+    console.log(`  ${cssPath}`);
     return;
   }
 
   if (actionable.length === 0) {
-    rememberUpdatedItems(cwd, analyses, options);
+    rememberUpdatedItems(cwd, analyses, installOptions);
+    updateCssFile(cssPath, targetDir);
     return;
   }
 
@@ -813,14 +877,15 @@ async function updateComponents(manifest, names, options) {
     }
   }
 
-  rememberUpdatedItems(cwd, analyses, options);
+  rememberUpdatedItems(cwd, analyses, installOptions);
+  updateCssFile(cssPath, targetDir);
 
   console.log(
     `Updated ${actionable.map((analysis) => analysis.item.name).join(", ")} in ${cwd}.`,
   );
 
   if (dependencies.size > 0) {
-    installDependencies(cwd, [...dependencies], options);
+    installDependencies(cwd, [...dependencies], installOptions);
   }
 }
 

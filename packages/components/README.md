@@ -4,8 +4,8 @@ Internal React component source for the Aspekt docs app and CLI templates.
 
 ## Public usage
 
-Use the Aspekt CLI to copy component source into your React and Tailwind
-project:
+Use the Aspekt CLI to add the Aspekt theme and copy component source into your
+React and Tailwind project:
 
 ```sh
 npx @aspekt/ui init

@@ -9,9 +9,11 @@ npx @aspekt/ui update
 ```
 
 The CLI copies component source into your project, usually under
-`components/aspekt`, so you can edit the components directly. It also records
-installed component template hashes in `.aspekt/components.json`, which lets the
-CLI detect outdated components later.
+`components/aspekt`, so you can edit the components directly. The `init`, `add`,
+and `update` commands also keep your Aspekt CSS theme block wired to the copied
+component directory for Tailwind. Installed component template hashes are
+recorded in `.aspekt/components.json`, which lets the CLI detect outdated
+components later.
 
 ## Commands
 
