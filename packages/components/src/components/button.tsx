@@ -171,7 +171,7 @@ const buttonVariants = cva(
     ],
     defaultVariants: {
       variant: "solid",
-      color: "info",
+      color: "neutral",
       size: "medium",
       shape: "square",
     },
@@ -375,7 +375,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 ) {
   const inheritedShape = React.useContext(ButtonShapeContext);
   const resolvedVariant = variant ?? "solid";
-  const resolvedColor = color ?? "info";
+  const resolvedColor = color ?? "neutral";
   const resolvedSize = size ?? "medium";
   const resolvedShape = shape ?? inheritedShape ?? aspektConfig.shape;
   const effectiveColor = status === "fail" ? "destructive" : resolvedColor;

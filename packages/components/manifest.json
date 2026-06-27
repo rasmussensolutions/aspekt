@@ -194,6 +194,30 @@
       ]
     },
     {
+      "name": "inline-slider",
+      "kind": "component",
+      "title": "Inline Slider",
+      "description": "A compact inline slider with label, value display, elastic pointer feedback, ticks, variants, shapes, and optional interaction sounds.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/inline-slider.tsx",
+          "target": "components/aspekt/inline-slider.tsx"
+        },
+        {
+          "path": "packages/components/src/components/sound.ts",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "form"
+      ]
+    },
+    {
       "name": "switch",
       "kind": "component",
       "title": "Switch",
@@ -650,6 +674,10 @@
         {
           "path": "packages/components/src/components/slider.tsx",
           "target": "components/aspekt/slider.tsx"
+        },
+        {
+          "path": "packages/components/src/components/inline-slider.tsx",
+          "target": "components/aspekt/inline-slider.tsx"
         },
         {
           "path": "packages/components/src/components/switch.tsx",
