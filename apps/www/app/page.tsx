@@ -2436,10 +2436,12 @@ function SoundProviderControls() {
   const {
     depths,
     enabled,
+    mobileEnabled,
     variant,
     volume,
     setDepthEnabled,
     setEnabled,
+    setMobileEnabled,
     setVariant,
     setVolume,
     play,
@@ -2453,6 +2455,12 @@ function SoundProviderControls() {
           label="enabled"
           checked={enabled}
           onCheckedChange={setEnabled}
+        />
+
+        <BooleanOptionRow
+          label="mobile enabled"
+          checked={mobileEnabled}
+          onCheckedChange={setMobileEnabled}
         />
 
         <OptionRow
@@ -3792,7 +3800,8 @@ export function SaveButton() {
         <Text size="base" tone="muted" className="max-w-3xl">
           Aspekt stays silent unless you opt in. Add SoundProvider when you want
           components to play sound, subscribe to specific sound depths, change
-          the sound variant, or tune the volume across your app.
+          the sound variant, or tune the volume across your app. Mobile
+          playback stays muted unless you pass <Code>mobileEnabled</Code>.
         </Text>
         <Snippet
           className="max-w-3xl"
@@ -4627,8 +4636,9 @@ function SonificationDocumentation() {
               variant, or subscribe to specific sound depths across every Aspekt
               component that supports sound. By default, SoundProvider
               subscribes to interactions and cues. Add feedback when continuous
-              controls should make sound while they move; Slider feedback adapts
-              to the range so dense controls do not become noisy.
+              controls should make sound while they move. Mobile playback stays
+              off by default and can be explicitly enabled with{" "}
+              <Code>mobileEnabled</Code>.
             </Text>
             <Snippet
               className="max-w-3xl"
@@ -4638,6 +4648,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <SoundProvider
       enabled
+      mobileEnabled
       depths={["interactions", "cues", "feedback"]}
       variant="pop"
       volume={0.8}

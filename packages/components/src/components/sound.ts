@@ -34,6 +34,7 @@ export type SoundPlayOptions = {
 
 type SoundSettings = {
   enabled: boolean;
+  mobileEnabled: boolean;
   variant: SoundVariant;
   volume: number;
   depths: SoundDepthSettings;
@@ -68,6 +69,7 @@ const soundDepthByName = {
 
 const settings: SoundSettings = {
   enabled: false,
+  mobileEnabled: false,
   variant: "pop",
   volume: 1,
   depths: { ...defaultSoundDepthSettings },
@@ -129,6 +131,10 @@ function isMobileDevice() {
   );
 }
 
+function isMobilePlaybackBlocked() {
+  return !settings.mobileEnabled && isMobileDevice();
+}
+
 function getAudioContext() {
   if (typeof window === "undefined") return null;
 
@@ -162,7 +168,7 @@ function playTone({
   envelope?: "pluck" | "swell" | "reverse";
 }) {
   if (!settings.enabled) return;
-  if (isMobileDevice()) return;
+  if (isMobilePlaybackBlocked()) return;
 
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -243,7 +249,7 @@ function playTactileClick({
   volume: number;
 }) {
   if (!settings.enabled) return;
-  if (isMobileDevice()) return;
+  if (isMobilePlaybackBlocked()) return;
 
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -1292,7 +1298,7 @@ const thockSounds: SoundMap = {
 export function playSound(sound: SoundName, options: SoundPlayOptions = {}) {
   if (soundProviderCount === 0) return;
   if (!settings.enabled) return;
-  if (isMobileDevice()) return;
+  if (isMobilePlaybackBlocked()) return;
 
   const depth = options.depth ?? soundDepthByName[sound];
 
@@ -1312,6 +1318,10 @@ export function playSound(sound: SoundName, options: SoundPlayOptions = {}) {
 export function configureSounds(options: SoundConfigureOptions) {
   if (typeof options.enabled === "boolean") {
     settings.enabled = options.enabled;
+  }
+
+  if (typeof options.mobileEnabled === "boolean") {
+    settings.mobileEnabled = options.mobileEnabled;
   }
 
   if (

@@ -50,7 +50,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <SoundProvider variant="pop" volume={1}>
+          <SoundProvider variant="pop" mobileEnabled enabled volume={1}>
             <Analytics />
             {children}
           </SoundProvider>

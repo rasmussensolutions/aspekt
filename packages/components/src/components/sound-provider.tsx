@@ -20,6 +20,7 @@ import {
 
 type SoundProviderProps = {
   enabled?: boolean;
+  mobileEnabled?: boolean;
   depths?: SoundDepthInput;
   variant?: SoundVariant;
   volume?: number;
@@ -28,11 +29,13 @@ type SoundProviderProps = {
 
 type SoundContextValue = {
   enabled: boolean;
+  mobileEnabled: boolean;
   depths: SoundDepthSettings;
   variant: SoundVariant;
   volume: number;
   play: (sound: SoundName, options?: SoundPlayOptions) => void;
   setEnabled: (enabled: boolean) => void;
+  setMobileEnabled: (enabled: boolean) => void;
   setDepthEnabled: (depth: SoundDepth, enabled: boolean) => void;
   setDepths: (depths: SoundDepthInput) => void;
   setVariant: (variant: SoundVariant) => void;
@@ -43,12 +46,15 @@ const SoundContext = React.createContext<SoundContextValue | null>(null);
 
 export function SoundProvider({
   enabled = true,
+  mobileEnabled = false,
   depths,
   variant = "pop",
   volume = 1,
   children,
 }: SoundProviderProps) {
   const [enabledState, setEnabledState] = React.useState(enabled);
+  const [mobileEnabledState, setMobileEnabledState] =
+    React.useState(mobileEnabled);
   const [depthState, setDepthState] = React.useState(
     () => getSoundDepthSettings(depths),
   );
@@ -66,11 +72,12 @@ export function SoundProvider({
   React.useEffect(() => {
     configureSounds({
       enabled: enabledState,
+      mobileEnabled: mobileEnabledState,
       depths: depthState,
       variant: variantState,
       volume: volumeState,
     });
-  }, [depthState, enabledState, variantState, volumeState]);
+  }, [depthState, enabledState, mobileEnabledState, variantState, volumeState]);
 
   const play = React.useCallback(
     (sound: SoundName, options?: SoundPlayOptions) => {
@@ -97,6 +104,10 @@ export function SoundProvider({
     setEnabledState(nextEnabled);
   }, []);
 
+  const setMobileEnabled = React.useCallback((nextEnabled: boolean) => {
+    setMobileEnabledState(nextEnabled);
+  }, []);
+
   const setVariant = React.useCallback((nextVariant: SoundVariant) => {
     setVariantState(nextVariant);
   }, []);
@@ -108,11 +119,13 @@ export function SoundProvider({
   const value = React.useMemo(
     () => ({
       enabled: enabledState,
+      mobileEnabled: mobileEnabledState,
       depths: depthState,
       variant: variantState,
       volume: volumeState,
       play,
       setEnabled,
+      setMobileEnabled,
       setDepthEnabled,
       setDepths,
       setVariant,
@@ -121,10 +134,12 @@ export function SoundProvider({
     [
       depthState,
       enabledState,
+      mobileEnabledState,
       variantState,
       volumeState,
       play,
       setEnabled,
+      setMobileEnabled,
       setDepthEnabled,
       setDepths,
       setVariant,
@@ -147,11 +162,13 @@ export function useSound() {
 
   return {
     enabled: settings.enabled,
+    mobileEnabled: settings.mobileEnabled,
     depths: settings.depths,
     variant: settings.variant,
     volume: settings.volume,
     play: noop,
     setEnabled: noop,
+    setMobileEnabled: noop,
     setDepthEnabled: noop,
     setDepths: noop,
     setVariant: noop,
