@@ -1242,39 +1242,53 @@ const componentUsageExamples = {
   Bold
 </Toggle>`,
   dialog: `<DialogRoot>
-  <DialogTrigger>Open dialog</DialogTrigger>
+  <DialogTrigger>Archive project</DialogTrigger>
   <DialogPortal>
     <DialogOverlay />
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Publish component</DialogTitle>
+        <DialogTitle>Archive project?</DialogTitle>
         <DialogDescription>
-          Make the latest changes available to your app.
+          Move Q3 launch plan out of active work. You can restore it later
+          from the archive.
         </DialogDescription>
       </DialogHeader>
+      <div className="rounded-lg border p-3 text-sm">
+        12 open tasks and 4 milestones will be hidden from dashboards.
+      </div>
       <DialogFooter>
-        <DialogClose>Cancel</DialogClose>
-        <Button color="neutral">Publish</Button>
+        <DialogClose>Keep project</DialogClose>
+        <Button color="destructive">Archive project</Button>
       </DialogFooter>
     </DialogContent>
   </DialogPortal>
 </DialogRoot>`,
   drawer: `<DrawerRoot side="right" detached>
-  <DrawerTrigger>Open drawer</DrawerTrigger>
+  <DrawerTrigger>View order</DrawerTrigger>
   <DrawerPortal>
     <DrawerOverlay />
     <DrawerViewport>
       <DrawerContent>
         <DrawerBody>
           <DrawerHeader>
-            <DrawerTitle>Component details</DrawerTitle>
+            <DrawerTitle>Order #1048</DrawerTitle>
             <DrawerDescription>
-              Review details before saving changes.
+              A shipment for Acme Studio is scheduled for Tuesday morning.
             </DrawerDescription>
           </DrawerHeader>
+          <div className="grid gap-2 text-sm">
+            <div className="flex justify-between gap-4">
+              <span>Customer</span>
+              <span>Acme Studio</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span>Total</span>
+              <span>$3,240.00</span>
+            </div>
+          </div>
           <DrawerFooter>
-            <DrawerClose>Cancel</DrawerClose>
-            <Button color="neutral">Save</Button>
+            <DrawerClose>Close</DrawerClose>
+            <Button color="neutral">Create label</Button>
           </DrawerFooter>
         </DrawerBody>
       </DrawerContent>
@@ -1282,20 +1296,30 @@ const componentUsageExamples = {
   </DrawerPortal>
 </DrawerRoot>`,
   popover: `<PopoverRoot>
-  <PopoverTrigger>Open popover</PopoverTrigger>
+  <PopoverTrigger>Share report</PopoverTrigger>
   <PopoverPortal>
     <PopoverPositioner>
       <PopoverPopup>
         <PopoverArrow />
         <PopoverHeader>
-          <PopoverTitle>Publish target</PopoverTitle>
+          <PopoverTitle>Share revenue report</PopoverTitle>
           <PopoverDescription>
-            Review the npm package before publishing.
+            Invite finance teammates to review the monthly numbers.
           </PopoverDescription>
         </PopoverHeader>
+        <div className="grid gap-2 text-sm">
+          <div className="flex justify-between gap-4">
+            <span>Access</span>
+            <span>View only</span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span>Expires</span>
+            <span>7 days</span>
+          </div>
+        </div>
         <PopoverFooter>
-          <PopoverClose>Cancel</PopoverClose>
-          <Button color="neutral">Publish</Button>
+          <PopoverClose>Dismiss</PopoverClose>
+          <Button color="neutral">Copy link</Button>
         </PopoverFooter>
       </PopoverPopup>
     </PopoverPositioner>
@@ -3259,25 +3283,49 @@ function SoundProviderPreview() {
 function DialogPreview({ settings }: { settings: DialogSettings }) {
   return (
     <DialogRoot shape={settings.shape}>
-      <DialogTrigger>Open dialog</DialogTrigger>
+      <DialogTrigger>Archive project</DialogTrigger>
       <DialogPortal>
         <DialogOverlay />
         <DialogContent size={settings.size}>
           <DialogHeader>
-            <DialogTitle>Publish component</DialogTitle>
+            <DialogTitle>Archive project?</DialogTitle>
             <DialogDescription>
-              This makes the latest component changes available to your app.
+              Move Q3 launch plan out of active work. You can restore it later
+              from the archive.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 font-mono text-sm text-neutral-500 dark:border-white/15 dark:bg-white/5 dark:text-neutral-300">
-            @/components/aspekt/dialog
+          <div className="grid gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-white/15 dark:bg-white/5">
+            <div className="flex min-w-0 items-center justify-between gap-4">
+              <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                project
+              </span>
+              <span className="min-w-0 text-right font-medium text-primary">
+                Q3 launch plan
+              </span>
+            </div>
+            <div className="flex min-w-0 items-center justify-between gap-4">
+              <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                open tasks
+              </span>
+              <span className="min-w-0 text-right font-medium text-primary">
+                12
+              </span>
+            </div>
+            <div className="flex min-w-0 items-center justify-between gap-4">
+              <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                milestones
+              </span>
+              <span className="min-w-0 text-right font-medium text-primary">
+                4
+              </span>
+            </div>
           </div>
 
           <DialogFooter>
-            <DialogClose>Cancel</DialogClose>
-            <Button type="button" color="neutral">
-              Publish
+            <DialogClose>Keep project</DialogClose>
+            <Button type="button" color="destructive">
+              Archive project
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3294,50 +3342,50 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
       shape={settings.shape}
       side={settings.side}
     >
-      <DrawerTrigger>Open drawer</DrawerTrigger>
+      <DrawerTrigger>View order</DrawerTrigger>
       <DrawerPortal>
         <DrawerOverlay />
         <DrawerViewport>
           <DrawerContent size={settings.size}>
             <DrawerBody>
               <DrawerHeader>
-                <DrawerTitle>Review component</DrawerTitle>
+                <DrawerTitle>Order #1048</DrawerTitle>
                 <DrawerDescription>
-                  Confirm the package export before publishing the component.
+                  A shipment for Acme Studio is scheduled for Tuesday morning.
                 </DrawerDescription>
               </DrawerHeader>
 
               <div className="grid gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-white/15 dark:bg-white/5">
                 <div className="flex min-w-0 items-center justify-between gap-4">
                   <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                    component
+                    customer
                   </span>
-                  <span className="min-w-0 break-all text-right font-mono text-primary">
-                    drawer
-                  </span>
-                </div>
-                <div className="flex min-w-0 items-center justify-between gap-4">
-                  <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                    target
-                  </span>
-                  <span className="min-w-0 break-all text-right font-mono text-primary">
-                    @/components/aspekt/drawer
+                  <span className="min-w-0 text-right font-medium text-primary">
+                    Acme Studio
                   </span>
                 </div>
                 <div className="flex min-w-0 items-center justify-between gap-4">
                   <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                    install
+                    total
                   </span>
-                  <span className="min-w-0 break-all text-right font-mono text-primary">
-                    npx @aspekt/ui init
+                  <span className="min-w-0 text-right font-medium text-primary">
+                    $3,240.00
+                  </span>
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-4">
+                  <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                    delivery
+                  </span>
+                  <span className="min-w-0 text-right font-medium text-primary">
+                    Tuesday, 9:00 AM
                   </span>
                 </div>
               </div>
 
               <DrawerFooter>
-                <DrawerClose>Cancel</DrawerClose>
+                <DrawerClose>Close</DrawerClose>
                 <Button type="button" color="neutral">
-                  Save
+                  Create label
                 </Button>
               </DrawerFooter>
             </DrawerBody>
@@ -3351,50 +3399,50 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
 function PopoverPreview({ settings }: { settings: PopoverSettings }) {
   return (
     <PopoverRoot modal={settings.modal} shape={settings.shape}>
-      <PopoverTrigger>Open popover</PopoverTrigger>
+      <PopoverTrigger>Share report</PopoverTrigger>
       <PopoverPortal>
         {settings.modal && <PopoverBackdrop />}
         <PopoverPositioner side={settings.side}>
           <PopoverPopup size={settings.size}>
             {settings.arrow && <PopoverArrow />}
             <PopoverHeader>
-              <PopoverTitle>Publish target</PopoverTitle>
+              <PopoverTitle>Share revenue report</PopoverTitle>
               <PopoverDescription>
-                Confirm the package metadata before publishing to npm.
+                Invite finance teammates to review the monthly numbers.
               </PopoverDescription>
             </PopoverHeader>
 
             <div className="grid gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-white/15 dark:bg-white/5">
               <div className="flex min-w-0 items-center justify-between gap-4">
                 <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                  package
+                  access
                 </span>
-                <span className="min-w-0 break-all text-right font-mono text-primary">
-                  @aspekt/ui
-                </span>
-              </div>
-              <div className="flex min-w-0 items-center justify-between gap-4">
-                <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                  version
-                </span>
-                <span className="min-w-0 break-all text-right font-mono text-primary">
-                  0.1.5
+                <span className="min-w-0 text-right font-medium text-primary">
+                  View only
                 </span>
               </div>
               <div className="flex min-w-0 items-center justify-between gap-4">
                 <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                  export
+                  expires
                 </span>
-                <span className="min-w-0 break-all text-right font-mono text-primary">
-                  @/components/aspekt/popover
+                <span className="min-w-0 text-right font-medium text-primary">
+                  7 days
+                </span>
+              </div>
+              <div className="flex min-w-0 items-center justify-between gap-4">
+                <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
+                  recipients
+                </span>
+                <span className="min-w-0 text-right font-medium text-primary">
+                  Finance team
                 </span>
               </div>
             </div>
 
             <PopoverFooter>
-              <PopoverClose>Cancel</PopoverClose>
+              <PopoverClose>Dismiss</PopoverClose>
               <Button type="button" color="neutral">
-                Publish
+                Copy link
               </Button>
             </PopoverFooter>
           </PopoverPopup>
