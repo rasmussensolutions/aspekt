@@ -1,6 +1,7 @@
 import "./styles.css";
 
 export * from "./components/app-tabs";
+export * from "./components/aspect-ratio";
 export * from "./components/button";
 export * from "./components/avatar";
 export * from "./components/checkbox";

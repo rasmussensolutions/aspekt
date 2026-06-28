@@ -12,8 +12,7 @@ const inlineSliderRootVariants = cva("relative w-full text-primary", {
     size: {
       micro:
         "h-8 text-xs [--inline-slider-padding-x:0.75rem] [--inline-slider-thumb-height:1rem] [--inline-slider-thumb-width:0.1875rem]",
-      tiny:
-        "h-9 text-xs [--inline-slider-padding-x:0.875rem] [--inline-slider-thumb-height:1.125rem] [--inline-slider-thumb-width:0.1875rem]",
+      tiny: "h-9 text-xs [--inline-slider-padding-x:0.875rem] [--inline-slider-thumb-height:1.125rem] [--inline-slider-thumb-width:0.1875rem]",
       small:
         "h-11 text-sm [--inline-slider-padding-x:1rem] [--inline-slider-thumb-height:1.375rem] [--inline-slider-thumb-width:0.25rem]",
       medium:
@@ -29,7 +28,7 @@ const inlineSliderRootVariants = cva("relative w-full text-primary", {
 
 const inlineSliderSurfaceVariants = cva(
   [
-    "group/inline-slider absolute inset-0 cursor-pointer touch-none overflow-hidden shadow-inner outline-none select-none",
+    "group/inline-slider absolute inset-0 cursor-pointer touch-none overflow-hidden outline-none select-none",
     "transition-[background-color,border-color,box-shadow,opacity,transform,width] duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none",
     "data-[dragging]:duration-0 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
     "data-[invalid]:ring-2 data-[invalid]:ring-destructive/15",
@@ -95,7 +94,12 @@ const inlineSliderThumbVariants = cva(
   },
 );
 
-type InlineSliderColor = "accent" | "info" | "destructive" | "warning" | "neutral";
+type InlineSliderColor =
+  | "accent"
+  | "info"
+  | "destructive"
+  | "warning"
+  | "neutral";
 type InlineSliderShape = "square" | "round";
 type InlineSliderSize = "micro" | "tiny" | "small" | "medium" | "large";
 type InlineSliderVariant = "solid" | "soft" | "outline";
@@ -115,26 +119,26 @@ type InlineSliderProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "color" | "defaultValue" | "onChange"
 > & {
-    className?: string;
-    color?: InlineSliderColor | null;
-    defaultValue?: number;
-    disabled?: boolean;
-    format?: InlineSliderFormat;
-    invalid?: boolean;
-    label: React.ReactNode;
-    max?: number;
-    min?: number;
-    onValueChange?: (value: number) => void;
-    onValueCommitted?: (value: number) => void;
-    shape?: InlineSliderShape | null;
-    showValue?: boolean;
-    size?: InlineSliderSize | null;
-    sound?: InlineSliderSound;
-    step?: number;
-    tickCount?: number;
-    value?: number;
-    variant?: InlineSliderVariant | null;
-  };
+  className?: string;
+  color?: InlineSliderColor | null;
+  defaultValue?: number;
+  disabled?: boolean;
+  format?: InlineSliderFormat;
+  invalid?: boolean;
+  label: React.ReactNode;
+  max?: number;
+  min?: number;
+  onValueChange?: (value: number) => void;
+  onValueCommitted?: (value: number) => void;
+  shape?: InlineSliderShape | null;
+  showValue?: boolean;
+  size?: InlineSliderSize | null;
+  sound?: InlineSliderSound;
+  step?: number;
+  tickCount?: number;
+  value?: number;
+  variant?: InlineSliderVariant | null;
+};
 
 type InlineSliderBounds = Pick<DOMRect, "left" | "right" | "width"> & {
   nativeWidth: number;
@@ -178,7 +182,12 @@ function roundValueToStep(value: number, min: number, step: number) {
   return Number(rounded.toFixed(getStepDecimalCount(step)));
 }
 
-function getBoundedValue(value: number, min: number, max: number, step: number) {
+function getBoundedValue(
+  value: number,
+  min: number,
+  max: number,
+  step: number,
+) {
   return clamp(roundValueToStep(value, min, step), min, max);
 }
 
@@ -364,9 +373,7 @@ const InlineSlider = React.forwardRef<HTMLDivElement, InlineSliderProps>(
     const isClickRef = React.useRef(true);
     const labelRef = React.useRef<HTMLSpanElement | null>(null);
     const latestValueRef = React.useRef(currentValue);
-    const pointerStartRef = React.useRef<{ x: number; y: number } | null>(
-      null,
-    );
+    const pointerStartRef = React.useRef<{ x: number; y: number } | null>(null);
     const rootRef = React.useRef<HTMLDivElement | null>(null);
     const surfaceRef = React.useRef<HTMLDivElement | null>(null);
     const valueRef = React.useRef<HTMLSpanElement | null>(null);
@@ -456,11 +463,12 @@ const InlineSlider = React.forwardRef<HTMLDivElement, InlineSliderProps>(
 
         if (interaction === "change") {
           const now =
-            typeof performance === "undefined"
-              ? Date.now()
-              : performance.now();
+            typeof performance === "undefined" ? Date.now() : performance.now();
 
-          if (now - feedbackTimeRef.current < inlineSliderFeedbackMinIntervalMs) {
+          if (
+            now - feedbackTimeRef.current <
+            inlineSliderFeedbackMinIntervalMs
+          ) {
             return;
           }
 
@@ -834,15 +842,15 @@ const InlineSlider = React.forwardRef<HTMLDivElement, InlineSliderProps>(
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 z-[2]"
           >
-            {ticks.map((style, index) => (
+            {ticks.map((style, index) =>
               style.percent > dodge.left && style.percent < dodge.right ? (
                 <span
                   key={index}
                   className="absolute top-1/2 h-[22%] min-h-2 w-px -translate-x-1/2 -translate-y-1/2 rounded-full bg-transparent transition-colors group-data-[active]/inline-slider:bg-primary/20 dark:group-data-[active]/inline-slider:bg-white/20"
                   style={{ left: `${style.percent}%` }}
                 />
-              ) : null
-            ))}
+              ) : null,
+            )}
           </div>
 
           <span
@@ -871,7 +879,7 @@ const InlineSlider = React.forwardRef<HTMLDivElement, InlineSliderProps>(
               <span
                 ref={valueRef}
                 aria-hidden="true"
-                className="ml-auto shrink-0 whitespace-nowrap font-mono font-semibold leading-none text-primary transition-colors group-data-[active]/inline-slider:text-primary"
+                className="ml-auto shrink-0 whitespace-nowrap font-medium leading-none text-primary transition-colors group-data-[active]/inline-slider:text-primary"
               >
                 {formattedValue}
               </span>
@@ -883,10 +891,7 @@ const InlineSlider = React.forwardRef<HTMLDivElement, InlineSliderProps>(
   },
 );
 
-export {
-  InlineSlider,
-  inlineSliderRootVariants as inlineSliderVariants,
-};
+export { InlineSlider, inlineSliderRootVariants as inlineSliderVariants };
 export type {
   InlineSliderColor,
   InlineSliderFormat,

@@ -25,6 +25,10 @@
       "types": "./src/app-tabs.ts",
       "import": "./src/app-tabs.ts"
     },
+    "./aspect-ratio": {
+      "types": "./src/aspect-ratio.ts",
+      "import": "./src/aspect-ratio.ts"
+    },
     "./button": {
       "types": "./src/button.ts",
       "import": "./src/button.ts"
@@ -142,6 +146,9 @@
     "*": {
       "app-tabs": [
         "src/app-tabs.ts"
+      ],
+      "aspect-ratio": [
+        "src/aspect-ratio.ts"
       ],
       "blockquote": [
         "src/blockquote.ts"

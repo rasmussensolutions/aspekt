@@ -21,7 +21,7 @@ components later.
 ```sh
 npx @aspekt/ui list
 npx @aspekt/ui init --preset round
-npx @aspekt/ui add button input dialog
+npx @aspekt/ui add aspect-ratio button input dialog
 npx @aspekt/ui preset square
 npx @aspekt/ui update
 npx @aspekt/ui update button --dry-run

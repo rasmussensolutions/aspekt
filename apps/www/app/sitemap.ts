@@ -8,6 +8,8 @@ const routes = [
   { path: "/typography", priority: 0.8 },
   { path: "/colors", priority: 0.8 },
   { path: "/sonification", priority: 0.8 },
+  { path: "/avatar-api", priority: 0.7 },
+  { path: "/icon-api", priority: 0.7 },
   { path: "/app-tabs", priority: 0.7 },
   { path: "/button", priority: 0.7 },
   { path: "/checkbox", priority: 0.7 },

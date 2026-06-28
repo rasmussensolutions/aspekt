@@ -19,6 +19,25 @@
       ]
     },
     {
+      "name": "aspect-ratio",
+      "kind": "component",
+      "title": "Aspect Ratio",
+      "description": "A layout wrapper that preserves a proportional box for responsive media, embeds, and previews.",
+      "dependencies": [
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/aspect-ratio.tsx",
+          "target": "components/aspekt/aspect-ratio.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "layout"
+      ]
+    },
+    {
       "name": "avatar",
       "kind": "component",
       "title": "Avatar",
@@ -647,6 +666,10 @@
         "refractor"
       ],
       "files": [
+        {
+          "path": "packages/components/src/components/aspect-ratio.tsx",
+          "target": "components/aspekt/aspect-ratio.tsx"
+        },
         {
           "path": "packages/components/src/components/avatar.tsx",
           "target": "components/aspekt/avatar.tsx"

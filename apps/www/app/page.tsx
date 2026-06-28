@@ -8,6 +8,7 @@ import {
   type AppTabsTabData,
   useAppTabs,
 } from "@aspekt/components-source/app-tabs";
+import { AspectRatio } from "@aspekt/components-source/aspect-ratio";
 import { Button } from "@aspekt/components-source/button";
 import { Checkbox } from "@aspekt/components-source/checkbox";
 import { Code } from "@aspekt/components-source/code";
@@ -139,8 +140,10 @@ import { ThemeToggle } from "./theme-toggle";
 
 type IntroPage = "getting-started" | "principles";
 type FoundationPage = "typography" | "colors" | "sonification";
+type ApiPage = "avatar-api" | "icon-api";
 type ComponentPreview =
   | "app-tabs"
+  | "aspect-ratio"
   | "avatar"
   | "button"
   | "checkbox"
@@ -172,7 +175,7 @@ type TypographyPrimitive = Extract<
   "heading" | "text" | "code" | "kbd" | "prose" | "blockquote" | "list"
 >;
 
-type DocsPage = IntroPage | FoundationPage | ComponentPreview;
+type DocsPage = IntroPage | FoundationPage | ApiPage | ComponentPreview;
 type DocsAppProps = {
   initialPage?: DocsPage;
 };
@@ -235,6 +238,52 @@ type SnippetVariant = "outline" | "soft";
 type ButtonStatusOption = "none" | "success" | "fail";
 type AvatarSize = "micro" | "tiny" | "small" | "medium" | "large";
 type AvatarShape = "square" | "round";
+type AvatarApiSizeOption = "32" | "64" | "128" | "256" | "512";
+type AvatarApiRadiusOption = "none" | "8" | "24" | "full";
+type IconApiSizeOption = "32" | "64" | "128" | "256" | "512";
+type AvatarApiSettings = {
+  initials: boolean;
+  radius: AvatarApiRadiusOption;
+  seed: string;
+  size: AvatarApiSizeOption;
+  variant: string;
+};
+type IconApiSettings = {
+  size: IconApiSizeOption;
+  target: string;
+};
+type AvatarApiEndpoint = {
+  method: string;
+  path: string;
+  description: string;
+  example: string;
+};
+type IconApiEndpoint = AvatarApiEndpoint;
+type AvatarApiVariantDoc = {
+  name: string;
+  description: string;
+  default_for_legacy_seed_urls?: boolean;
+};
+type AvatarApiDocs = {
+  name: string;
+  description: string;
+  base_url: string;
+  response_type: string;
+  docs: string;
+  endpoints: AvatarApiEndpoint[];
+  variants: AvatarApiVariantDoc[];
+  examples: string[];
+};
+type IconApiDocs = {
+  name: string;
+  description: string;
+  base_url: string;
+  response_type: string;
+  docs: string;
+  endpoints: IconApiEndpoint[];
+  examples: string[];
+};
+type AspectRatioValue = "1:1" | "4:3" | "16:9" | "21:9";
 type AppTabsVariant = "soft" | "outline" | "line";
 type AppTabsSize = "small" | "medium" | "large";
 type AppTabsColor = ButtonColor;
@@ -258,6 +307,10 @@ type AvatarSettings = {
   image: boolean;
   shape: AvatarShape;
   size: AvatarSize;
+};
+
+type AspectRatioSettings = {
+  ratio: AspectRatioValue;
 };
 
 type InputSettings = {
@@ -483,8 +536,25 @@ const scrollOverflowThreshold = 2;
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? React.useEffect : React.useLayoutEffect;
 
+function useDebouncedValue<TValue>(value: TValue, delayMs: number) {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
+
+  React.useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedValue(value);
+    }, delayMs);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [delayMs, value]);
+
+  return debouncedValue;
+}
+
 const introIds = ["getting-started", "principles"] as const;
 const foundationIds = ["typography", "colors", "sonification"] as const;
+const apiIds = ["avatar-api", "icon-api"] as const;
 const typographyPrimitiveIds = [
   "heading",
   "text",
@@ -496,6 +566,7 @@ const typographyPrimitiveIds = [
 ] as const satisfies readonly TypographyPrimitive[];
 const componentIds = [
   "app-tabs",
+  "aspect-ratio",
   "avatar",
   "button",
   "checkbox",
@@ -524,6 +595,7 @@ const componentIds = [
 ] as const;
 const docsComponentIds = [
   "app-tabs",
+  "aspect-ratio",
   "avatar",
   "button",
   "checkbox",
@@ -546,6 +618,7 @@ const docsComponentIds = [
 const docsPageIds = [
   ...introIds,
   ...foundationIds,
+  ...apiIds,
   ...docsComponentIds,
 ] as const;
 
@@ -582,6 +655,7 @@ const navGroups = [
   {
     title: "Components",
     items: [
+      { label: "Aspect Ratio", page: "aspect-ratio" },
       { label: "Avatar", page: "avatar" },
       { label: "Dialog", page: "dialog" },
       { label: "Drawer", page: "drawer" },
@@ -592,6 +666,13 @@ const navGroups = [
       { label: "Tabs", page: "tabs" },
       { label: "Table", page: "table" },
       { label: "Snippet", page: "snippet" },
+    ],
+  },
+  {
+    title: "APIs",
+    items: [
+      { label: "Avatar API", page: "avatar-api" },
+      { label: "Icon API", page: "icon-api" },
     ],
   },
 ] as const satisfies readonly {
@@ -611,6 +692,17 @@ const avatarOptions = {
   size: ["micro", "tiny", "small", "medium", "large"],
   shape: ["square", "round"],
 } as const;
+
+const aspectRatioOptions = {
+  ratio: ["1:1", "4:3", "16:9", "21:9"],
+} as const;
+
+const aspectRatioValues = {
+  "1:1": 1,
+  "4:3": 4 / 3,
+  "16:9": 16 / 9,
+  "21:9": 21 / 9,
+} satisfies Record<AspectRatioValue, number>;
 
 const inputOptions = {
   variant: ["outline", "soft", "ghost"],
@@ -802,6 +894,10 @@ const componentCopy = {
     description:
       "is used to keep open application pages mounted while switching between them.",
   },
+  "aspect-ratio": {
+    title: "Aspect Ratio",
+    description: "is used to preserve proportional media and embeds.",
+  },
   avatar: {
     title: "Avatar",
     description: "is used to identify people, teams, and entities.",
@@ -912,6 +1008,8 @@ const componentCopy = {
 >;
 
 const componentImportExamples = {
+  "aspect-ratio":
+    'import { AspectRatio } from "@/components/aspekt/aspect-ratio";',
   avatar: 'import { Avatar } from "@/components/aspekt/avatar";',
   button: 'import { Button } from "@/components/aspekt/button";',
   checkbox: 'import { Checkbox } from "@/components/aspekt/checkbox";',
@@ -963,8 +1061,113 @@ const componentImportExamples = {
   list: 'import { List, ListItem } from "@/components/aspekt/list";',
 } satisfies Record<ComponentPreview, string>;
 
+const avatarApiBaseUrl = "https://avatar.aspekt.systems";
+const avatarApiDocsUrl = `${avatarApiBaseUrl}/docs.json?aspekt=docs`;
+const avatarApiDocsFetchUrl = "/api/avatar-docs";
+const avatarApiUsername = "aspekt_systems";
+const avatarApiSizeOptions = ["32", "64", "128", "256", "512"] as const;
+const avatarApiRadiusOptions = ["none", "8", "24", "full"] as const;
+const iconApiBaseUrl = "https://icon.aspekt.systems";
+const iconApiDocsUrl = `${iconApiBaseUrl}/docs.json?aspekt=docs`;
+const iconApiDefaultTarget = "www.aspekt.systems";
+const iconApiSizeOptions = ["32", "64", "128", "256", "512"] as const;
+const fallbackAvatarApiDocs = {
+  name: "Aspekt Avatar API",
+  description: "Generate deterministic SVG avatars from a URL seed.",
+  base_url: avatarApiBaseUrl,
+  response_type: "image/svg+xml; charset=utf-8",
+  docs: avatarApiDocsUrl,
+  endpoints: [
+    {
+      method: "GET",
+      path: "/:seed",
+      description:
+        "Generate the default solid avatar for a seed. Initials are shown by default on legacy seed URLs.",
+      example: `${avatarApiBaseUrl}/mira-slate`,
+    },
+    {
+      method: "GET",
+      path: "/:variant/:seed",
+      description:
+        "Generate an avatar with an explicit variant. Initials are hidden by default unless the initials query parameter is enabled.",
+      example: `${avatarApiBaseUrl}/gradient/nova-river?size=256&radius=full&initials=true`,
+    },
+  ],
+  variants: [
+    {
+      name: "solid",
+      description: "Flat background color with optional initials.",
+      default_for_legacy_seed_urls: true,
+    },
+    {
+      name: "gradient",
+      description: "Soft abstract gradient shapes generated from the seed.",
+    },
+    {
+      name: "grid",
+      description: "Seeded 8 by 8 tile pattern.",
+    },
+  ],
+  examples: [
+    `${avatarApiBaseUrl}/mira-slate`,
+    `${avatarApiBaseUrl}/solid/nova-river?initials=false`,
+    `${avatarApiBaseUrl}/gradient/nova-river?size=256&radius=full`,
+    `${avatarApiBaseUrl}/grid/nova-river?initials`,
+  ],
+} satisfies AvatarApiDocs;
+const fallbackIconApiDocs = {
+  name: "Aspekt Icon API",
+  description:
+    "Fetch a site favicon as image/png, with generated initials as the fallback.",
+  base_url: iconApiBaseUrl,
+  response_type: "image/png",
+  docs: iconApiDocsUrl,
+  endpoints: [
+    {
+      method: "GET",
+      path: "/:url",
+      description:
+        "Resolve the target page from the path, discover its favicon, and return a PNG image.",
+      example: `${iconApiBaseUrl}/www.example.com`,
+    },
+    {
+      method: "GET",
+      path: "/?url=:url",
+      description:
+        "Use the query-string form for full URLs that include paths or query parameters.",
+      example: `${iconApiBaseUrl}/?url=https%3A%2F%2Fwww.example.com%2Fproducts`,
+    },
+    {
+      method: "HEAD",
+      path: "/:url",
+      description:
+        "Return the same cache and image metadata headers without an image body.",
+      example: `${iconApiBaseUrl}/www.example.com`,
+    },
+  ],
+  examples: [
+    `${iconApiBaseUrl}/www.example.com`,
+    `${iconApiBaseUrl}/www.aspekt.systems?size=128`,
+    `${iconApiBaseUrl}/?url=https%3A%2F%2Fwww.example.com%2Fdocs&size=256`,
+  ],
+} satisfies IconApiDocs;
+const avatarExampleImageSrc = `${avatarApiBaseUrl}/gradient/${avatarApiUsername}`;
+
 const componentUsageExamples = {
-  avatar: `<Avatar alt="Maya Chen" fallback="MC" />`,
+  "aspect-ratio": `<AspectRatio ratio={16 / 9} className="w-full max-w-sm rounded-lg border border-border bg-surface">
+  <Image
+    src="/logo.png"
+    alt="Aspekt logo"
+    fill
+    sizes="(min-width: 640px) 24rem, calc(100vw - 3rem)"
+    className="object-contain p-12 dark:invert"
+  />
+</AspectRatio>`,
+  avatar: `<Avatar
+  alt="Tobias Rasmussen"
+  fallback="TR"
+  src="${avatarExampleImageSrc}"
+/>`,
   button: `<Button color="neutral" status="success" sound="success">
   Save changes
 </Button>`,
@@ -1261,11 +1464,47 @@ const foundationCopy = {
   }
 >;
 
+const apiCopy = {
+  "avatar-api": {
+    title: "Avatar API",
+    description:
+      "generates deterministic avatar images from a variant and username URL.",
+  },
+  "icon-api": {
+    title: "Icon API",
+    description:
+      "returns a site favicon as PNG, with a simple initials fallback.",
+  },
+} satisfies Record<
+  ApiPage,
+  {
+    title: string;
+    description: string;
+  }
+>;
+
+const defaultAvatarApiSettings = {
+  initials: false,
+  radius: "full",
+  seed: avatarApiUsername,
+  size: "64",
+  variant: "gradient",
+} satisfies AvatarApiSettings;
+
+const defaultIconApiSettings = {
+  size: "64",
+  target: iconApiDefaultTarget,
+} satisfies IconApiSettings;
+
 const defaultAvatarSettings = {
-  image: false,
+  image: true,
   shape: "round",
   size: "large",
 } satisfies AvatarSettings;
+
+const defaultAspectRatioSettings = {
+  ratio: "16:9",
+} satisfies AspectRatioSettings;
 
 const defaultButtonSettings = {
   variant: "solid",
@@ -2375,6 +2614,10 @@ function isFoundationPage(value: string): value is FoundationPage {
   return (foundationIds as readonly string[]).includes(value);
 }
 
+function isApiPage(value: string): value is ApiPage {
+  return (apiIds as readonly string[]).includes(value);
+}
+
 function isDocsPage(value: string): value is DocsPage {
   return (docsPageIds as readonly string[]).includes(value);
 }
@@ -2382,6 +2625,7 @@ function isDocsPage(value: string): value is DocsPage {
 function getDocsPageCopy(page: DocsPage) {
   if (isComponentPreview(page)) return componentCopy[page];
   if (isFoundationPage(page)) return foundationCopy[page];
+  if (isApiPage(page)) return apiCopy[page];
 
   return introCopy[page];
 }
@@ -2715,19 +2959,38 @@ function AvatarPreview({ settings }: { settings: AvatarSettings }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 px-6">
       <Avatar
-        alt="Maya Chen"
-        fallback="MC"
+        alt="Tobias Rasmussen"
+        fallback="TR"
         shape={settings.shape}
         size={settings.size}
-        src={settings.image ? "/logo.png" : undefined}
+        src={settings.image ? avatarExampleImageSrc : undefined}
       />
       <div className="grid min-w-0 gap-1">
-        <p className="text-sm font-medium text-primary">Maya Chen</p>
+        <Text as={"p"} size={"lg"} className="leading-4">
+          Tobias Rasmussen
+        </Text>
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Product systems
+          Aspekt systems
         </p>
       </div>
     </div>
+  );
+}
+
+function AspectRatioPreview({ settings }: { settings: AspectRatioSettings }) {
+  return (
+    <AspectRatio
+      ratio={aspectRatioValues[settings.ratio]}
+      className="w-full max-w-sm rounded-lg border border-border bg-surface shadow-sm"
+    >
+      <Image
+        src="/logo.png"
+        alt="Aspekt logo"
+        fill
+        sizes="(min-width: 640px) 24rem, calc(100vw - 6rem)"
+        className="object-contain p-12 dark:invert"
+      />
+    </AspectRatio>
   );
 }
 
@@ -4750,6 +5013,514 @@ export function Actions() {
   );
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getSafeString(value: unknown, fallback = "", maxLength = 320) {
+  if (typeof value !== "string") return fallback;
+
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) return fallback;
+
+  return trimmedValue.slice(0, maxLength);
+}
+
+function isSafeAvatarApiSegment(value: string) {
+  return /^[a-z0-9][a-z0-9-]{0,63}$/i.test(value);
+}
+
+function getAvatarApiSeedSegment(seed: string) {
+  const trimmedSeed = seed.trim().slice(0, 80);
+
+  return encodeURIComponent(trimmedSeed || defaultAvatarApiSettings.seed);
+}
+
+function normalizeAvatarApiVariantDoc(
+  value: unknown,
+): AvatarApiVariantDoc | null {
+  if (!isRecord(value)) return null;
+
+  const name = getSafeString(value.name, "", 48).toLowerCase();
+
+  if (!isSafeAvatarApiSegment(name)) return null;
+
+  return {
+    name,
+    description: getSafeString(
+      value.description,
+      "Generated from the same stable seed.",
+      240,
+    ),
+    default_for_legacy_seed_urls:
+      typeof value.default_for_legacy_seed_urls === "boolean"
+        ? value.default_for_legacy_seed_urls
+        : undefined,
+  };
+}
+
+function normalizeAvatarApiVariants(value: unknown) {
+  if (!isRecord(value) || !Array.isArray(value.variants)) {
+    return fallbackAvatarApiDocs.variants;
+  }
+
+  const variants = value.variants
+    .slice(0, 8)
+    .map(normalizeAvatarApiVariantDoc)
+    .filter((variant): variant is AvatarApiVariantDoc => Boolean(variant));
+
+  return variants.length > 0 ? variants : fallbackAvatarApiDocs.variants;
+}
+
+function useAvatarApiVariants(enabled: boolean) {
+  const [variants, setVariants] = React.useState<AvatarApiVariantDoc[]>(
+    fallbackAvatarApiDocs.variants,
+  );
+
+  React.useEffect(() => {
+    if (!enabled) return;
+
+    let active = true;
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 4500);
+
+    async function loadVariants() {
+      try {
+        const response = await fetch(avatarApiDocsFetchUrl, {
+          cache: "no-store",
+          credentials: "omit",
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load Avatar API variants.");
+        }
+
+        const variants = normalizeAvatarApiVariants(await response.json());
+
+        if (active) {
+          setVariants(variants);
+        }
+      } catch {
+        if (active) {
+          setVariants(fallbackAvatarApiDocs.variants);
+        }
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    }
+
+    loadVariants();
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [enabled]);
+
+  return variants;
+}
+
+function getAvatarApiVariantOptions(variants: AvatarApiVariantDoc[]) {
+  const names = variants.map((variant) => variant.name);
+
+  return names.length > 0
+    ? names
+    : fallbackAvatarApiDocs.variants.map((variant) => variant.name);
+}
+
+function getAvatarApiImageSrc(settings: AvatarApiSettings) {
+  const variant = isSafeAvatarApiSegment(settings.variant)
+    ? settings.variant
+    : defaultAvatarApiSettings.variant;
+  const seed = getAvatarApiSeedSegment(settings.seed);
+  const params = new URLSearchParams({
+    initials: String(settings.initials),
+    radius: settings.radius,
+    size: settings.size,
+  });
+
+  return (
+    avatarApiBaseUrl + "/" + variant + "/" + seed + "?" + params.toString()
+  );
+}
+
+function getAvatarApiPreviewSize(settings: AvatarApiSettings) {
+  return Math.min(Number(settings.size), 220);
+}
+
+function getIconApiTarget(value: string) {
+  const trimmedValue = value.trim().slice(0, 180);
+
+  return trimmedValue || defaultIconApiSettings.target;
+}
+
+function isSimpleIconApiPathTarget(value: string) {
+  return (
+    !/^[a-z][a-z0-9+.-]*:\/\//i.test(value) &&
+    !/[/?#]/.test(value) &&
+    /^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/i.test(value)
+  );
+}
+
+function getIconApiImageSrc(settings: IconApiSettings) {
+  const target = getIconApiTarget(settings.target);
+  const params = new URLSearchParams({ size: settings.size });
+
+  if (isSimpleIconApiPathTarget(target)) {
+    return `${iconApiBaseUrl}/${encodeURIComponent(target)}?${params.toString()}`;
+  }
+
+  params.set("url", target);
+
+  return `${iconApiBaseUrl}/?${params.toString()}`;
+}
+
+function getIconApiFallback(target: string) {
+  const clean = target
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/[/?#].*$/, "")
+    .replace(/[_.+-]+/g, " ")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
+    .trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  return (parts[0] || "I").slice(0, 2).toUpperCase();
+}
+
+function getIconApiPreviewSize(settings: IconApiSettings) {
+  return Math.min(Number(settings.size), 220);
+}
+
+function AvatarApiPreview({ settings }: { settings: AvatarApiSettings }) {
+  const src = getAvatarApiImageSrc(settings);
+  const previewSize = getAvatarApiPreviewSize(settings);
+
+  return (
+    <div className="grid max-w-full justify-items-center gap-4 px-6 text-center">
+      <Avatar
+        alt="Tobias Rasmussen"
+        className="rounded-none bg-transparent ring-0"
+        fallback="TR"
+        imageProps={{ className: "object-contain" }}
+        shape="square"
+        size="large"
+        src={src}
+        style={{ height: previewSize, width: previewSize }}
+      />
+      <Code className="max-w-full break-all text-xs leading-5">{src}</Code>
+    </div>
+  );
+}
+
+function IconApiPreview({ settings }: { settings: IconApiSettings }) {
+  const src = getIconApiImageSrc(settings);
+  const target = getIconApiTarget(settings.target);
+  const previewSize = getIconApiPreviewSize(settings);
+
+  return (
+    <div className="grid max-w-full justify-items-center gap-4 px-6 text-center">
+      <Avatar
+        alt={`${target} icon`}
+        className="rounded-none bg-transparent ring-0"
+        fallback={getIconApiFallback(target)}
+        imageProps={{ className: "object-contain" }}
+        shape="square"
+        size="large"
+        src={src}
+        style={{ height: previewSize, width: previewSize }}
+      />
+      <Code className="max-w-full break-all text-xs leading-5">{src}</Code>
+    </div>
+  );
+}
+
+function AvatarApiUsageDocumentation({
+  settings,
+}: {
+  settings: AvatarApiSettings;
+}) {
+  const src = getAvatarApiImageSrc(settings);
+  const usageCode = [
+    "<Avatar",
+    '  alt="Tobias Rasmussen"',
+    '  fallback="TR"',
+    '  src="' + src + '"',
+    "/>",
+  ].join("\n");
+
+  return (
+    <div className="grid gap-6">
+      <div className="grid gap-3">
+        <Snippet code={src} language="bash" showHeader={false} />
+      </div>
+
+      <Snippet className="max-w-3xl" code={usageCode} language="tsx" />
+    </div>
+  );
+}
+
+function IconApiUsageDocumentation({ settings }: { settings: IconApiSettings }) {
+  const src = getIconApiImageSrc(settings);
+  const target = getIconApiTarget(settings.target);
+  const usageCode = [
+    "<Avatar",
+    `  alt="${target} icon"`,
+    `  fallback="${getIconApiFallback(target)}"`,
+    '  shape="square"',
+    '  src="' + src + '"',
+    "/>",
+  ].join("\n");
+
+  return (
+    <div className="grid gap-6">
+      <div className="grid gap-3">
+        <Snippet code={src} language="bash" showHeader={false} />
+      </div>
+
+      <Snippet className="max-w-3xl" code={usageCode} language="tsx" />
+
+      <div className="grid gap-2">
+        {fallbackIconApiDocs.examples.map((example) => (
+          <Snippet
+            key={example}
+            code={example}
+            language="bash"
+            showHeader={false}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AvatarApiSeedOptionRow({
+  value,
+  onValueChange,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+}) {
+  return (
+    <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_minmax(12rem,16rem)] items-center gap-4 py-2.5">
+      <h2 className="min-w-0 text-sm font-medium text-primary">seed</h2>
+      <Input
+        aria-label="Avatar API seed"
+        value={value}
+        onChange={(event) => onValueChange(event.currentTarget.value)}
+        onClear={() => onValueChange("")}
+        clearable
+        shape="square"
+        size="small"
+        variant="outline"
+      />
+    </div>
+  );
+}
+
+function IconApiTargetOptionRow({
+  value,
+  onValueChange,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+}) {
+  return (
+    <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_minmax(12rem,18rem)] items-center gap-4 py-2.5">
+      <h2 className="min-w-0 text-sm font-medium text-primary">target</h2>
+      <Input
+        aria-label="Icon API target"
+        value={value}
+        onChange={(event) => onValueChange(event.currentTarget.value)}
+        onClear={() => onValueChange("")}
+        clearable
+        shape="square"
+        size="small"
+        variant="outline"
+      />
+    </div>
+  );
+}
+
+function AvatarApiControls({
+  settings,
+  variantOptions,
+  onSettingsChange,
+}: {
+  settings: AvatarApiSettings;
+  variantOptions: readonly string[];
+  onSettingsChange: React.Dispatch<React.SetStateAction<AvatarApiSettings>>;
+}) {
+  return (
+    <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+      <AvatarApiSeedOptionRow
+        value={settings.seed}
+        onValueChange={(seed) =>
+          onSettingsChange((current) => ({ ...current, seed }))
+        }
+      />
+
+      <OptionRow
+        label="variant"
+        values={variantOptions}
+        active={settings.variant}
+        onValueChange={(variant) =>
+          onSettingsChange((current) => ({ ...current, variant }))
+        }
+      />
+
+      <OptionRow
+        label="size"
+        values={avatarApiSizeOptions}
+        active={settings.size}
+        onValueChange={(size) =>
+          onSettingsChange((current) => ({ ...current, size }))
+        }
+      />
+
+      <OptionRow
+        label="radius"
+        values={avatarApiRadiusOptions}
+        active={settings.radius}
+        onValueChange={(radius) =>
+          onSettingsChange((current) => ({ ...current, radius }))
+        }
+      />
+
+      <BooleanOptionRow
+        label="initials"
+        checked={settings.initials}
+        onCheckedChange={(initials) =>
+          onSettingsChange((current) => ({ ...current, initials }))
+        }
+      />
+    </div>
+  );
+}
+
+function IconApiControls({
+  settings,
+  onSettingsChange,
+}: {
+  settings: IconApiSettings;
+  onSettingsChange: React.Dispatch<React.SetStateAction<IconApiSettings>>;
+}) {
+  return (
+    <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+      <IconApiTargetOptionRow
+        value={settings.target}
+        onValueChange={(target) =>
+          onSettingsChange((current) => ({ ...current, target }))
+        }
+      />
+
+      <OptionRow
+        label="size"
+        values={iconApiSizeOptions}
+        active={settings.size}
+        onValueChange={(size) =>
+          onSettingsChange((current) => ({ ...current, size }))
+        }
+      />
+    </div>
+  );
+}
+
+function AvatarApiDocumentation({
+  previewStageClassName,
+  previewSettings,
+  settings,
+  variantOptions,
+  onSettingsChange,
+}: {
+  previewStageClassName: string;
+  previewSettings: AvatarApiSettings;
+  settings: AvatarApiSettings;
+  variantOptions: readonly string[];
+  onSettingsChange: React.Dispatch<React.SetStateAction<AvatarApiSettings>>;
+}) {
+  return (
+    <>
+      <div className={previewStageClassName}>
+        <AvatarApiPreview settings={previewSettings} />
+      </div>
+
+      <TabsRoot
+        defaultValue="usage"
+        variant="line"
+        color="neutral"
+        className="mb-12"
+      >
+        <TabsList>
+          <TabsTab value="usage">Usage</TabsTab>
+          <TabsTab value="controls">Controls</TabsTab>
+          <TabsIndicator />
+        </TabsList>
+        <TabsPanel value="usage">
+          <AvatarApiUsageDocumentation settings={previewSettings} />
+        </TabsPanel>
+        <TabsPanel value="controls">
+          <AvatarApiControls
+            settings={settings}
+            variantOptions={variantOptions}
+            onSettingsChange={onSettingsChange}
+          />
+        </TabsPanel>
+      </TabsRoot>
+    </>
+  );
+}
+
+function IconApiDocumentation({
+  previewStageClassName,
+  previewSettings,
+  settings,
+  onSettingsChange,
+}: {
+  previewStageClassName: string;
+  previewSettings: IconApiSettings;
+  settings: IconApiSettings;
+  onSettingsChange: React.Dispatch<React.SetStateAction<IconApiSettings>>;
+}) {
+  return (
+    <>
+      <div className={previewStageClassName}>
+        <IconApiPreview settings={previewSettings} />
+      </div>
+
+      <TabsRoot
+        defaultValue="usage"
+        variant="line"
+        color="neutral"
+        className="mb-12"
+      >
+        <TabsList>
+          <TabsTab value="usage">Usage</TabsTab>
+          <TabsTab value="controls">Controls</TabsTab>
+          <TabsIndicator />
+        </TabsList>
+        <TabsPanel value="usage">
+          <IconApiUsageDocumentation settings={previewSettings} />
+        </TabsPanel>
+        <TabsPanel value="controls">
+          <IconApiControls
+            settings={settings}
+            onSettingsChange={onSettingsChange}
+          />
+        </TabsPanel>
+      </TabsRoot>
+    </>
+  );
+}
+
 function FoundationDocumentation({
   activePage,
   ...typographyProps
@@ -4774,6 +5545,12 @@ function IntroDocumentation({ activePage }: { activePage: IntroPage }) {
 }
 
 export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
+  const [aspectRatioSettings, setAspectRatioSettings] =
+    React.useState<AspectRatioSettings>(defaultAspectRatioSettings);
+  const [avatarApiSettings, setAvatarApiSettings] =
+    React.useState<AvatarApiSettings>(defaultAvatarApiSettings);
+  const [iconApiSettings, setIconApiSettings] =
+    React.useState<IconApiSettings>(defaultIconApiSettings);
   const [avatarSettings, setAvatarSettings] = React.useState<AvatarSettings>(
     defaultAvatarSettings,
   );
@@ -4857,6 +5634,43 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const activeComponent = isComponentPreview(activePage) ? activePage : null;
   const activeIntroPage = isIntroPage(activePage) ? activePage : null;
   const activeFoundationPage = isFoundationPage(activePage) ? activePage : null;
+  const activeApiPage = isApiPage(activePage) ? activePage : null;
+  const avatarApiVariants = useAvatarApiVariants(
+    activeApiPage === "avatar-api",
+  );
+  const avatarApiVariantOptions = React.useMemo(
+    () => getAvatarApiVariantOptions(avatarApiVariants),
+    [avatarApiVariants],
+  );
+  const resolvedAvatarApiSettings = React.useMemo(() => {
+    if (avatarApiVariantOptions.includes(avatarApiSettings.variant)) {
+      return avatarApiSettings;
+    }
+
+    return {
+      ...avatarApiSettings,
+      variant: avatarApiVariantOptions[0] ?? defaultAvatarApiSettings.variant,
+    };
+  }, [avatarApiSettings, avatarApiVariantOptions]);
+  const debouncedAvatarApiSeed = useDebouncedValue(
+    resolvedAvatarApiSettings.seed,
+    450,
+  );
+  const debouncedAvatarApiSettings = React.useMemo(
+    () => ({
+      ...resolvedAvatarApiSettings,
+      seed: debouncedAvatarApiSeed,
+    }),
+    [debouncedAvatarApiSeed, resolvedAvatarApiSettings],
+  );
+  const debouncedIconApiTarget = useDebouncedValue(iconApiSettings.target, 450);
+  const debouncedIconApiSettings = React.useMemo(
+    () => ({
+      ...iconApiSettings,
+      target: debouncedIconApiTarget,
+    }),
+    [debouncedIconApiTarget, iconApiSettings],
+  );
   const pageCopy = getDocsPageCopy(activePage);
 
   React.useEffect(() => {
@@ -4985,7 +5799,9 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
             {activeComponent ? (
               <>
                 <div className={previewStageClassName}>
-                  {activeComponent === "avatar" ? (
+                  {activeComponent === "aspect-ratio" ? (
+                    <AspectRatioPreview settings={aspectRatioSettings} />
+                  ) : activeComponent === "avatar" ? (
                     <AvatarPreview settings={avatarSettings} />
                   ) : activeComponent === "button" ? (
                     <div className="flex flex-wrap items-center justify-center gap-3">
@@ -5181,6 +5997,22 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     <ImportExample activeComponent={activeComponent} />
                   </TabsPanel>
                   <TabsPanel value="controls">
+                    {activeComponent === "aspect-ratio" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="ratio"
+                          values={aspectRatioOptions.ratio}
+                          active={aspectRatioSettings.ratio}
+                          onValueChange={(ratio) =>
+                            setAspectRatioSettings((settings) => ({
+                              ...settings,
+                              ratio,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
                     {activeComponent === "avatar" && (
                       <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
                         <OptionRow
@@ -6871,6 +7703,26 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     setTextSettings={setTextSettings}
                     textSettings={textSettings}
                   />
+                )}
+                {activeApiPage && (
+                  <>
+                    {activeApiPage === "avatar-api" ? (
+                      <AvatarApiDocumentation
+                        previewStageClassName={previewStageClassName}
+                        previewSettings={debouncedAvatarApiSettings}
+                        settings={resolvedAvatarApiSettings}
+                        variantOptions={avatarApiVariantOptions}
+                        onSettingsChange={setAvatarApiSettings}
+                      />
+                    ) : (
+                      <IconApiDocumentation
+                        previewStageClassName={previewStageClassName}
+                        previewSettings={debouncedIconApiSettings}
+                        settings={iconApiSettings}
+                        onSettingsChange={setIconApiSettings}
+                      />
+                    )}
+                  </>
                 )}
               </>
             )}
