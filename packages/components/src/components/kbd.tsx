@@ -12,8 +12,8 @@ const kbdVariants = cva(
   {
     variants: {
       variant: {
-        outline: "border-border bg-surface text-primary",
-        soft: "border-transparent bg-surface-sunken text-primary",
+        outline: "border-border bg-surface-current text-primary",
+        soft: "border-transparent bg-surface-muted text-primary",
       },
       size: {
         sm: "h-5 min-w-5 px-1 text-[0.6875rem]",

@@ -8,14 +8,23 @@ import * as React from "react";
 
 import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
+import {
+  SurfaceProvider,
+  getSurfaceClassName,
+  getSurfaceStyle,
+  resolveSurfaceShadow,
+  type SurfaceLevelValue,
+  type SurfaceShadow,
+  useResolvedSurfaceLevel,
+} from "./surface";
 
 const comboboxInputGroupVariants = cva(
   [
-    "group/combobox inline-flex w-full shrink-0 items-center border bg-[var(--combobox-background)] [--combobox-background:var(--surface)]",
+    "group/combobox inline-flex w-full shrink-0 items-center border bg-[var(--combobox-background)] [--combobox-background:var(--surface-current)]",
     "[--combobox-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
     "text-primary shadow-[0_0_0_1px_transparent] outline-none",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
-    "hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_4%,var(--surface))]",
+    "hover:[--combobox-background:var(--surface-hover)]",
     "has-[:focus-visible]:shadow-[0_0_0_1px_var(--combobox-ring)]",
     "data-[popup-open]:shadow-[0_0_0_1px_var(--combobox-ring)]",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
@@ -26,9 +35,9 @@ const comboboxInputGroupVariants = cva(
       variant: {
         outline: "border-border",
         soft:
-          "border-transparent [--combobox-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--combobox-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
+          "border-transparent [--combobox-background:var(--surface-muted)] hover:[--combobox-background:var(--surface-hover)]",
         ghost:
-          "border-transparent [--combobox-background:transparent] hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] data-[popup-open]:[--combobox-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] dark:hover:[--combobox-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:data-[popup-open]:[--combobox-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))]",
+          "border-transparent [--combobox-background:transparent] hover:[--combobox-background:var(--surface-hover)] data-[popup-open]:[--combobox-background:var(--surface-hover)]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -52,7 +61,7 @@ const comboboxInputGroupVariants = cva(
 
 const comboboxPopupVariants = cva(
   [
-    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border bg-surface-floating text-primary shadow-xl outline-none",
+    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border text-primary outline-none",
     "origin-[var(--transform-origin)] transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
@@ -149,6 +158,9 @@ type ComboboxPopupProps = Omit<
 > & {
   className?: string;
   shape?: ComboboxShape | null;
+  surface?: SurfaceLevelValue | null;
+  surfaceLift?: number | null;
+  surfaceShadow?: SurfaceShadow | null;
 };
 
 type ComboboxListProps = Omit<
@@ -497,22 +509,43 @@ const ComboboxPositioner = React.forwardRef<
 });
 
 const ComboboxPopup = React.forwardRef<HTMLDivElement, ComboboxPopupProps>(
-  function ComboboxPopup({ className, shape, ...props }, ref) {
+  function ComboboxPopup(
+    {
+      className,
+      shape,
+      style,
+      surface,
+      surfaceLift,
+      surfaceShadow,
+      ...props
+    },
+    ref,
+  ) {
     const inheritedShape = React.useContext(ComboboxShapeContext);
     const resolvedShape = shape ?? inheritedShape;
+    const resolvedSurface = useResolvedSurfaceLevel({
+      level: surface,
+      lift: surfaceLift ?? 2,
+    });
+    const resolvedShadow = resolveSurfaceShadow(surfaceShadow, resolvedSurface);
 
     return (
-      <ComboboxShapeContext.Provider value={resolvedShape}>
-        <ComboboxPrimitive.Popup
-          ref={ref}
-          data-slot="combobox-popup"
-          className={cn(
-            comboboxPopupVariants({ shape: resolvedShape }),
-            className,
-          )}
-          {...props}
-        />
-      </ComboboxShapeContext.Provider>
+      <SurfaceProvider value={resolvedSurface}>
+        <ComboboxShapeContext.Provider value={resolvedShape}>
+          <ComboboxPrimitive.Popup
+            ref={ref}
+            data-slot="combobox-popup"
+            data-surface-level={resolvedSurface}
+            className={cn(
+              getSurfaceClassName(resolvedSurface, resolvedShadow),
+              comboboxPopupVariants({ shape: resolvedShape }),
+              className,
+            )}
+            style={getSurfaceStyle(resolvedSurface, style)}
+            {...props}
+          />
+        </ComboboxShapeContext.Provider>
+      </SurfaceProvider>
     );
   },
 );

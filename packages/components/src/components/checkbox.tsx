@@ -25,11 +25,11 @@ const checkboxVariants = cva(
     variants: {
       variant: {
         solid:
-          "border-border bg-surface text-on-color hover:bg-surface-sunken",
+          "border-border bg-surface-current text-on-color hover:bg-surface-hover",
         soft:
-          "border-transparent bg-surface-sunken text-transparent hover:bg-surface-sunken/80",
+          "border-transparent bg-surface-muted text-transparent hover:bg-surface-hover",
         outline:
-          "border-border bg-transparent text-transparent hover:bg-surface-sunken",
+          "border-border bg-transparent text-transparent hover:bg-surface-hover",
       },
       color: {
         accent: "",
@@ -114,7 +114,7 @@ const checkboxVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "data-[checked]:bg-surface-sunken data-[checked]:text-primary data-[checked]:hover:bg-surface-sunken/80 data-[indeterminate]:bg-surface-sunken data-[indeterminate]:text-primary",
+          "data-[checked]:bg-surface-active data-[checked]:text-primary data-[checked]:hover:bg-surface-hover data-[indeterminate]:bg-surface-active data-[indeterminate]:text-primary",
       },
 
       {
@@ -145,7 +145,7 @@ const checkboxVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "data-[checked]:border-primary/15 data-[checked]:bg-surface-sunken data-[checked]:text-primary data-[checked]:hover:bg-surface-sunken/80 data-[indeterminate]:border-primary/15 data-[indeterminate]:bg-surface-sunken data-[indeterminate]:text-primary",
+          "data-[checked]:border-primary/15 data-[checked]:bg-surface-active data-[checked]:text-primary data-[checked]:hover:bg-surface-hover data-[indeterminate]:border-primary/15 data-[indeterminate]:bg-surface-active data-[indeterminate]:text-primary",
       },
     ],
     defaultVariants: {

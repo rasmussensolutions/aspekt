@@ -8,6 +8,15 @@ import * as React from "react";
 
 import { aspektConfig } from "./config";
 import { playSound } from "./sound";
+import {
+  SurfaceProvider,
+  getSurfaceClassName,
+  getSurfaceStyle,
+  resolveSurfaceShadow,
+  type SurfaceLevelValue,
+  type SurfaceShadow,
+  useResolvedSurfaceLevel,
+} from "./surface";
 
 const toastPositions = [
   "bottom-right",
@@ -20,7 +29,7 @@ const toastPositions = [
 
 const toastRootVariants = cva(
   [
-    "pointer-events-auto w-full overflow-hidden border-2 border-border bg-surface-floating text-primary shadow-xl outline-none",
+    "pointer-events-auto w-full overflow-hidden border-2 border-border text-primary outline-none",
     "transition-[opacity,transform] duration-200 ease-out",
     "data-[limited]:pointer-events-none data-[limited]:opacity-0",
     "data-[swiping]:transition-none",
@@ -132,6 +141,9 @@ type ToastRootProps = Omit<
   className?: string;
   colorful?: boolean | null;
   shape?: ToastShape | null;
+  surface?: SurfaceLevelValue | null;
+  surfaceLift?: number | null;
+  surfaceShadow?: SurfaceShadow | null;
 };
 
 type ToastPositionerProps = Omit<
@@ -396,12 +408,30 @@ const ToastViewport = React.forwardRef<HTMLDivElement, ToastViewportProps>(
 );
 
 const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(
-  function ToastRoot({ className, colorful, shape, toast, ...props }, ref) {
+  function ToastRoot(
+    {
+      className,
+      colorful,
+      shape,
+      style,
+      surface,
+      surfaceLift,
+      surfaceShadow,
+      toast,
+      ...props
+    },
+    ref,
+  ) {
     const position = React.useContext(ToastPositionContext);
     const stacked = toast.positionerProps?.anchor === undefined;
     const playedSoundKeyRef = React.useRef<string | null>(null);
     const sound = getToastSound(toast.type);
     const resolvedShape = shape ?? aspektConfig.shape;
+    const resolvedSurface = useResolvedSurfaceLevel({
+      level: surface,
+      lift: surfaceLift ?? 4,
+    });
+    const resolvedShadow = resolveSurfaceShadow(surfaceShadow, resolvedSurface);
 
     React.useEffect(() => {
       if (!sound || toast.limited || toast.transitionStatus === "ending") {
@@ -419,21 +449,26 @@ const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(
     }, [sound, toast.id, toast.limited, toast.transitionStatus]);
 
     return (
-      <ToastPrimitive.Root
-        ref={ref}
-        data-slot="toast-root"
-        className={cn(
-          toastRootVariants({
-            colorful,
-            shape: resolvedShape,
-            side: stacked ? getToastSide(position) : null,
-            stacked,
-          }),
-          className,
-        )}
-        toast={toast}
-        {...props}
-      />
+      <SurfaceProvider value={resolvedSurface}>
+        <ToastPrimitive.Root
+          ref={ref}
+          data-slot="toast-root"
+          data-surface-level={resolvedSurface}
+          className={cn(
+            getSurfaceClassName(resolvedSurface, resolvedShadow),
+            toastRootVariants({
+              colorful,
+              shape: resolvedShape,
+              side: stacked ? getToastSide(position) : null,
+              stacked,
+            }),
+            className,
+          )}
+          style={getSurfaceStyle(resolvedSurface, style)}
+          toast={toast}
+          {...props}
+        />
+      </SurfaceProvider>
     );
   },
 );
@@ -510,7 +545,7 @@ const ToastAction = React.forwardRef<HTMLButtonElement, ToastActionProps>(
         data-slot="toast-action"
         className={cn(
           "inline-flex h-7 shrink-0 items-center justify-center rounded-md px-2 text-sm font-medium outline-none",
-          "text-primary hover:bg-surface-sunken focus-visible:ring-2 focus-visible:ring-current/20",
+          "text-primary hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-current/20",
           "disabled:pointer-events-none disabled:opacity-50",
           className,
         )}
@@ -529,7 +564,7 @@ const ToastClose = React.forwardRef<HTMLButtonElement, ToastCloseProps>(
         aria-label="Dismiss notification"
         className={cn(
           "inline-flex size-7 shrink-0 items-center justify-center rounded-md text-secondary outline-none",
-          "hover:bg-surface-sunken hover:text-primary focus-visible:ring-2 focus-visible:ring-current/20",
+          "hover:bg-surface-hover hover:text-primary focus-visible:ring-2 focus-visible:ring-current/20",
           className,
         )}
         {...props}

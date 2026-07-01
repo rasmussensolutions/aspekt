@@ -8,14 +8,23 @@ import * as React from "react";
 
 import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
+import {
+  SurfaceProvider,
+  getSurfaceClassName,
+  getSurfaceStyle,
+  resolveSurfaceShadow,
+  type SurfaceLevelValue,
+  type SurfaceShadow,
+  useResolvedSurfaceLevel,
+} from "./surface";
 
 const selectTriggerVariants = cva(
   [
-    "group/select inline-flex w-full shrink-0 cursor-pointer items-center border bg-[var(--select-background)] [--select-background:var(--surface)]",
+    "group/select inline-flex w-full shrink-0 cursor-pointer items-center border bg-[var(--select-background)] [--select-background:var(--surface-current)]",
     "[--select-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
     "text-primary shadow-[0_0_0_1px_transparent] outline-none select-none",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
-    "hover:[--select-background:color-mix(in_oklab,var(--text-primary)_4%,var(--surface))]",
+    "hover:[--select-background:var(--surface-hover)]",
     "focus-visible:shadow-[0_0_0_1px_var(--select-ring)]",
     "data-[popup-open]:shadow-[0_0_0_1px_var(--select-ring)]",
     "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
@@ -27,9 +36,9 @@ const selectTriggerVariants = cva(
       variant: {
         outline: "border-border",
         soft:
-          "border-transparent [--select-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] hover:[--select-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--select-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--select-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
+          "border-transparent [--select-background:var(--surface-muted)] hover:[--select-background:var(--surface-hover)]",
         ghost:
-          "border-transparent [--select-background:transparent] hover:[--select-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] data-[popup-open]:[--select-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] dark:hover:[--select-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:data-[popup-open]:[--select-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))]",
+          "border-transparent [--select-background:transparent] hover:[--select-background:var(--surface-hover)] data-[popup-open]:[--select-background:var(--surface-hover)]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",
@@ -53,7 +62,7 @@ const selectTriggerVariants = cva(
 
 const selectPopupVariants = cva(
   [
-    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border bg-surface-floating text-primary shadow-xl outline-none",
+    "z-50 min-w-[var(--anchor-width)] overflow-hidden border border-border text-primary outline-none",
     "origin-[var(--transform-origin)] transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
@@ -139,6 +148,9 @@ type SelectPopupProps = Omit<
 > & {
     className?: string;
     shape?: SelectShape | null;
+    surface?: SurfaceLevelValue | null;
+    surfaceLift?: number | null;
+    surfaceShadow?: SurfaceShadow | null;
   };
 
 type SelectListProps = Omit<
@@ -452,22 +464,43 @@ const SelectPositioner = React.forwardRef<
 });
 
 const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(
-  function SelectPopup({ className, shape, ...props }, ref) {
+  function SelectPopup(
+    {
+      className,
+      shape,
+      style,
+      surface,
+      surfaceLift,
+      surfaceShadow,
+      ...props
+    },
+    ref,
+  ) {
     const inheritedShape = React.useContext(SelectShapeContext);
     const resolvedShape = shape ?? inheritedShape;
+    const resolvedSurface = useResolvedSurfaceLevel({
+      level: surface,
+      lift: surfaceLift ?? 2,
+    });
+    const resolvedShadow = resolveSurfaceShadow(surfaceShadow, resolvedSurface);
 
     return (
-      <SelectShapeContext.Provider value={resolvedShape}>
-        <SelectPrimitive.Popup
-          ref={ref}
-          data-slot="select-popup"
-          className={cn(
-            selectPopupVariants({ shape: resolvedShape }),
-            className,
-          )}
-          {...props}
-        />
-      </SelectShapeContext.Provider>
+      <SurfaceProvider value={resolvedSurface}>
+        <SelectShapeContext.Provider value={resolvedShape}>
+          <SelectPrimitive.Popup
+            ref={ref}
+            data-slot="select-popup"
+            data-surface-level={resolvedSurface}
+            className={cn(
+              getSurfaceClassName(resolvedSurface, resolvedShadow),
+              selectPopupVariants({ shape: resolvedShape }),
+              className,
+            )}
+            style={getSurfaceStyle(resolvedSurface, style)}
+            {...props}
+          />
+        </SelectShapeContext.Provider>
+      </SurfaceProvider>
     );
   },
 );
@@ -556,7 +589,7 @@ const SelectScrollUpArrow = React.forwardRef<
       ref={ref}
       data-slot="select-scroll-up-arrow"
       className={cn(
-        "flex h-5 cursor-default items-center justify-center bg-surface-floating text-secondary",
+        "flex h-5 cursor-default items-center justify-center bg-surface-current text-secondary",
         className,
       )}
       {...props}
@@ -579,7 +612,7 @@ const SelectScrollDownArrow = React.forwardRef<
       ref={ref}
       data-slot="select-scroll-down-arrow"
       className={cn(
-        "flex h-5 cursor-default items-center justify-center bg-surface-floating text-secondary",
+        "flex h-5 cursor-default items-center justify-center bg-surface-current text-secondary",
         className,
       )}
       {...props}

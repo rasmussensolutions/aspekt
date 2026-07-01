@@ -24,12 +24,12 @@ const toggleVariants = cva(
     variants: {
       variant: {
         solid:
-          "border border-border bg-surface-sunken text-primary hover:bg-surface-sunken/80",
-        soft: "border border-transparent bg-control-soft text-primary hover:bg-control-soft/80",
+          "border border-border bg-surface-muted text-primary hover:bg-surface-hover",
+        soft: "border border-transparent bg-surface-muted text-primary hover:bg-surface-hover",
         ghost:
-          "border border-transparent bg-transparent text-primary hover:bg-surface-sunken",
+          "border border-transparent bg-transparent text-primary hover:bg-surface-hover",
         outline:
-          "border border-border bg-surface text-primary hover:bg-surface-sunken",
+          "border border-border bg-surface-current text-primary hover:bg-surface-hover",
       },
       color: {
         accent: "",
@@ -110,7 +110,7 @@ const toggleVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "data-[pressed]:bg-surface-sunken data-[pressed]:text-primary data-[pressed]:hover:bg-surface-sunken/80",
+          "data-[pressed]:bg-surface-active data-[pressed]:text-primary data-[pressed]:hover:bg-surface-hover",
       },
 
       {
@@ -141,7 +141,7 @@ const toggleVariants = cva(
         variant: "ghost",
         color: "neutral",
         className:
-          "data-[pressed]:bg-surface-sunken data-[pressed]:text-primary data-[pressed]:hover:bg-surface-sunken/80",
+          "data-[pressed]:bg-surface-active data-[pressed]:text-primary data-[pressed]:hover:bg-surface-hover",
       },
 
       {
@@ -172,7 +172,7 @@ const toggleVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "data-[pressed]:border-primary/15 data-[pressed]:bg-surface-sunken data-[pressed]:text-primary data-[pressed]:hover:bg-surface-sunken/80",
+          "data-[pressed]:border-primary/15 data-[pressed]:bg-surface-active data-[pressed]:text-primary data-[pressed]:hover:bg-surface-hover",
       },
     ],
     defaultVariants: {

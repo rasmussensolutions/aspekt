@@ -122,7 +122,7 @@ const appTabsTabVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "bg-surface-sunken/50 data-[active]:bg-surface-sunken data-[active]:text-primary hover:bg-surface-sunken",
+          "bg-surface-muted data-[active]:bg-surface-active data-[active]:text-primary hover:bg-surface-hover",
       },
       {
         variant: "outline",
@@ -152,7 +152,7 @@ const appTabsTabVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "bg-surface-sunken/35 data-[active]:border-border data-[active]:bg-surface-sunken data-[active]:text-primary hover:bg-surface-sunken/70",
+          "bg-surface-muted data-[active]:border-border data-[active]:bg-surface-active data-[active]:text-primary hover:bg-surface-hover",
       },
       {
         variant: "line",
@@ -467,7 +467,7 @@ function AppTabsRoot({
       <div
         data-slot="app-tabs-root"
         className={cn(
-          "flex min-h-dvh min-w-0 flex-1 flex-col bg-surface text-primary",
+          "flex min-h-dvh min-w-0 flex-1 flex-col bg-surface-current text-primary",
           className,
         )}
         {...props}
@@ -691,7 +691,7 @@ const AppTabsTabClose = React.forwardRef<
       }}
       className={cn(
         "mr-1 grid size-5 shrink-0 place-items-center rounded-md text-secondary opacity-0 outline-none transition-[background-color,color,opacity] duration-150",
-        "hover:bg-surface-sunken hover:text-primary focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-current/20",
+        "hover:bg-surface-hover hover:text-primary focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-current/20",
         "group-hover/app-tabs-tab:opacity-100 group-data-[active]/app-tabs-tab:opacity-100",
         className,
       )}

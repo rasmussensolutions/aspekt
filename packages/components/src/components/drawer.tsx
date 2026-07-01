@@ -8,6 +8,15 @@ import { cn } from "cnfast";
 import { Button, ButtonShapeProvider } from "./button";
 import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
+import {
+  SurfaceProvider,
+  getSurfaceClassName,
+  getSurfaceStyle,
+  resolveSurfaceShadow,
+  type SurfaceLevelValue,
+  type SurfaceShadow,
+  useResolvedSurfaceLevel,
+} from "./surface";
 
 const drawerViewportVariants = cva(
   [
@@ -40,7 +49,7 @@ const drawerViewportVariants = cva(
 const drawerContentVariants = cva(
   [
     "z-50 grid gap-5 overflow-y-auto overscroll-contain touch-auto",
-    "border border-border bg-surface-floating text-primary shadow-2xl outline-none",
+    "border border-border text-primary outline-none",
     "transition-[opacity,transform] duration-200 ease-out",
     "data-[swiping]:select-none",
     "data-[ending-style]:duration-[calc(var(--drawer-swipe-strength)*400ms)]",
@@ -279,6 +288,9 @@ type DrawerContentProps = Omit<
     shape?: DrawerShape | null;
     side?: DrawerSide | null;
     size?: DrawerSize | null;
+    surface?: SurfaceLevelValue | null;
+    surfaceLift?: number | null;
+    surfaceShadow?: SurfaceShadow | null;
   };
 
 type DrawerBodyProps = Omit<
@@ -454,28 +466,49 @@ const DrawerViewport = React.forwardRef<HTMLDivElement, DrawerViewportProps>(
 
 const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
   function DrawerContent(
-    { className, detached, shape, side, size, ...props },
+    {
+      className,
+      detached,
+      shape,
+      side,
+      size,
+      style,
+      surface,
+      surfaceLift,
+      surfaceShadow,
+      ...props
+    },
     ref,
   ) {
     const inheritedDetached = React.useContext(DrawerDetachedContext);
     const inheritedShape = React.useContext(DrawerShapeContext);
     const inheritedSide = React.useContext(DrawerSideContext);
+    const resolvedSurface = useResolvedSurfaceLevel({
+      level: surface,
+      lift: surfaceLift ?? 4,
+    });
+    const resolvedShadow = resolveSurfaceShadow(surfaceShadow, resolvedSurface);
 
     return (
-      <DrawerPrimitive.Popup
-        ref={ref}
-        data-slot="drawer-content"
-        className={cn(
-          drawerContentVariants({
-            detached: detached ?? inheritedDetached,
-            shape: shape ?? inheritedShape,
-            side: side ?? inheritedSide,
-            size,
-          }),
-          className,
-        )}
-        {...props}
-      />
+      <SurfaceProvider value={resolvedSurface}>
+        <DrawerPrimitive.Popup
+          ref={ref}
+          data-slot="drawer-content"
+          data-surface-level={resolvedSurface}
+          className={cn(
+            getSurfaceClassName(resolvedSurface, resolvedShadow),
+            drawerContentVariants({
+              detached: detached ?? inheritedDetached,
+              shape: shape ?? inheritedShape,
+              side: side ?? inheritedSide,
+              size,
+            }),
+            className,
+          )}
+          style={getSurfaceStyle(resolvedSurface, style)}
+          {...props}
+        />
+      </SurfaceProvider>
     );
   },
 );

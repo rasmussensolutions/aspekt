@@ -222,7 +222,7 @@ function getItem(manifest, name) {
 }
 
 function listItems(manifest) {
-  console.log("Available Aspekt components:\n");
+  console.log("Available Aspekt components and utilities:\n");
 
   for (const item of getPublicItems(manifest)) {
     console.log(`  ${item.name.padEnd(16)} ${item.description ?? ""}`);
@@ -348,7 +348,7 @@ function collectItems(manifest, names) {
       const available = getPublicItems(manifest)
         .map((publicItem) => publicItem.name)
         .join(", ");
-      fail(`Unknown component "${name}". Available components: ${available}.`);
+      fail(`Unknown item "${name}". Available items: ${available}.`);
     }
 
     return item;
@@ -412,7 +412,7 @@ function addComponents(manifest, names, options) {
 
   if (requestedNames.length === 0) {
     fail(
-      "Pass at least one component name, for example `npx @aspekt/ui add button`.",
+      "Pass at least one item name, for example `npx @aspekt/ui add button`.",
     );
   }
 
@@ -752,7 +752,7 @@ function getUpdateItems(manifest, names, options, cwd, state) {
 
       if (!item || item.kind === "base") {
         const available = [...publicNames].join(", ");
-        fail(`Unknown component "${name}". Available components: ${available}.`);
+        fail(`Unknown item "${name}". Available items: ${available}.`);
       }
 
       return item;

@@ -33,6 +33,10 @@
       "types": "./src/button.ts",
       "import": "./src/button.ts"
     },
+    "./card": {
+      "types": "./src/card.ts",
+      "import": "./src/card.ts"
+    },
     "./avatar": {
       "types": "./src/avatar.ts",
       "import": "./src/avatar.ts"
@@ -73,6 +77,10 @@
       "types": "./src/popover.ts",
       "import": "./src/popover.ts"
     },
+    "./scroll-area": {
+      "types": "./src/scroll-area.ts",
+      "import": "./src/scroll-area.ts"
+    },
     "./toggle": {
       "types": "./src/toggle.ts",
       "import": "./src/toggle.ts"
@@ -80,6 +88,10 @@
     "./dialog": {
       "types": "./src/dialog.ts",
       "import": "./src/dialog.ts"
+    },
+    "./dock": {
+      "types": "./src/dock.ts",
+      "import": "./src/dock.ts"
     },
     "./drawer": {
       "types": "./src/drawer.ts",
@@ -140,6 +152,10 @@
     "./sound-provider": {
       "types": "./src/sound-provider.ts",
       "import": "./src/sound-provider.ts"
+    },
+    "./surface": {
+      "types": "./src/surface.ts",
+      "import": "./src/surface.ts"
     }
   },
   "typesVersions": {
@@ -159,6 +175,9 @@
       "button": [
         "src/button.ts"
       ],
+      "card": [
+        "src/card.ts"
+      ],
       "checkbox": [
         "src/checkbox.ts"
       ],
@@ -173,6 +192,9 @@
       ],
       "dialog": [
         "src/dialog.ts"
+      ],
+      "dock": [
+        "src/dock.ts"
       ],
       "drawer": [
         "src/drawer.ts"
@@ -198,6 +220,9 @@
       "prose": [
         "src/prose.ts"
       ],
+      "scroll-area": [
+        "src/scroll-area.ts"
+      ],
       "select": [
         "src/select.ts"
       ],
@@ -215,6 +240,9 @@
       ],
       "sound-provider": [
         "src/sound-provider.ts"
+      ],
+      "surface": [
+        "src/surface.ts"
       ],
       "switch": [
         "src/switch.ts"

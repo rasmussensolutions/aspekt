@@ -67,9 +67,9 @@ const sliderTrackVariants = cva(
   {
     variants: {
       variant: {
-        solid: "border border-transparent bg-control-soft",
-        soft: "border border-transparent bg-control-soft/80",
-        outline: "border border-border bg-surface",
+        solid: "border border-transparent bg-surface-active",
+        soft: "border border-transparent bg-surface-muted",
+        outline: "border border-border bg-surface-current",
       },
       shape: {
         square: "rounded-md",
@@ -113,7 +113,7 @@ const sliderIndicatorVariants = cva(
 
 const sliderThumbVariants = cva(
   [
-    "z-10 block size-[var(--slider-thumb-size)] shrink-0 border bg-surface shadow-sm ring-1 ring-border",
+    "z-10 block size-[var(--slider-thumb-size)] shrink-0 border bg-surface-current shadow-sm ring-1 ring-border",
     "cursor-grab outline-none transition-[background-color,border-color,box-shadow,scale,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
     "active:scale-95 data-[disabled]:cursor-not-allowed data-[disabled]:active:scale-100",
     "data-[dragging]:cursor-grabbing data-[dragging]:scale-95",

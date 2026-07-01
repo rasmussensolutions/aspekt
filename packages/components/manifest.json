@@ -19,6 +19,47 @@
       ]
     },
     {
+      "name": "scroll-fade",
+      "kind": "utility",
+      "title": "Scroll Fade",
+      "description": "CSS mask utilities that fade scroll container edges as content overflows.",
+      "dependencies": [],
+      "files": [],
+      "categories": [
+        "utilities"
+      ]
+    },
+    {
+      "name": "shimmer",
+      "kind": "utility",
+      "title": "Shimmer",
+      "description": "Text shimmer utilities for loading, pending, and generated states.",
+      "dependencies": [],
+      "files": [],
+      "categories": [
+        "utilities"
+      ]
+    },
+    {
+      "name": "surface",
+      "kind": "component",
+      "title": "Surface",
+      "description": "A contextual eight-level surface primitive for nested cards, dialogs, popovers, dropdowns, and other elevated planes.",
+      "dependencies": [
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "layout"
+      ]
+    },
+    {
       "name": "aspect-ratio",
       "kind": "component",
       "title": "Aspect Ratio",
@@ -30,6 +71,31 @@
         {
           "path": "packages/components/src/components/aspect-ratio.tsx",
           "target": "components/aspekt/aspect-ratio.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "layout"
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "kind": "component",
+      "title": "Scroll Area",
+      "description": "A Base UI scroll area with styled viewports, custom scrollbars, edge fades, and Aspekt surface variants.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/scroll-area.tsx",
+          "target": "components/aspekt/scroll-area.tsx"
+        },
+        {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
         }
       ],
       "categories": [
@@ -62,7 +128,7 @@
       "name": "button",
       "kind": "component",
       "title": "Button",
-      "description": "A native button with variants, sizes, loading state, affixes, and optional interaction sounds.",
+      "description": "A composable button with variants, sizes, loading state, affixes, asChild support, and optional interaction sounds.",
       "dependencies": [
         "@phosphor-icons/react",
         "class-variance-authority",
@@ -74,6 +140,10 @@
           "target": "components/aspekt/button.tsx"
         },
         {
+          "path": "packages/components/src/components/slot.tsx",
+          "target": "components/aspekt/slot.tsx"
+        },
+        {
           "path": "packages/components/src/components/sound.ts",
           "target": "components/aspekt/sound.ts"
         }
@@ -81,6 +151,30 @@
       "categories": [
         "ui",
         "form"
+      ]
+    },
+    {
+      "name": "card",
+      "kind": "component",
+      "title": "Card",
+      "description": "A composable surface with header, action, content, and footer slots.",
+      "dependencies": [
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/card.tsx",
+          "target": "components/aspekt/card.tsx"
+        },
+        {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        }
+      ],
+      "categories": [
+        "ui",
+        "layout"
       ]
     },
     {
@@ -152,6 +246,10 @@
           "target": "components/aspekt/select.tsx"
         },
         {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        },
+        {
           "path": "packages/components/src/components/sound.ts",
           "target": "components/aspekt/sound.ts"
         }
@@ -176,6 +274,10 @@
         {
           "path": "packages/components/src/components/combobox.tsx",
           "target": "components/aspekt/combobox.tsx"
+        },
+        {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
         },
         {
           "path": "packages/components/src/components/sound.ts",
@@ -304,8 +406,16 @@
           "target": "components/aspekt/dialog.tsx"
         },
         {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        },
+        {
           "path": "packages/components/src/components/button.tsx",
           "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/components/src/components/slot.tsx",
+          "target": "components/aspekt/slot.tsx"
         },
         {
           "path": "packages/components/src/components/sound.ts",
@@ -334,8 +444,16 @@
           "target": "components/aspekt/drawer.tsx"
         },
         {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        },
+        {
           "path": "packages/components/src/components/button.tsx",
           "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/components/src/components/slot.tsx",
+          "target": "components/aspekt/slot.tsx"
         },
         {
           "path": "packages/components/src/components/sound.ts",
@@ -364,8 +482,16 @@
           "target": "components/aspekt/popover.tsx"
         },
         {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        },
+        {
           "path": "packages/components/src/components/button.tsx",
           "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/components/src/components/slot.tsx",
+          "target": "components/aspekt/slot.tsx"
         },
         {
           "path": "packages/components/src/components/sound.ts",
@@ -375,6 +501,43 @@
       "categories": [
         "ui",
         "overlay"
+      ]
+    },
+    {
+      "name": "dock",
+      "kind": "component",
+      "title": "Dock",
+      "description": "A mobile-first navigation dock with actions and expandable panel content.",
+      "dependencies": [
+        "@phosphor-icons/react",
+        "class-variance-authority",
+        "cnfast"
+      ],
+      "files": [
+        {
+          "path": "packages/components/src/components/dock.tsx",
+          "target": "components/aspekt/dock.tsx"
+        },
+        {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        },
+        {
+          "path": "packages/components/src/components/button.tsx",
+          "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/components/src/components/slot.tsx",
+          "target": "components/aspekt/slot.tsx"
+        },
+        {
+          "path": "packages/components/src/components/sound.ts",
+          "target": "components/aspekt/sound.ts"
+        }
+      ],
+      "categories": [
+        "ui",
+        "navigation"
       ]
     },
     {
@@ -392,6 +555,10 @@
         {
           "path": "packages/components/src/components/toast.tsx",
           "target": "components/aspekt/toast.tsx"
+        },
+        {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
         },
         {
           "path": "packages/components/src/components/sound.ts",
@@ -422,6 +589,10 @@
         {
           "path": "packages/components/src/components/button.tsx",
           "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/components/src/components/slot.tsx",
+          "target": "components/aspekt/slot.tsx"
         },
         {
           "path": "packages/components/src/components/sound.ts",
@@ -494,6 +665,10 @@
         {
           "path": "packages/components/src/components/table.tsx",
           "target": "components/aspekt/table.tsx"
+        },
+        {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
         }
       ],
       "categories": [
@@ -671,12 +846,24 @@
           "target": "components/aspekt/aspect-ratio.tsx"
         },
         {
+          "path": "packages/components/src/components/surface.tsx",
+          "target": "components/aspekt/surface.tsx"
+        },
+        {
+          "path": "packages/components/src/components/scroll-area.tsx",
+          "target": "components/aspekt/scroll-area.tsx"
+        },
+        {
           "path": "packages/components/src/components/avatar.tsx",
           "target": "components/aspekt/avatar.tsx"
         },
         {
           "path": "packages/components/src/components/button.tsx",
           "target": "components/aspekt/button.tsx"
+        },
+        {
+          "path": "packages/components/src/components/slot.tsx",
+          "target": "components/aspekt/slot.tsx"
         },
         {
           "path": "packages/components/src/components/input.tsx",

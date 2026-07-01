@@ -8,12 +8,12 @@ const codeVariants = cva("font-mono tabular-nums", {
   variants: {
     variant: {
       inline: [
-        "inline rounded-md border border-border bg-surface-sunken",
+        "inline rounded-md border border-border bg-surface-muted",
         "px-1.5 py-0.5 text-[0.875em] leading-none",
       ],
       block: [
         "block max-w-full overflow-x-auto whitespace-pre rounded-lg border border-border",
-        "bg-surface-sunken px-4 py-3 text-sm leading-6 shadow-sm",
+        "bg-surface-muted px-4 py-3 text-sm leading-6 shadow-sm",
       ],
     },
     tone: {

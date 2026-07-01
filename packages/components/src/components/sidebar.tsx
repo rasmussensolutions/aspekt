@@ -7,12 +7,13 @@ import { cn } from "cnfast";
 import * as React from "react";
 
 import { Button, type ButtonProps } from "./button";
+import { Slot } from "./slot";
 
 const SIDEBAR_RESIZE_STEP = 16;
 
 const sidebarRootVariants = cva(
   [
-    "group/sidebar-root flex min-h-dvh w-full bg-surface text-primary",
+    "group/sidebar-root flex min-h-dvh w-full bg-surface-current text-primary",
     "[--sidebar-width:16rem] [--sidebar-collapsed-width:3rem]",
   ],
   {
@@ -41,10 +42,10 @@ const sidebarVariants = cva(
   {
     variants: {
       variant: {
-        solid: "border-border bg-surface-raised",
-        soft: "border-transparent bg-surface-sunken/35",
+        solid: "border-border bg-surface-current",
+        soft: "border-transparent bg-surface-muted",
         floating: [
-          "m-2 min-h-[calc(100dvh-1rem)] rounded-md border border-border bg-surface-raised shadow-sm",
+          "m-2 min-h-[calc(100dvh-1rem)] rounded-md border border-border bg-surface-current shadow-sm",
           "data-[side=left]:border data-[side=right]:border",
         ],
         inset: [
@@ -64,9 +65,9 @@ const sidebarMenuButtonVariants = cva(
     "group/sidebar-menu-button relative flex w-full min-w-0 items-center gap-2 rounded-lg",
     "font-medium text-secondary outline-none select-none",
     "transition-[background-color,color,box-shadow,opacity] duration-150 ease-out",
-    "dark:hover:bg-surface-floating/50 hover:bg-surface-sunken/50 hover:text-primary",
+    "hover:bg-surface-hover hover:text-primary",
     "focus-visible:ring-2 focus-visible:ring-current/20",
-    "dark:data-[active]:bg-surface-floating data-[active]:bg-surface-sunken data-[active]:text-primary",
+    "data-[active]:bg-surface-active data-[active]:text-primary",
     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
     "group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:gap-0 group-data-[state=collapsed]/sidebar:px-0",
@@ -158,6 +159,7 @@ type SidebarMenuButtonProps = Omit<
 > & {
   active?: boolean;
   as?: "a" | "button";
+  asChild?: boolean;
   disabled?: boolean;
   href?: string;
   prefix?: React.ReactNode;
@@ -492,8 +494,8 @@ const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
           "peer-data-[variant=floating]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-md",
           "peer-data-[variant=inset]/sidebar:m-2 peer-data-[variant=inset]/sidebar:rounded-lg",
           "group-data-[side=left]/sidebar-root:peer-data-[variant=inset]/sidebar:ml-0 group-data-[side=right]/sidebar-root:peer-data-[variant=inset]/sidebar:mr-0",
-          "peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-surface-raised peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
-          "peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-surface peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
+          "peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-surface-current peer-data-[variant=solid]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
+          "peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:rounded-none peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:border-0 peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:bg-surface-current peer-data-[variant=soft]/sidebar:[&_[data-slot=sidebar-inset-content]]:shadow-none",
           className,
         )}
         {...props}
@@ -511,7 +513,7 @@ const SidebarInsetContent = React.forwardRef<
       ref={ref}
       data-slot="sidebar-inset-content"
       className={cn(
-        "min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-surface-raised shadow-sm",
+        "min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-surface-current shadow-sm",
         className,
       )}
       {...props}
@@ -635,6 +637,7 @@ const SidebarMenuButton = React.forwardRef<HTMLElement, SidebarMenuButtonProps>(
     {
       active = false,
       as = "button",
+      asChild = false,
       children,
       className,
       disabled = false,
@@ -648,31 +651,15 @@ const SidebarMenuButton = React.forwardRef<HTMLElement, SidebarMenuButtonProps>(
   ) {
     const { open } = useSidebar("SidebarMenuButton");
     const Component = as;
-    const label = typeof children === "string" ? children : undefined;
+    const slottedChildren =
+      asChild && React.isValidElement<{ children?: React.ReactNode }>(children)
+        ? children.props.children
+        : children;
+    const label =
+      typeof slottedChildren === "string" ? slottedChildren : undefined;
     const ariaLabel = open || props["aria-label"] ? props["aria-label"] : label;
-    const buttonProps =
-      Component === "button"
-        ? {
-            disabled,
-            type,
-          }
-        : {
-            "aria-disabled": disabled || undefined,
-            tabIndex: disabled ? -1 : props.tabIndex,
-          };
-
-    return (
-      <Component
-        ref={ref as never}
-        data-slot="sidebar-menu-button"
-        data-active={active ? "" : undefined}
-        data-disabled={disabled ? "" : undefined}
-        className={cn(sidebarMenuButtonVariants({ size }), className)}
-        {...props}
-        aria-label={ariaLabel}
-        aria-current={active ? "page" : props["aria-current"]}
-        {...buttonProps}
-      >
+    const content = (
+      <>
         {prefix && (
           <span
             data-slot="sidebar-menu-prefix"
@@ -682,7 +669,7 @@ const SidebarMenuButton = React.forwardRef<HTMLElement, SidebarMenuButtonProps>(
           </span>
         )}
 
-        {children && (
+        {slottedChildren && (
           <span
             data-slot="sidebar-menu-label"
             className={cn(
@@ -691,7 +678,7 @@ const SidebarMenuButton = React.forwardRef<HTMLElement, SidebarMenuButtonProps>(
               "group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:max-w-0 group-data-[state=collapsed]/sidebar:opacity-0",
             )}
           >
-            {children}
+            {slottedChildren}
           </span>
         )}
 
@@ -706,6 +693,52 @@ const SidebarMenuButton = React.forwardRef<HTMLElement, SidebarMenuButtonProps>(
             {suffix}
           </span>
         )}
+      </>
+    );
+
+    const commonProps = {
+      "aria-current": active ? "page" : props["aria-current"],
+      "aria-label": ariaLabel,
+      className: cn(sidebarMenuButtonVariants({ size }), className),
+      "data-active": active ? "" : undefined,
+      "data-disabled": disabled ? "" : undefined,
+      "data-slot": "sidebar-menu-button",
+    } as const;
+
+    if (asChild) {
+      return (
+        <Slot
+          ref={ref}
+          {...commonProps}
+          {...props}
+          aria-disabled={disabled || undefined}
+          tabIndex={disabled ? -1 : props.tabIndex}
+          slottedChildren={content}
+        >
+          {children}
+        </Slot>
+      );
+    }
+
+    const buttonProps =
+      Component === "button"
+        ? {
+            disabled,
+            type,
+          }
+        : {
+            "aria-disabled": disabled || undefined,
+            tabIndex: disabled ? -1 : props.tabIndex,
+          };
+
+    return (
+      <Component
+        ref={ref as never}
+        {...commonProps}
+        {...props}
+        {...buttonProps}
+      >
+        {content}
       </Component>
     );
   },

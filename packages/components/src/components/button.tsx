@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "cnfast";
 
 import { aspektConfig } from "./config";
+import { Slot } from "./slot";
 import { playSound, type SoundName } from "./sound";
 
 const buttonVariants = cva(
@@ -107,7 +108,7 @@ const buttonVariants = cva(
         variant: "soft",
         color: "neutral",
         className:
-          "bg-control-soft text-primary border border-transparent hover:bg-control-soft/80",
+          "bg-surface-muted text-primary border border-transparent hover:bg-surface-hover",
       },
 
       {
@@ -135,7 +136,7 @@ const buttonVariants = cva(
         variant: "ghost",
         color: "neutral",
         className:
-          "text-primary border border-transparent hover:bg-surface-sunken",
+          "text-primary border border-transparent hover:bg-surface-hover",
       },
 
       {
@@ -166,7 +167,7 @@ const buttonVariants = cva(
         variant: "outline",
         color: "neutral",
         className:
-          "bg-surface text-primary border border-border hover:bg-surface-sunken",
+          "bg-surface-current text-primary border border-border hover:bg-surface-hover",
       },
     ],
     defaultVariants: {
@@ -192,6 +193,7 @@ type ButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "color" | "prefix" | "suffix"
 > & {
+  asChild?: boolean;
   variant?: ButtonVariant | null;
   color?: ButtonColor | null;
   size?: ButtonSize | null;
@@ -350,8 +352,9 @@ function ButtonShapeProvider({
   );
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+const Button = React.forwardRef<HTMLElement, ButtonProps>(function Button(
   {
+    asChild = false,
     className,
     variant,
     color,
@@ -379,10 +382,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   const resolvedSize = size ?? "medium";
   const resolvedShape = shape ?? inheritedShape ?? aspektConfig.shape;
   const effectiveColor = status === "fail" ? "destructive" : resolvedColor;
+  const slottedChildren =
+    asChild && React.isValidElement<{ children?: React.ReactNode }>(children)
+      ? children.props.children
+      : children;
 
   const isDisabled = Boolean(disabled);
   const isInteractionBlocked = isDisabled || loading;
-  const hasLabel = Boolean(children);
+  const hasLabel = Boolean(slottedChildren);
   const hasPrefix = Boolean(prefix);
   const hasSuffix = Boolean(suffix);
   const hasStatus = status === "success" || status === "fail";
@@ -450,41 +457,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     }
   }, [failSound, sound, status]);
 
-  return (
-    <button
-      ref={ref}
-      data-slot="button"
-      data-loading={loading ? "" : undefined}
-      data-disabled={isDisabled ? "" : undefined}
-      data-status={status ?? undefined}
-      type={type}
-      className={cn(
-        buttonVariants({
-          variant: resolvedVariant,
-          color: effectiveColor,
-          size: resolvedSize,
-          shape: resolvedShape,
-          className,
-        }),
-        showSuffix && buttonSuffixPadding[resolvedSize],
-      )}
-      disabled={isDisabled}
-      aria-disabled={loading && !isDisabled ? true : undefined}
-      aria-busy={loading || undefined}
-      onClick={(event) => {
-        if (isInteractionBlocked) {
-          event.preventDefault();
-          return;
-        }
-
-        if (resolvedSound) {
-          playSound(resolvedSound);
-        }
-
-        onClick?.(event);
-      }}
-      {...props}
-    >
+  const buttonContent = (
+    <>
       <ButtonAffix
         side="prefix"
         show={showPrefix}
@@ -502,9 +476,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
         {prefix}
       </ButtonAffix>
 
-      {children && (
+      {slottedChildren && (
         <span data-slot="button-label" className="inline-flex items-center">
-          {children}
+          {slottedChildren}
         </span>
       )}
 
@@ -523,6 +497,70 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       >
         {suffix}
       </ButtonAffix>
+    </>
+  );
+
+  const buttonClassName = cn(
+    buttonVariants({
+      variant: resolvedVariant,
+      color: effectiveColor,
+      size: resolvedSize,
+      shape: resolvedShape,
+      className,
+    }),
+    showSuffix && buttonSuffixPadding[resolvedSize],
+  );
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (isInteractionBlocked) {
+      event.preventDefault();
+      return;
+    }
+
+    if (resolvedSound) {
+      playSound(resolvedSound);
+    }
+
+    onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+  };
+
+  if (asChild) {
+    return (
+      <Slot
+        ref={ref}
+        data-slot="button"
+        data-loading={loading ? "" : undefined}
+        data-disabled={isDisabled ? "" : undefined}
+        data-status={status ?? undefined}
+        className={buttonClassName}
+        aria-disabled={isInteractionBlocked || undefined}
+        aria-busy={loading || undefined}
+        tabIndex={isInteractionBlocked ? -1 : props.tabIndex}
+        onClick={handleClick}
+        slottedChildren={buttonContent}
+        {...props}
+      >
+        {children}
+      </Slot>
+    );
+  }
+
+  return (
+    <button
+      ref={ref as React.ForwardedRef<HTMLButtonElement>}
+      data-slot="button"
+      data-loading={loading ? "" : undefined}
+      data-disabled={isDisabled ? "" : undefined}
+      data-status={status ?? undefined}
+      type={type}
+      className={buttonClassName}
+      disabled={isDisabled}
+      aria-disabled={loading && !isDisabled ? true : undefined}
+      aria-busy={loading || undefined}
+      onClick={handleClick}
+      {...props}
+    >
+      {buttonContent}
     </button>
   );
 });

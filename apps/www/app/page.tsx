@@ -10,6 +10,15 @@ import {
 } from "@aspekt/components-source/app-tabs";
 import { AspectRatio } from "@aspekt/components-source/aspect-ratio";
 import { Button } from "@aspekt/components-source/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@aspekt/components-source/card";
 import { Checkbox } from "@aspekt/components-source/checkbox";
 import { Code } from "@aspekt/components-source/code";
 import { Blockquote } from "@aspekt/components-source/blockquote";
@@ -39,6 +48,20 @@ import {
   DialogTrigger,
 } from "@aspekt/components-source/dialog";
 import {
+  DockBar,
+  DockButton,
+  DockMenu,
+  DockMenuItem,
+  DockPanel,
+  DockPanelContent,
+  DockPanelDescription,
+  DockPanelHeader,
+  DockPanelTitle,
+  DockRoot,
+  DockSeparator,
+  DockTrigger,
+} from "@aspekt/components-source/dock";
+import {
   DrawerBody,
   DrawerClose,
   DrawerContent,
@@ -66,6 +89,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@aspekt/components-source/popover";
+import { ScrollArea } from "@aspekt/components-source/scroll-area";
 import { Heading } from "@aspekt/components-source/heading";
 import { Kbd } from "@aspekt/components-source/kbd";
 import { List, ListItem } from "@aspekt/components-source/list";
@@ -110,6 +134,11 @@ import {
   type SoundDepth,
   useSound,
 } from "@aspekt/components-source/sound-provider";
+import {
+  Surface,
+  SurfaceProvider,
+  surfaceLevels,
+} from "@aspekt/components-source/surface";
 import { Switch } from "@aspekt/components-source/switch";
 import {
   TabsIndicator,
@@ -136,16 +165,20 @@ import {
 } from "@phosphor-icons/react";
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 
 type IntroPage = "getting-started" | "principles";
-type FoundationPage = "typography" | "colors" | "sonification";
+type FoundationPage = "typography" | "surfaces" | "colors" | "sonification";
+type UtilityPage = "scroll-fade" | "shimmer";
 type ApiPage = "avatar-api" | "icon-api";
 type ComponentPreview =
   | "app-tabs"
   | "aspect-ratio"
+  | "scroll-area"
   | "avatar"
   | "button"
+  | "card"
   | "checkbox"
   | "input"
   | "select"
@@ -155,6 +188,7 @@ type ComponentPreview =
   | "switch"
   | "toggle"
   | "dialog"
+  | "dock"
   | "drawer"
   | "popover"
   | "sidebar"
@@ -175,7 +209,12 @@ type TypographyPrimitive = Extract<
   "heading" | "text" | "code" | "kbd" | "prose" | "blockquote" | "list"
 >;
 
-type DocsPage = IntroPage | FoundationPage | ApiPage | ComponentPreview;
+type DocsPage =
+  | IntroPage
+  | FoundationPage
+  | UtilityPage
+  | ApiPage
+  | ComponentPreview;
 type DocsAppProps = {
   initialPage?: DocsPage;
 };
@@ -186,10 +225,17 @@ type ButtonShape = "square" | "round";
 type DialogSize = "small" | "medium" | "large";
 type DrawerSide = "top" | "right" | "bottom" | "left";
 type PopoverSide = "top" | "right" | "bottom" | "left";
+type DockBarSize = "small" | "medium" | "large";
+type DockPreviewPanel = "menu" | "create" | "closed";
 type TabsVariant = "line" | "soft" | "outline";
 type TabsOrientation = "horizontal" | "vertical";
 type TableVariant = "outline" | "soft" | "ghost";
 type TableSize = "compact" | "medium" | "large";
+type ScrollAreaVariant = "outline" | "soft" | "ghost";
+type ScrollAreaSize = "small" | "medium" | "large";
+type ScrollAreaAxis = "vertical" | "horizontal";
+type CardVariant = "outline" | "soft" | "ghost";
+type CardSize = "small" | "medium" | "large";
 type InputVariant = "outline" | "soft" | "ghost";
 type SelectVariant = "outline" | "soft" | "ghost";
 type ComboboxVariant = "outline" | "soft" | "ghost";
@@ -301,6 +347,12 @@ type ButtonSettings = {
   loading: boolean;
   status: ButtonStatusOption;
   disabled: boolean;
+};
+
+type CardSettings = {
+  variant: CardVariant;
+  size: CardSize;
+  shape: ButtonShape;
 };
 
 type AvatarSettings = {
@@ -415,6 +467,12 @@ type PopoverSettings = {
   size: DialogSize;
 };
 
+type DockSettings = {
+  panel: DockPreviewPanel;
+  shape: ButtonShape;
+  size: DockBarSize;
+};
+
 type ToastSettings = {
   action: boolean;
   autoClose: boolean;
@@ -451,6 +509,14 @@ type TableSettings = {
   sortable: boolean;
   stickyHeader: boolean;
   showColumnBorders: boolean;
+};
+
+type ScrollAreaSettings = {
+  axis: ScrollAreaAxis;
+  fade: boolean;
+  shape: ButtonShape;
+  size: ScrollAreaSize;
+  variant: ScrollAreaVariant;
 };
 
 type SidebarSettings = {
@@ -553,7 +619,13 @@ function useDebouncedValue<TValue>(value: TValue, delayMs: number) {
 }
 
 const introIds = ["getting-started", "principles"] as const;
-const foundationIds = ["typography", "colors", "sonification"] as const;
+const foundationIds = [
+  "typography",
+  "surfaces",
+  "colors",
+  "sonification",
+] as const;
+const utilityIds = ["scroll-fade", "shimmer"] as const;
 const apiIds = ["avatar-api", "icon-api"] as const;
 const typographyPrimitiveIds = [
   "heading",
@@ -567,8 +639,10 @@ const typographyPrimitiveIds = [
 const componentIds = [
   "app-tabs",
   "aspect-ratio",
+  "scroll-area",
   "avatar",
   "button",
+  "card",
   "checkbox",
   "input",
   "select",
@@ -578,6 +652,7 @@ const componentIds = [
   "switch",
   "toggle",
   "dialog",
+  "dock",
   "drawer",
   "popover",
   "sidebar",
@@ -596,7 +671,9 @@ const componentIds = [
 const docsComponentIds = [
   "app-tabs",
   "aspect-ratio",
+  "scroll-area",
   "avatar",
+  "card",
   "button",
   "checkbox",
   "input",
@@ -607,6 +684,7 @@ const docsComponentIds = [
   "switch",
   "toggle",
   "dialog",
+  "dock",
   "drawer",
   "popover",
   "sidebar",
@@ -618,6 +696,7 @@ const docsComponentIds = [
 const docsPageIds = [
   ...introIds,
   ...foundationIds,
+  ...utilityIds,
   ...apiIds,
   ...docsComponentIds,
 ] as const;
@@ -634,6 +713,7 @@ const navGroups = [
     title: "Foundations",
     items: [
       { label: "Typography", page: "typography" },
+      { label: "Surfaces", page: "surfaces" },
       { label: "Colors", page: "colors" },
       { label: "Sonification", page: "sonification" },
     ],
@@ -656,8 +736,11 @@ const navGroups = [
     title: "Components",
     items: [
       { label: "Aspect Ratio", page: "aspect-ratio" },
+      { label: "Scroll Area", page: "scroll-area" },
       { label: "Avatar", page: "avatar" },
+      { label: "Card", page: "card" },
       { label: "Dialog", page: "dialog" },
+      { label: "Dock", page: "dock" },
       { label: "Drawer", page: "drawer" },
       { label: "Popover", page: "popover" },
       { label: "Sidebar", page: "sidebar" },
@@ -666,6 +749,13 @@ const navGroups = [
       { label: "Tabs", page: "tabs" },
       { label: "Table", page: "table" },
       { label: "Snippet", page: "snippet" },
+    ],
+  },
+  {
+    title: "Utilities",
+    items: [
+      { label: "Scroll Fade", page: "scroll-fade" },
+      { label: "Shimmer", page: "shimmer" },
     ],
   },
   {
@@ -695,6 +785,12 @@ const avatarOptions = {
 
 const aspectRatioOptions = {
   ratio: ["1:1", "4:3", "16:9", "21:9"],
+} as const;
+
+const cardOptions = {
+  variant: ["outline", "soft", "ghost"],
+  size: ["small", "medium", "large"],
+  shape: buttonOptions.shape,
 } as const;
 
 const aspectRatioValues = {
@@ -767,6 +863,12 @@ const popoverOptions = {
   size: dialogOptions.size,
 } as const;
 
+const dockOptions = {
+  panel: ["menu", "create", "closed"],
+  shape: buttonOptions.shape,
+  size: ["small", "medium", "large"],
+} as const;
+
 const toastOptions = {
   maxToasts: ["1", "3", "6", "9"],
   position: toastPositions,
@@ -792,6 +894,13 @@ const appTabsOptions = {
 const tableOptions = {
   variant: ["outline", "soft", "ghost"],
   size: ["compact", "medium", "large"],
+  shape: buttonOptions.shape,
+} as const;
+
+const scrollAreaOptions = {
+  axis: ["vertical", "horizontal"],
+  variant: ["outline", "soft", "ghost"],
+  size: ["small", "medium", "large"],
   shape: buttonOptions.shape,
 } as const;
 
@@ -898,9 +1007,18 @@ const componentCopy = {
     title: "Aspect Ratio",
     description: "is used to preserve proportional media and embeds.",
   },
+  "scroll-area": {
+    title: "Scroll Area",
+    description:
+      "is used to contain overflow with custom scrollbars and edge fades.",
+  },
   avatar: {
     title: "Avatar",
     description: "is used to identify people, teams, and entities.",
+  },
+  card: {
+    title: "Card",
+    description: "is used to group related content and actions.",
   },
   button: {
     title: "Button",
@@ -942,6 +1060,11 @@ const componentCopy = {
   dialog: {
     title: "Dialog",
     description: "is used for focused decisions and short modal workflows.",
+  },
+  dock: {
+    title: "Dock",
+    description:
+      "is used for mobile-first navigation actions and expandable menus.",
   },
   drawer: {
     title: "Drawer",
@@ -1010,7 +1133,20 @@ const componentCopy = {
 const componentImportExamples = {
   "aspect-ratio":
     'import { AspectRatio } from "@/components/aspekt/aspect-ratio";',
+  "scroll-area":
+    'import { ScrollArea } from "@/components/aspekt/scroll-area";',
   avatar: 'import { Avatar } from "@/components/aspekt/avatar";',
+  card: `import { Button } from "@/components/aspekt/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/aspekt/card";
+import { Input } from "@/components/aspekt/input";`,
   button: 'import { Button } from "@/components/aspekt/button";',
   checkbox: 'import { Checkbox } from "@/components/aspekt/checkbox";',
   input: 'import { Input } from "@/components/aspekt/input";',
@@ -1025,6 +1161,20 @@ const componentImportExamples = {
   toggle: 'import { Toggle } from "@/components/aspekt/toggle";',
   dialog:
     'import { DialogRoot, DialogTrigger } from "@/components/aspekt/dialog";',
+  dock: `import {
+  DockBar,
+  DockButton,
+  DockMenu,
+  DockMenuItem,
+  DockPanel,
+  DockPanelContent,
+  DockPanelDescription,
+  DockPanelHeader,
+  DockPanelTitle,
+  DockRoot,
+  DockSeparator,
+  DockTrigger,
+} from "@/components/aspekt/dock";`,
   drawer:
     'import { DrawerRoot, DrawerTrigger } from "@/components/aspekt/drawer";',
   popover:
@@ -1154,7 +1304,7 @@ const fallbackIconApiDocs = {
 const avatarExampleImageSrc = `${avatarApiBaseUrl}/gradient/${avatarApiUsername}`;
 
 const componentUsageExamples = {
-  "aspect-ratio": `<AspectRatio ratio={16 / 9} className="w-full max-w-sm rounded-lg border border-border bg-surface">
+  "aspect-ratio": `<AspectRatio ratio={16 / 9} className="w-full max-w-sm rounded-lg border border-border bg-surface-current">
   <Image
     src="/logo.png"
     alt="Aspekt logo"
@@ -1163,11 +1313,53 @@ const componentUsageExamples = {
     className="object-contain p-12 dark:invert"
   />
 </AspectRatio>`,
+  "scroll-area": `<ScrollArea
+  className="h-64 w-full max-w-sm"
+  contentClassName="grid gap-3 p-4"
+  fade
+>
+  {updates.map((update) => (
+    <article key={update.title} className="rounded-lg border p-3">
+      <h3 className="text-sm font-medium">{update.title}</h3>
+      <p className="text-sm text-secondary">{update.description}</p>
+    </article>
+  ))}
+</ScrollArea>`,
   avatar: `<Avatar
   alt="Tobias Rasmussen"
   fallback="TR"
   src="${avatarExampleImageSrc}"
 />`,
+  card: `<Card className="w-full max-w-sm">
+  <CardHeader>
+    <CardTitle>Sign in to your account</CardTitle>
+    <CardDescription>
+      Enter your email below to sign in.
+    </CardDescription>
+    <CardAction>
+      <Button color="neutral" size="tiny" variant="soft">
+        Sign up
+      </Button>
+    </CardAction>
+  </CardHeader>
+  <form className="grid gap-4">
+    <CardContent className="grid gap-3">
+      <label className="grid gap-1.5">
+        <span className="text-sm font-medium">Email</span>
+        <Input type="email" placeholder="you@example.com" />
+      </label>
+      <label className="grid gap-1.5">
+        <span className="text-sm font-medium">Password</span>
+        <Input type="password" placeholder="Enter password" />
+      </label>
+    </CardContent>
+    <CardFooter className="pt-0">
+      <Button type="submit" color="neutral" className="w-full">
+        Sign in
+      </Button>
+    </CardFooter>
+  </form>
+</Card>`,
   button: `<Button color="neutral" status="success" sound="success">
   Save changes
 </Button>`,
@@ -1263,6 +1455,64 @@ const componentUsageExamples = {
     </DialogContent>
   </DialogPortal>
 </DialogRoot>`,
+  dock: `<DockRoot defaultValue="menu">
+  <DockPanel value="menu">
+    <DockPanelHeader>
+      <DockPanelTitle>Atlas Studio</DockPanelTitle>
+      <DockPanelDescription>
+        Jump between mobile workspace views from the dock.
+      </DockPanelDescription>
+    </DockPanelHeader>
+    <DockPanelContent>
+      <DockMenu>
+        <DockMenuItem active prefix={<StackIcon />}>
+          Roadmap
+        </DockMenuItem>
+        <DockMenuItem prefix={<ListIcon />}>Releases</DockMenuItem>
+        <DockMenuItem prefix={<PlusCircleIcon />}>Reports</DockMenuItem>
+        <DockSeparator />
+        <DockMenuItem badge="99+" prefix={<StackIcon />}>
+          Inbox
+        </DockMenuItem>
+      </DockMenu>
+    </DockPanelContent>
+  </DockPanel>
+  <DockPanel value="create">
+    <DockPanelHeader>
+      <DockPanelTitle>Quick actions</DockPanelTitle>
+      <DockPanelDescription>
+        Start common workspace tasks from the dock.
+      </DockPanelDescription>
+    </DockPanelHeader>
+    <DockPanelContent>
+      <DockMenu>
+        <DockMenuItem prefix={<PlusCircleIcon />}>New brief</DockMenuItem>
+        <DockMenuItem prefix={<StackIcon />}>Add milestone</DockMenuItem>
+        <DockMenuItem prefix={<ListIcon />}>Invite collaborator</DockMenuItem>
+      </DockMenu>
+    </DockPanelContent>
+  </DockPanel>
+  <DockBar>
+    <DockButton aria-label="Search" prefix={<MagnifyingGlassIcon />}>
+      Search
+    </DockButton>
+    <DockButton asChild active prefix={<StackIcon />}>
+      <a href="#roadmap">Roadmap</a>
+    </DockButton>
+    <DockTrigger value="create" aria-label="Open quick actions">
+      <PlusCircleIcon />
+    </DockTrigger>
+    <DockTrigger
+      value="menu"
+      aria-label="Toggle navigation"
+      activeChildren={<XIcon />}
+      align="end"
+      separator
+    >
+      <ListIcon />
+    </DockTrigger>
+  </DockBar>
+</DockRoot>`,
   drawer: `<DrawerRoot side="right" detached>
   <DrawerTrigger>View order</DrawerTrigger>
   <DrawerPortal>
@@ -1345,7 +1595,9 @@ const componentUsageExamples = {
         <SidebarSectionLabel>Workspace</SidebarSectionLabel>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton active>Projects</SidebarMenuButton>
+            <SidebarMenuButton asChild active>
+              <a href="/projects">Projects</a>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarSection>
@@ -1470,10 +1722,15 @@ const foundationCopy = {
     description:
       "collects the text primitives used to shape hierarchy, rhythm, and long-form content.",
   },
+  surfaces: {
+    title: "Surfaces",
+    description:
+      "explains Aspekt depth, contextual surface inheritance, overlay lift, and neutral state treatments.",
+  },
   colors: {
     title: "Colors",
     description:
-      "explains the z-axis surface scale and the theme tokens that ship through Aspekt.",
+      "documents text roles, action colors, feedback colors, structure tokens, and radii.",
   },
   sonification: {
     title: "Sonification",
@@ -1482,6 +1739,23 @@ const foundationCopy = {
   },
 } satisfies Record<
   FoundationPage,
+  {
+    title: string;
+    description: string;
+  }
+>;
+
+const utilityCopy = {
+  "scroll-fade": {
+    title: "Scroll Fade",
+    description: "adds edge fades to scroll containers with CSS masks.",
+  },
+  shimmer: {
+    title: "Shimmer",
+    description: "adds animated text shimmer for pending and generated states.",
+  },
+} satisfies Record<
+  UtilityPage,
   {
     title: string;
     description: string;
@@ -1530,6 +1804,14 @@ const defaultAspectRatioSettings = {
   ratio: "16:9",
 } satisfies AspectRatioSettings;
 
+const defaultScrollAreaSettings = {
+  axis: "vertical",
+  fade: true,
+  shape: "round",
+  size: "medium",
+  variant: "outline",
+} satisfies ScrollAreaSettings;
+
 const defaultButtonSettings = {
   variant: "solid",
   size: "medium",
@@ -1541,6 +1823,12 @@ const defaultButtonSettings = {
   status: "none",
   disabled: false,
 } satisfies ButtonSettings;
+
+const defaultCardSettings = {
+  variant: "outline",
+  size: "medium",
+  shape: "round",
+} satisfies CardSettings;
 
 const defaultInputSettings = {
   variant: "soft",
@@ -1635,7 +1923,7 @@ const defaultToggleSettings = {
 
 const defaultDialogSettings = {
   shape: "round",
-  size: "medium",
+  size: "small",
 } satisfies DialogSettings;
 
 const defaultDrawerSettings = {
@@ -1653,6 +1941,12 @@ const defaultPopoverSettings = {
   side: "bottom",
   size: "medium",
 } satisfies PopoverSettings;
+
+const defaultDockSettings = {
+  panel: "menu",
+  shape: "round",
+  size: "medium",
+} satisfies DockSettings;
 
 const defaultToastSettings = {
   action: false,
@@ -1691,6 +1985,39 @@ const defaultTableSettings = {
   stickyHeader: false,
   showColumnBorders: false,
 } satisfies TableSettings;
+
+const scrollAreaPreviewItems = [
+  {
+    title: "Release notes",
+    meta: "8 min ago",
+    description:
+      "Draft copy is ready for the June platform update and needs one final product review.",
+  },
+  {
+    title: "Design audit",
+    meta: "18 min ago",
+    description:
+      "Three dense dashboard states have been checked for focus order, overflow, and long labels.",
+  },
+  {
+    title: "Billing export",
+    meta: "42 min ago",
+    description:
+      "The finance workspace export finished with 124 customer rows and two retry warnings.",
+  },
+  {
+    title: "Invite queue",
+    meta: "1 hr ago",
+    description:
+      "Six pending collaborator invitations are waiting for domain approval.",
+  },
+  {
+    title: "Incident review",
+    meta: "2 hr ago",
+    description:
+      "A monitoring summary is attached to the reliability channel for Tuesday planning.",
+  },
+] as const;
 
 const defaultSidebarSettings = {
   collapsible: true,
@@ -2181,7 +2508,7 @@ function DocsNavigation({
 
 function MobileNavbar({ onMenuOpen }: { onMenuOpen: () => void }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-surface/95 px-6 py-4 backdrop-blur sm:px-10 lg:hidden dark:border-white/15">
+    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-surface-current/95 px-6 py-4 backdrop-blur sm:px-10 lg:hidden dark:border-white/15">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
         <LogoLockup />
         <button
@@ -2237,7 +2564,7 @@ function MobileMenu({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-surface text-primary lg:hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-surface-current text-primary lg:hidden">
       <div className="flex shrink-0 items-center justify-between gap-4 border-b border-neutral-200 px-6 py-4 sm:px-10 dark:border-white/15">
         <LogoLockup />
         <button
@@ -2638,6 +2965,10 @@ function isFoundationPage(value: string): value is FoundationPage {
   return (foundationIds as readonly string[]).includes(value);
 }
 
+function isUtilityPage(value: string): value is UtilityPage {
+  return (utilityIds as readonly string[]).includes(value);
+}
+
 function isApiPage(value: string): value is ApiPage {
   return (apiIds as readonly string[]).includes(value);
 }
@@ -2649,6 +2980,7 @@ function isDocsPage(value: string): value is DocsPage {
 function getDocsPageCopy(page: DocsPage) {
   if (isComponentPreview(page)) return componentCopy[page];
   if (isFoundationPage(page)) return foundationCopy[page];
+  if (isUtilityPage(page)) return utilityCopy[page];
   if (isApiPage(page)) return apiCopy[page];
 
   return introCopy[page];
@@ -3005,7 +3337,7 @@ function AspectRatioPreview({ settings }: { settings: AspectRatioSettings }) {
   return (
     <AspectRatio
       ratio={aspectRatioValues[settings.ratio]}
-      className="w-full max-w-sm rounded-lg border border-border bg-surface shadow-sm"
+      className="w-full max-w-sm rounded-lg border border-border bg-surface-current shadow-sm"
     >
       <Image
         src="/logo.png"
@@ -3015,6 +3347,71 @@ function AspectRatioPreview({ settings }: { settings: AspectRatioSettings }) {
         className="object-contain p-12 dark:invert"
       />
     </AspectRatio>
+  );
+}
+
+function CardPreview({ settings }: { settings: CardSettings }) {
+  return (
+    <div className="w-full max-w-sm px-6">
+      <Card
+        variant={settings.variant}
+        size={settings.size}
+        shape={settings.shape}
+      >
+        <CardHeader>
+          <CardTitle>Sign in to your account</CardTitle>
+          <CardDescription>Enter your email below to sign in.</CardDescription>
+          <CardAction>
+            <Button
+              type="button"
+              color="neutral"
+              size="tiny"
+              shape={settings.shape}
+              variant="soft"
+            >
+              Sign up
+            </Button>
+          </CardAction>
+        </CardHeader>
+
+        <form
+          className="grid gap-4"
+          onSubmit={(event) => event.preventDefault()}
+        >
+          <CardContent className="grid gap-3">
+            <label className="grid gap-1.5">
+              <span className="text-sm font-medium text-primary">Email</span>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                shape={settings.shape}
+                variant="soft"
+              />
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-sm font-medium text-primary">Password</span>
+              <Input
+                type="password"
+                placeholder="Enter password"
+                shape={settings.shape}
+                variant="soft"
+              />
+            </label>
+          </CardContent>
+
+          <CardFooter className="pt-0">
+            <Button
+              type="submit"
+              color="neutral"
+              shape={settings.shape}
+              className="w-full"
+            >
+              Sign in
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   );
 }
 
@@ -3295,36 +3692,9 @@ function DialogPreview({ settings }: { settings: DialogSettings }) {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-white/15 dark:bg-white/5">
-            <div className="flex min-w-0 items-center justify-between gap-4">
-              <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                project
-              </span>
-              <span className="min-w-0 text-right font-medium text-primary">
-                Q3 launch plan
-              </span>
-            </div>
-            <div className="flex min-w-0 items-center justify-between gap-4">
-              <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                open tasks
-              </span>
-              <span className="min-w-0 text-right font-medium text-primary">
-                12
-              </span>
-            </div>
-            <div className="flex min-w-0 items-center justify-between gap-4">
-              <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
-                milestones
-              </span>
-              <span className="min-w-0 text-right font-medium text-primary">
-                4
-              </span>
-            </div>
-          </div>
-
           <DialogFooter>
-            <DialogClose>Keep project</DialogClose>
-            <Button type="button" color="destructive">
+            <DialogClose variant={"soft"}>Keep project</DialogClose>
+            <Button type="button" color="neutral">
               Archive project
             </Button>
           </DialogFooter>
@@ -3355,7 +3725,7 @@ function DrawerPreview({ settings }: { settings: DrawerSettings }) {
                 </DrawerDescription>
               </DrawerHeader>
 
-              <div className="grid gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-white/15 dark:bg-white/5">
+              <div className="grid gap-2 rounded-lg border border-border bg-surface-muted p-3 text-sm">
                 <div className="flex min-w-0 items-center justify-between gap-4">
                   <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                     customer
@@ -3449,6 +3819,384 @@ function PopoverPreview({ settings }: { settings: PopoverSettings }) {
         </PopoverPositioner>
       </PopoverPortal>
     </PopoverRoot>
+  );
+}
+
+type DockPreviewView =
+  | "roadmap"
+  | "releases"
+  | "activity"
+  | "reports"
+  | "inbox"
+  | "customers"
+  | "automations"
+  | "search"
+  | "brief"
+  | "milestone"
+  | "collaborator";
+
+const dockPreviewViews = {
+  roadmap: {
+    icon: StackIcon,
+    eyebrow: "Planning",
+    title: "Roadmap",
+    description: "Prioritize the next mobile workspace milestones.",
+    metric: "4 lanes",
+    status: "Q3",
+    items: [
+      ["Mobile command bar", "Design review", "Today"],
+      ["Insights overview", "Ready for scope", "Wed"],
+      ["Customer handoff", "Blocked by copy", "Fri"],
+    ],
+  },
+  releases: {
+    icon: ListIcon,
+    eyebrow: "Shipping",
+    title: "Releases",
+    description: "Coordinate what is ready to package this week.",
+    metric: "3 builds",
+    status: "Stable",
+    items: [
+      ["v1.8 dashboard polish", "Waiting on QA", "2 checks"],
+      ["API usage cards", "Release notes drafted", "Ready"],
+      ["Billing filters", "Regression pass", "Tonight"],
+    ],
+  },
+  activity: {
+    icon: MagnifyingGlassIcon,
+    eyebrow: "Timeline",
+    title: "Activity",
+    description: "Track the latest changes across the workspace.",
+    metric: "18 events",
+    status: "Live",
+    items: [
+      ["Maya moved Reports to review", "Product", "4m"],
+      ["Jon attached new launch notes", "Content", "12m"],
+      ["Pilot feedback imported", "Research", "31m"],
+    ],
+  },
+  reports: {
+    icon: PlusCircleIcon,
+    eyebrow: "Insights",
+    title: "Reports",
+    description: "Review summaries before the weekly planning sync.",
+    metric: "7 charts",
+    status: "Draft",
+    items: [
+      ["Activation trend", "Up 12 percent", "Green"],
+      ["Mobile retention", "Needs a closer look", "Watch"],
+      ["Team velocity", "On pace", "Good"],
+    ],
+  },
+  inbox: {
+    icon: StackIcon,
+    eyebrow: "Messages",
+    title: "Inbox",
+    description: "Triage workspace requests before they pile up.",
+    metric: "99+",
+    status: "Busy",
+    items: [
+      ["Finance approval", "Needs owner", "High"],
+      ["Partner intro", "Reply drafted", "New"],
+      ["Design QA notes", "Assigned to Lina", "Open"],
+    ],
+  },
+  customers: {
+    icon: ListIcon,
+    eyebrow: "Accounts",
+    title: "Customers",
+    description: "Keep high-signal customer work easy to reach.",
+    metric: "42",
+    status: "Active",
+    items: [
+      ["Northstar Labs", "Expansion call", "Today"],
+      ["Fjord Studio", "Prototype shared", "Wed"],
+      ["Lumen Health", "Security review", "Open"],
+    ],
+  },
+  automations: {
+    icon: PlusCircleIcon,
+    eyebrow: "Workflows",
+    title: "Automations",
+    description: "Inspect the helpers keeping recurring work moving.",
+    metric: "Beta",
+    status: "5 active",
+    items: [
+      ["Weekly digest", "Runs Monday", "On"],
+      ["Launch checklist", "Triggered by release", "On"],
+      ["Renewal reminders", "Paused for edits", "Paused"],
+    ],
+  },
+  search: {
+    icon: MagnifyingGlassIcon,
+    eyebrow: "Find",
+    title: "Search",
+    description: "Surface pages, customers, and recent workspace files.",
+    metric: "8 hits",
+    status: "Recent",
+    items: [
+      ["Roadmap planning", "Workspace page", "Top"],
+      ["Q3 launch notes", "Document", "Recent"],
+      ["Northstar Labs", "Customer", "Pinned"],
+    ],
+  },
+  brief: {
+    icon: PlusCircleIcon,
+    eyebrow: "Create",
+    title: "New brief",
+    description: "Draft the project context before the team jumps in.",
+    metric: "3 steps",
+    status: "Template",
+    items: [
+      ["Define audience", "Required", "Step 1"],
+      ["Add success metric", "Recommended", "Step 2"],
+      ["Assign reviewers", "Optional", "Step 3"],
+    ],
+  },
+  milestone: {
+    icon: StackIcon,
+    eyebrow: "Create",
+    title: "Add milestone",
+    description: "Add a visible checkpoint to the active roadmap.",
+    metric: "May 18",
+    status: "Draft",
+    items: [
+      ["Name milestone", "Mobile beta", "Done"],
+      ["Choose owner", "Unassigned", "Next"],
+      ["Attach tasks", "12 suggested", "Later"],
+    ],
+  },
+  collaborator: {
+    icon: ListIcon,
+    eyebrow: "Create",
+    title: "Invite collaborator",
+    description: "Bring someone into the workspace with the right context.",
+    metric: "2 seats",
+    status: "Ready",
+    items: [
+      ["Mira Chen", "Product lead", "Editor"],
+      ["Owen Vale", "Research", "Viewer"],
+      ["Invite note", "Personalized", "Ready"],
+    ],
+  },
+} satisfies Record<
+  DockPreviewView,
+  {
+    description: string;
+    eyebrow: string;
+    icon: typeof StackIcon;
+    items: Array<[string, string, string]>;
+    metric: string;
+    status: string;
+    title: string;
+  }
+>;
+
+function DockPreview({
+  settings,
+  onPanelChange,
+}: {
+  settings: DockSettings;
+  onPanelChange: (panel: DockPreviewPanel) => void;
+}) {
+  const [activeView, setActiveView] =
+    React.useState<DockPreviewView>("roadmap");
+  const activePreview = dockPreviewViews[activeView];
+  const ActiveIcon = activePreview.icon;
+
+  function selectView(view: DockPreviewView) {
+    setActiveView(view);
+    onPanelChange("closed");
+  }
+
+  return (
+    <div className="h-[34rem] w-full max-w-2xl px-6">
+      <DockRoot
+        className="h-full justify-end overflow-hidden rounded-2xl border border-border bg-surface-current"
+        position="static"
+        shape={settings.shape}
+        value={settings.panel === "closed" ? null : settings.panel}
+        onValueChange={(value) =>
+          onPanelChange(value === null ? "closed" : (value as DockPreviewPanel))
+        }
+      >
+        <div className="pointer-events-auto flex min-h-0 w-full flex-1 self-stretch p-5">
+          <div className="flex min-h-0 w-full flex-col">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 text-xs font-medium uppercase text-tertiary">
+                  <ActiveIcon className="size-4" />
+                  {activePreview.eyebrow}
+                </div>
+                <h3 className="mt-2 truncate text-2xl font-semibold leading-tight text-primary">
+                  {activePreview.title}
+                </h3>
+                <p className="mt-1 max-w-sm text-sm leading-6 text-secondary">
+                  {activePreview.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DockPanel value="menu">
+          <DockPanelHeader>
+            <DockPanelTitle>Atlas Studio</DockPanelTitle>
+            <DockPanelDescription>
+              Mobile navigation for a product workspace.
+            </DockPanelDescription>
+          </DockPanelHeader>
+          <DockPanelContent>
+            <DockMenu>
+              <DockMenuItem
+                active={activeView === "roadmap"}
+                closeOnSelect
+                prefix={<StackIcon />}
+                onClick={() => setActiveView("roadmap")}
+              >
+                Roadmap
+              </DockMenuItem>
+              <DockMenuItem
+                active={activeView === "releases"}
+                closeOnSelect
+                prefix={<ListIcon />}
+                onClick={() => setActiveView("releases")}
+              >
+                Releases
+              </DockMenuItem>
+              <DockMenuItem
+                active={activeView === "activity"}
+                closeOnSelect
+                prefix={<MagnifyingGlassIcon />}
+                onClick={() => setActiveView("activity")}
+              >
+                Activity
+              </DockMenuItem>
+              <DockMenuItem
+                active={activeView === "reports"}
+                closeOnSelect
+                prefix={<PlusCircleIcon />}
+                onClick={() => setActiveView("reports")}
+              >
+                Reports
+              </DockMenuItem>
+              <DockSeparator />
+              <DockMenuItem
+                active={activeView === "inbox"}
+                badge="99+"
+                closeOnSelect
+                prefix={<StackIcon />}
+                onClick={() => setActiveView("inbox")}
+              >
+                Inbox
+              </DockMenuItem>
+              <DockMenuItem
+                active={activeView === "customers"}
+                closeOnSelect
+                prefix={<ListIcon />}
+                suffix={<ArrowRightIcon />}
+                onClick={() => setActiveView("customers")}
+              >
+                Customers
+              </DockMenuItem>
+              <DockMenuItem
+                active={activeView === "automations"}
+                badge="Beta"
+                closeOnSelect
+                prefix={<PlusCircleIcon />}
+                suffix={<ArrowRightIcon />}
+                onClick={() => setActiveView("automations")}
+              >
+                Automations
+              </DockMenuItem>
+            </DockMenu>
+          </DockPanelContent>
+        </DockPanel>
+        <DockPanel value="create">
+          <DockPanelHeader>
+            <DockPanelTitle>Quick actions</DockPanelTitle>
+            <DockPanelDescription>
+              Start common workspace tasks from the dock.
+            </DockPanelDescription>
+          </DockPanelHeader>
+          <DockPanelContent>
+            <DockMenu>
+              <DockMenuItem
+                active={activeView === "brief"}
+                closeOnSelect
+                prefix={<PlusCircleIcon />}
+                onClick={() => setActiveView("brief")}
+              >
+                New brief
+              </DockMenuItem>
+              <DockMenuItem
+                active={activeView === "milestone"}
+                closeOnSelect
+                prefix={<StackIcon />}
+                onClick={() => setActiveView("milestone")}
+              >
+                Add milestone
+              </DockMenuItem>
+              <DockMenuItem
+                active={activeView === "collaborator"}
+                closeOnSelect
+                prefix={<ListIcon />}
+                onClick={() => setActiveView("collaborator")}
+              >
+                Invite collaborator
+              </DockMenuItem>
+            </DockMenu>
+          </DockPanelContent>
+        </DockPanel>
+
+        <DockBar size={settings.size} className="mx-auto w-full max-w-sm">
+          <DockButton
+            active={activeView === "search"}
+            aria-label="Search"
+            prefix={<MagnifyingGlassIcon />}
+            shape={settings.shape}
+            onClick={() => selectView("search")}
+          >
+            Search
+          </DockButton>
+          <DockButton
+            active={activeView === "roadmap"}
+            asChild
+            prefix={<StackIcon />}
+            shape={settings.shape}
+          >
+            <a
+              href="#dock-roadmap"
+              onClick={(event) => {
+                event.preventDefault();
+                selectView("roadmap");
+              }}
+            >
+              Roadmap
+            </a>
+          </DockButton>
+          <DockTrigger
+            value="create"
+            aria-label="Open quick actions"
+            activeChildren={<XIcon />}
+            shape={settings.shape}
+            prefix={<PlusCircleIcon />}
+          >
+            Menu
+          </DockTrigger>
+          <DockTrigger
+            value="menu"
+            aria-label="Toggle dock menu"
+            activeChildren={<XIcon />}
+            align="end"
+            separator
+            shape={settings.shape}
+          >
+            <ListIcon />
+          </DockTrigger>
+        </DockBar>
+      </DockRoot>
+    </div>
   );
 }
 
@@ -3602,7 +4350,7 @@ function SidebarPreview({
         onOpenChange={onOpenChange}
         side={settings.side}
         width="13rem"
-        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface shadow-sm"
+        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface-current shadow-sm"
       >
         <ComponentSidebar
           variant={settings.variant}
@@ -3660,7 +4408,7 @@ function AppTabsPreview({ settings }: { settings: AppTabsSettings }) {
         shape={settings.shape}
         size={settings.size}
         variant={settings.variant}
-        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface shadow-sm"
+        className="h-[34rem] !min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface-current shadow-sm"
       >
         <SidebarRoot
           collapsedWidth="3rem"
@@ -3852,6 +4600,53 @@ function TabsPreview({ settings }: { settings: TabsSettings }) {
   );
 }
 
+function ScrollAreaPreview({ settings }: { settings: ScrollAreaSettings }) {
+  const isHorizontal = settings.axis === "horizontal";
+
+  return (
+    <div className="w-full px-6">
+      <ScrollArea
+        className={[
+          "mx-auto w-full",
+          isHorizontal ? "h-44 max-w-2xl" : "h-72 max-w-md",
+        ].join(" ")}
+        contentClassName={[
+          isHorizontal ? "flex w-max gap-3 p-4" : "grid min-w-full gap-3 p-4",
+        ].join(" ")}
+        fade={settings.fade && !isHorizontal}
+        scrollbars={settings.axis}
+        scrollbarVisibility="always"
+        shape={settings.shape}
+        size={settings.size}
+        variant={settings.variant}
+        viewportClassName={
+          settings.fade && isHorizontal ? "scroll-fade-x scroll-fade-8" : ""
+        }
+      >
+        {scrollAreaPreviewItems.map((item) => (
+          <article
+            key={item.title}
+            className={[
+              "grid gap-2 rounded-lg border border-border bg-surface-current px-4 py-3 shadow-sm",
+              isHorizontal ? "w-60 shrink-0" : "",
+            ].join(" ")}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-sm font-medium text-primary">{item.title}</h2>
+              <span className="shrink-0 font-mono text-xs text-tertiary">
+                {item.meta}
+              </span>
+            </div>
+            <p className="text-sm leading-6 text-secondary">
+              {item.description}
+            </p>
+          </article>
+        ))}
+      </ScrollArea>
+    </div>
+  );
+}
+
 function TablePreview({ settings }: { settings: TableSettings }) {
   return (
     <div className="w-full px-6">
@@ -3920,7 +4715,7 @@ const principles = [
     title: "Color and text live on depth axes",
     body: [
       "Neutral surface color should describe depth before it describes importance.",
-      "From deepest to foremost, Aspekt uses surface-sunken, surface, surface-raised, and surface-floating. Deeper planes are darker; foremost planes are brighter.",
+      "From deepest to foremost, Aspekt uses surface-1 through surface-8. Components lift relative to their current substrate, while muted, hover, active, border, and ring treatments adapt inside that surface.",
       "Text follows the same idea: text-primary, text-secondary, text-tertiary, and text-disabled move from strongest to quietest.",
       "Intent colors stay separate. Brand, status, selection, warning, and destructive states should not be hidden inside the surface scale.",
     ],
@@ -4179,6 +4974,403 @@ export function Actions() {
   );
 }
 
+const scrollFadeItems = [
+  "Inbox triage",
+  "Customer handoff",
+  "Launch notes",
+  "Billing review",
+  "Research summary",
+  "Design QA",
+  "Metrics follow-up",
+  "Security check",
+  "Roadmap sync",
+  "Release prep",
+] as const;
+
+const scrollFadeTags = [
+  "Design",
+  "Engineering",
+  "Marketing",
+  "Product",
+  "Research",
+  "Sales",
+  "Support",
+  "Operations",
+  "Finance",
+  "Legal",
+] as const;
+
+function ScrollFadeDemoItems({
+  count = scrollFadeItems.length,
+}: {
+  count?: number;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5 p-1.5">
+      {scrollFadeItems.slice(0, count).map((item) => (
+        <div
+          key={item}
+          className="rounded-lg bg-surface-current px-3 py-2.5 text-sm text-primary shadow-sm ring-1 ring-black/5 dark:bg-surface-current dark:ring-white/10"
+        >
+          {item}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ScrollFadeDemoTags() {
+  return (
+    <div className="flex w-max gap-1.5 p-1.5">
+      {scrollFadeTags.map((tag) => (
+        <div
+          key={tag}
+          className="shrink-0 rounded-lg bg-surface-current px-3 py-2.5 text-sm text-primary shadow-sm ring-1 ring-black/5 dark:bg-surface-current dark:ring-white/10"
+        >
+          {tag}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ScrollFadeFrame({
+  children,
+  label,
+}: {
+  children: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="grid gap-3">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-surface-current dark:border-white/10 dark:bg-surface-active">
+        {children}
+      </div>
+      <Text as="p" size="xs" tone="muted" className="text-center font-mono">
+        {label}
+      </Text>
+    </div>
+  );
+}
+
+function ScrollFadeDocumentation() {
+  return (
+    <div className="grid gap-12">
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <Heading level={2} size="h5" className="max-w-3xl">
+          Install once
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Scroll Fade ships in the Aspekt theme block. Run init once, then add
+          the utility classes to any scroll container.
+        </Text>
+        <Snippet
+          className="max-w-3xl"
+          code="pnpm dlx @aspekt/ui init"
+          filename="terminal"
+          language="bash"
+        />
+      </section>
+
+      <section className="grid gap-6 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <div className="grid gap-4">
+          <Heading level={2} size="h5" className="max-w-3xl">
+            Vertical scroll
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            Use <Code>scroll-fade</Code> or <Code>scroll-fade-y</Code> on the
+            element that owns vertical overflow. The mask reveals and clears as
+            the container reaches each edge.
+          </Text>
+        </div>
+
+        <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
+          <ScrollFadeFrame label="scroll-fade">
+            <div className="h-72 overflow-y-auto scroll-fade">
+              <ScrollFadeDemoItems />
+            </div>
+          </ScrollFadeFrame>
+          <ScrollFadeFrame label="scroll-fade scroll-fade-24">
+            <div className="h-72 overflow-y-auto scroll-fade scroll-fade-24">
+              <ScrollFadeDemoItems />
+            </div>
+          </ScrollFadeFrame>
+        </div>
+
+        <Snippet
+          className="max-w-3xl"
+          code={`<div className="h-72 overflow-y-auto scroll-fade">
+  {items.map((item) => (
+    <div key={item}>{item}</div>
+  ))}
+</div>`}
+          filename="scroll-list.tsx"
+          language="tsx"
+        />
+      </section>
+
+      <section className="grid gap-6 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <div className="grid gap-4">
+          <Heading level={2} size="h5" className="max-w-3xl">
+            Horizontal and edge fades
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            Use <Code>scroll-fade-x</Code> for horizontal overflow. Use edge
+            classes when only one side should fade.
+          </Text>
+        </div>
+
+        <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
+          <ScrollFadeFrame label="scroll-fade-x">
+            <div className="overflow-x-auto scroll-fade-x">
+              <ScrollFadeDemoTags />
+            </div>
+          </ScrollFadeFrame>
+          <ScrollFadeFrame label="scroll-fade-b">
+            <div className="h-36 overflow-y-auto scroll-fade-b">
+              <ScrollFadeDemoItems count={7} />
+            </div>
+          </ScrollFadeFrame>
+        </div>
+
+        <Snippet
+          className="max-w-3xl"
+          code={`<div className="overflow-x-auto scroll-fade-x">
+  {tags.map((tag) => (
+    <div key={tag}>{tag}</div>
+  ))}
+</div>
+
+<div className="h-48 overflow-y-auto scroll-fade-b">
+  ...
+</div>`}
+          filename="scroll-fade-edges.tsx"
+          language="tsx"
+        />
+      </section>
+
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <Heading level={2} size="h5" className="max-w-3xl">
+          Reference
+        </Heading>
+        <List
+          variant="disc"
+          spacing="normal"
+          tone="muted"
+          className="max-w-3xl"
+        >
+          <ListItem>
+            <Code>scroll-fade</Code>, <Code>scroll-fade-y</Code>, and{" "}
+            <Code>scroll-fade-x</Code> cover both edges on an axis.
+          </ListItem>
+          <ListItem>
+            <Code>scroll-fade-t</Code>, <Code>scroll-fade-r</Code>,{" "}
+            <Code>scroll-fade-b</Code>, and <Code>scroll-fade-l</Code> target
+            physical edges.
+          </ListItem>
+          <ListItem>
+            <Code>scroll-fade-s</Code> and <Code>scroll-fade-e</Code> target
+            logical inline start and end, including RTL layouts.
+          </ListItem>
+          <ListItem>
+            <Code>scroll-fade-24</Code>, <Code>scroll-fade-[15%]</Code>, and
+            per-edge sizes like <Code>scroll-fade-b-8</Code> tune the fade
+            distance.
+          </ListItem>
+          <ListItem>
+            <Code>scroll-fade-none</Code> removes the mask for responsive or
+            stateful overrides.
+          </ListItem>
+        </List>
+      </section>
+    </div>
+  );
+}
+
+function ShimmerFrame({
+  children,
+  label,
+}: {
+  children: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="grid gap-3 rounded-2xl border border-neutral-200 bg-surface-current p-5 dark:border-white/10 dark:bg-surface-active">
+      <div className="flex min-h-16 items-center">{children}</div>
+      <Text as="p" size="xs" tone="muted" className="font-mono">
+        {label}
+      </Text>
+    </div>
+  );
+}
+
+function ShimmerDocumentation() {
+  return (
+    <div className="grid gap-12">
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <Heading level={2} size="h5" className="max-w-3xl">
+          Install once
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Shimmer ships in the Aspekt theme block. Run init once, then add the
+          utility classes to text that represents loading, pending, or generated
+          output.
+        </Text>
+        <Snippet
+          className="max-w-3xl"
+          code="pnpm dlx @aspekt/ui init"
+          filename="terminal"
+          language="bash"
+        />
+      </section>
+
+      <section className="grid gap-6 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <div className="grid gap-4">
+          <Heading level={2} size="h5" className="max-w-3xl">
+            Text shimmer
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            Use <Code>shimmer</Code> on text that should feel alive while a
+            response, summary, or result is being prepared. It uses the text
+            color as the base and sweeps a highlight through the glyphs.
+          </Text>
+        </div>
+
+        <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
+          <ShimmerFrame label="shimmer">
+            <p className="shimmer text-sm text-secondary">
+              Generating response...
+            </p>
+          </ShimmerFrame>
+          <ShimmerFrame label="shimmer shimmer-color-info/60 shimmer-duration-1000">
+            <p className="shimmer shimmer-color-info/60 shimmer-duration-1000 text-sm text-secondary">
+              Searching project context...
+            </p>
+          </ShimmerFrame>
+        </div>
+
+        <Snippet
+          className="max-w-3xl"
+          code={`<p className="shimmer text-primary">
+  Generating response...
+</p>
+
+<p className="shimmer shimmer-color-info/60 shimmer-duration-1000">
+  Searching project context...
+</p>`}
+          filename="pending-state.tsx"
+          language="tsx"
+        />
+      </section>
+
+      <section className="grid gap-6 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <div className="grid gap-4">
+          <Heading level={2} size="h5" className="max-w-3xl">
+            Direction and spread
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            Tune the highlight with color, duration, angle, and spread
+            modifiers. Use <Code>shimmer-reverse</Code> for the opposite sweep,
+            or <Code>shimmer-once</Code> when the shimmer should run one time.
+          </Text>
+        </div>
+
+        <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
+          <ShimmerFrame label="shimmer shimmer-color-success/70 shimmer-spread-24">
+            <p className="shimmer shimmer-color-success/70 shimmer-spread-24 text-sm text-secondary">
+              Syncing workspace state...
+            </p>
+          </ShimmerFrame>
+          <ShimmerFrame label="shimmer shimmer-angle-45 shimmer-reverse">
+            <p className="shimmer shimmer-angle-45 shimmer-reverse text-sm text-secondary">
+              Preparing handoff notes...
+            </p>
+          </ShimmerFrame>
+        </div>
+
+        <Snippet
+          className="max-w-3xl"
+          code={`<span className="shimmer shimmer-color-success/70 shimmer-spread-24">
+  Syncing workspace state...
+</span>
+
+<span className="shimmer shimmer-angle-45 shimmer-reverse">
+  Preparing handoff notes...
+</span>`}
+          filename="shimmer-options.tsx"
+          language="tsx"
+        />
+      </section>
+
+      <section className="grid gap-6 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <div className="grid gap-4">
+          <Heading level={2} size="h5" className="max-w-3xl">
+            Disable when needed
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            Use <Code>shimmer-none</Code> for responsive or stateful overrides.
+            Reduced-motion users also receive the non-animated fallback.
+          </Text>
+        </div>
+
+        <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
+          <ShimmerFrame label="shimmer shimmer-once">
+            <p className="shimmer shimmer-once text-sm text-secondary">
+              Created summary
+            </p>
+          </ShimmerFrame>
+          <ShimmerFrame label="shimmer shimmer-none">
+            <p className="shimmer shimmer-none text-sm text-secondary">
+              Static text fallback
+            </p>
+          </ShimmerFrame>
+        </div>
+      </section>
+
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <Heading level={2} size="h5" className="max-w-3xl">
+          Reference
+        </Heading>
+        <List
+          variant="disc"
+          spacing="normal"
+          tone="muted"
+          className="max-w-3xl"
+        >
+          <ListItem>
+            <Code>shimmer</Code> applies the animated text shimmer.
+          </ListItem>
+          <ListItem>
+            <Code>shimmer-color-info/60</Code> and{" "}
+            <Code>shimmer-color-[#7c3aed]</Code> set the highlight color.
+          </ListItem>
+          <ListItem>
+            <Code>shimmer-duration-1000</Code> and{" "}
+            <Code>shimmer-duration-[1.75s]</Code> set animation speed.
+          </ListItem>
+          <ListItem>
+            <Code>shimmer-spread-24</Code> and <Code>shimmer-angle-45</Code>{" "}
+            adjust the sweep shape.
+          </ListItem>
+          <ListItem>
+            <Code>shimmer-once</Code>, <Code>shimmer-reverse</Code>, and{" "}
+            <Code>shimmer-none</Code> control repetition, direction, and
+            fallback.
+          </ListItem>
+        </List>
+      </section>
+    </div>
+  );
+}
+
+function UtilityDocumentation({ activePage }: { activePage: UtilityPage }) {
+  if (activePage === "scroll-fade") {
+    return <ScrollFadeDocumentation />;
+  }
+
+  return <ShimmerDocumentation />;
+}
+
 function PrinciplesDocumentation() {
   return (
     <div className="grid gap-10">
@@ -4221,33 +5413,166 @@ function PrinciplesDocumentation() {
 
 const surfaceDepthTokens = [
   {
-    name: "--surface-sunken",
-    className: "bg-surface-sunken",
-    layer: "Layer 0",
-    position: "Deepest",
-    description:
-      "Inset wells, code blocks, table headers, and quiet nested regions.",
+    name: "--surface-1",
+    className: "bg-surface-1",
+    layer: "Level 1",
+    position: "Canvas",
+    description: "The default app and site substrate.",
   },
   {
-    name: "--surface",
-    className: "bg-surface",
-    layer: "Layer 1",
-    position: "Base",
-    description: "The default app and site canvas.",
-  },
-  {
-    name: "--surface-raised",
-    className: "bg-surface-raised",
-    layer: "Layer 2",
+    name: "--surface-2",
+    className: "bg-surface-2",
+    layer: "Level 2",
     position: "Raised",
-    description: "Cards, panels, sheets, and controls above the canvas.",
+    description: "Cards, panels, tables, and persistent content surfaces.",
   },
   {
-    name: "--surface-floating",
-    className: "bg-surface-floating",
-    layer: "Layer 3",
-    position: "Foremost",
-    description: "Popovers, dropdowns, command menus, dialogs, and tooltips.",
+    name: "--surface-3",
+    className: "bg-surface-3",
+    layer: "Level 3",
+    position: "Floating",
+    description: "Small overlays, menus, and elevated nested panels.",
+  },
+  {
+    name: "--surface-4",
+    className: "bg-surface-4",
+    layer: "Level 4",
+    position: "Overlay",
+    description: "Dialogs, drawers, toasts, and prominent overlay surfaces.",
+  },
+  {
+    name: "--surface-5",
+    className: "bg-surface-5",
+    layer: "Level 5",
+    position: "Nested overlay",
+    description: "Dropdowns and popovers opened inside larger overlays.",
+  },
+  {
+    name: "--surface-6",
+    className: "bg-surface-6",
+    layer: "Level 6",
+    position: "Deep nested",
+    description: "Second-order nested overlays that still need separation.",
+  },
+  {
+    name: "--surface-7",
+    className: "bg-surface-7",
+    layer: "Level 7",
+    position: "High foreground",
+    description: "Rare foreground planes above already elevated content.",
+  },
+  {
+    name: "--surface-8",
+    className: "bg-surface-8",
+    layer: "Level 8",
+    position: "Maximum",
+    description: "The clamped top of the surface ladder.",
+  },
+] as const;
+
+const surfaceTreatmentTokens = [
+  {
+    name: "--surface-current",
+    className: "bg-surface-current",
+    description:
+      "The current substrate inherited from the nearest Surface context.",
+  },
+  {
+    name: "--surface-muted",
+    className: "bg-surface-muted",
+    description:
+      "Soft fills, quiet regions, rails, code blocks, and inactive controls.",
+  },
+  {
+    name: "--surface-hover",
+    className: "bg-surface-hover",
+    description: "Hover and transient interaction fills inside a surface.",
+  },
+  {
+    name: "--surface-active",
+    className: "bg-surface-active",
+    description: "Pressed, selected, checked, and active neutral states.",
+  },
+  {
+    name: "--surface-border",
+    className: "bg-surface-border",
+    description: "Default contextual borders and separators.",
+  },
+  {
+    name: "--surface-border-strong",
+    className: "bg-surface-border-strong",
+    description: "Higher contrast borders for selected or emphasized outlines.",
+  },
+  {
+    name: "--surface-ring",
+    className: "bg-surface-ring",
+    description: "Contextual focus rings and active outlines.",
+  },
+] as const;
+
+const surfaceShadowTokens = [
+  {
+    name: "shadow-surface-1",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-1",
+    description: "The resting shadow for the app canvas and base substrate.",
+  },
+  {
+    name: "shadow-surface-2",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-2",
+    description: "A quiet elevation for cards, panels, and tables.",
+  },
+  {
+    name: "shadow-surface-3",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-3",
+    description: "A visible lift for floating panels and compact overlays.",
+  },
+  {
+    name: "shadow-surface-4",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-4",
+    description: "The default overlay shadow for dialogs, drawers, and toasts.",
+  },
+  {
+    name: "shadow-surface-5",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-5",
+    description: "A stronger shadow for overlays opened inside overlays.",
+  },
+  {
+    name: "shadow-surface-6",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-6",
+    description: "A high foreground shadow for second-order nested content.",
+  },
+  {
+    name: "shadow-surface-7",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-7",
+    description: "A rare foreground shadow above already elevated planes.",
+  },
+  {
+    name: "shadow-surface-8",
+    className: "bg-surface-current",
+    previewClassName: "h-10 w-14 rounded-lg shadow-surface-8",
+    description: "The strongest clamped shadow in the surface scale.",
+  },
+] as const;
+
+const surfaceTokenGroups = [
+  {
+    title: "Surface levels",
+    tokens: surfaceDepthTokens,
+  },
+  {
+    title: "Surface treatments",
+    tokens: surfaceTreatmentTokens,
+  },
+  {
+    title: "Surface shadows",
+    tokens: surfaceShadowTokens,
   },
 ] as const;
 
@@ -4305,10 +5630,6 @@ const textRoleTokens = [
 ] as const;
 
 const colorTokenGroups = [
-  {
-    title: "Depth surfaces",
-    tokens: surfaceDepthTokens,
-  },
   {
     title: "Text depth",
     tokens: textDepthTokens,
@@ -4416,12 +5737,6 @@ const colorTokenGroups = [
         description: "Input borders and field surfaces.",
       },
       {
-        name: "--control-soft",
-        className: "bg-control-soft",
-        description:
-          "Soft neutral control fills for buttons, toggles, and inactive rails.",
-      },
-      {
         name: "--ring",
         className: "bg-ring",
         description: "Focus rings and active outlines.",
@@ -4438,49 +5753,49 @@ const colorTokenGroups = [
     tokens: [
       {
         name: "--radius",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-[var(--radius)]",
         description: "Base corner radius used to derive the scale.",
       },
       {
         name: "--radius-sm",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-sm",
         description: "Small controls and compact nested elements.",
       },
       {
         name: "--radius-md",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-md",
         description: "Default control radius.",
       },
       {
         name: "--radius-lg",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-lg",
         description: "Cards, previews, and larger controls.",
       },
       {
         name: "--radius-xl",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-xl",
         description: "Large surfaces and prominent panels.",
       },
       {
         name: "--radius-2xl",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-2xl",
         description: "Roomier modal and sheet surfaces.",
       },
       {
         name: "--radius-3xl",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-3xl",
         description: "Maximum radius for expressive large containers.",
       },
       {
         name: "--radius-full",
-        className: "bg-surface-raised",
+        className: "bg-surface-current",
         previewClassName: "h-10 w-14 rounded-full",
         description: "Fully rounded pills, toggles, and circular controls.",
       },
@@ -4826,7 +6141,7 @@ function TypographyDocumentation(props: TypographyDocumentationProps) {
               <TabsIndicator />
             </TabsList>
           </TabsRoot>
-          <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-surface-raised px-4 py-10 dark:bg-neutral-900/70">
+          <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-surface-current px-4 py-10 dark:bg-neutral-900/70">
             <TypographyPrimitivePreview {...props} />
           </div>
         </div>
@@ -4854,59 +6169,1020 @@ function TypographyDocumentation(props: TypographyDocumentationProps) {
   );
 }
 
+type SurfacePreviewLevel = (typeof surfaceLevels)[number];
+
+function getSurfacePreviewLevel(value: number) {
+  return Math.min(8, Math.max(1, Math.round(value))) as SurfacePreviewLevel;
+}
+
+function getSurfacePreviewLayerStyle(level: SurfacePreviewLevel) {
+  return {
+    backgroundColor: `var(--surface-${level})`,
+    boxShadow: `var(--surface-shadow-${level})`,
+  } satisfies React.CSSProperties;
+}
+
+const surfacePreviewCode = `import {
+  ElevatedSurface,
+  SurfaceProvider,
+} from "@/components/aspekt/surface";
+
+function NestedOverlayPreview() {
+  return (
+    <SurfaceProvider value={1}>
+      <ElevatedSurface lift={1}>
+        <ElevatedSurface lift={1}>
+          <ElevatedSurface lift={2}>
+            Popover inside a card
+          </ElevatedSurface>
+        </ElevatedSurface>
+      </ElevatedSurface>
+    </SurfaceProvider>
+  );
+}`;
+
+const contextualSurfacePreviewCode = `import { Button } from "@/components/aspekt/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/aspekt/card";
+import { Surface, SurfaceProvider } from "@/components/aspekt/surface";
+
+function ContextualCard({ level }: { level: number }) {
+  return (
+    <SurfaceProvider value={1}>
+      <Card surface={level} surfaceShadow={level}>
+        <CardHeader>
+          <CardTitle>Workspace review</CardTitle>
+          <CardDescription>Card substrate surface-{level}</CardDescription>
+          <CardAction>
+            <Button size="tiny" variant="soft">
+              Approve
+            </Button>
+          </CardAction>
+        </CardHeader>
+
+        <CardContent>
+          <Button variant="outline">Details</Button>
+          <Surface lift={2}>Nested menu</Surface>
+        </CardContent>
+      </Card>
+    </SurfaceProvider>
+  );
+}`;
+
+const dashboardSurfacePreviewCode = `import {
+  PopoverArrow,
+  PopoverPopup,
+  PopoverPortal,
+  PopoverPositioner,
+  PopoverRoot,
+  PopoverTrigger,
+} from "@/components/aspekt/popover";
+import { Surface } from "@/components/aspekt/surface";
+
+function DashboardOverlayStack() {
+  return (
+    <Surface level={1}>
+      <main>Dashboard background</main>
+
+      <Surface lift={3}>
+        <aside>Drawer</aside>
+
+        <PopoverRoot defaultOpen>
+          <PopoverTrigger variant="soft">
+            Qualified leads
+          </PopoverTrigger>
+          <PopoverPortal>
+            <PopoverPositioner side="bottom" sideOffset={8}>
+              <PopoverPopup surfaceLift={2}>
+                <PopoverArrow />
+                Popover inside drawer
+              </PopoverPopup>
+            </PopoverPositioner>
+          </PopoverPortal>
+        </PopoverRoot>
+      </Surface>
+    </Surface>
+  );
+}`;
+
+function SurfaceStackLayer({
+  index = 0,
+  levels,
+}: {
+  index?: number;
+  levels: readonly SurfacePreviewLevel[];
+}) {
+  const level = levels[index];
+
+  if (!level) return null;
+
+  const isLast = index === levels.length - 1;
+
+  return (
+    <Surface
+      level={level}
+      shadow={level}
+      className={[
+        "relative flex items-center justify-center border border-border transition-[background-color,box-shadow]",
+        isLast
+          ? "h-24 w-24 rounded-2xl sm:h-28 sm:w-28"
+          : "rounded-[1.75rem] p-4 sm:p-6",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={getSurfacePreviewLayerStyle(level)}
+    >
+      <span className="sr-only">surface-{level}</span>
+      {isLast ? null : <SurfaceStackLayer levels={levels} index={index + 1} />}
+    </Surface>
+  );
+}
+
+function DashboardSurfacePreview() {
+  return (
+    <div className="grid gap-4 pt-2">
+      <div className="grid gap-3">
+        <Heading level={4} size="h6" className="max-w-3xl">
+          Dashboard, drawer, popover
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          A common product flow: open a drawer from a dashboard, then open a
+          popover inside that drawer. Each overlay lifts from the surface it
+          actually sits in.
+        </Text>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface-current p-4 text-primary shadow-surface-2 sm:p-6">
+        <TabsRoot defaultValue="preview" variant="soft" color="neutral">
+          <TabsList>
+            <TabsTab value="preview">Preview</TabsTab>
+            <TabsTab value="code">Code</TabsTab>
+            <TabsIndicator />
+          </TabsList>
+
+          <TabsPanel value="preview">
+            <div className="pt-6">
+              <Surface
+                level={1}
+                shadow={1}
+                className="relative min-h-[34rem] overflow-hidden rounded-2xl border border-border"
+              >
+                <div className="grid h-full min-h-[34rem] grid-cols-[4.5rem_minmax(0,1fr)]">
+                  <aside className="border-r border-border bg-surface-muted p-3">
+                    <div className="mb-6 size-9 rounded-xl bg-surface-active" />
+                    <div className="grid gap-2">
+                      {["", "", "", ""].map((_, index) => (
+                        <div
+                          key={index}
+                          className="h-8 rounded-lg bg-surface-hover"
+                        />
+                      ))}
+                    </div>
+                  </aside>
+
+                  <main className="grid content-start gap-4 p-4 sm:p-6">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <Heading level={5} size="h6">
+                          Revenue dashboard
+                        </Heading>
+                        <Text size="sm" tone="muted">
+                          Surface-1 application background
+                        </Text>
+                      </div>
+                      <Button color="neutral" size="small" variant="outline">
+                        Filters
+                      </Button>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      {["Pipeline", "Conversion", "Expansion"].map((label) => (
+                        <div
+                          key={label}
+                          className="rounded-2xl border border-border bg-surface-current p-3"
+                        >
+                          <Text size="sm" tone="muted">
+                            {label}
+                          </Text>
+                          <div className="mt-2 h-6 rounded-lg bg-surface-muted" />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid h-48 items-end gap-2 rounded-2xl border border-border bg-surface-muted p-4 sm:grid-cols-8">
+                      {[54, 68, 46, 76, 88, 58, 72, 92].map((height, index) => (
+                        <div
+                          key={index}
+                          className="rounded-t-lg bg-surface-active"
+                          style={{ height: `${height}%` }}
+                        />
+                      ))}
+                    </div>
+                  </main>
+                </div>
+
+                <Surface
+                  lift={3}
+                  className="absolute inset-y-4 right-4 flex w-[min(22rem,calc(100%-2rem))] flex-col rounded-2xl border border-border p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Heading level={5} size="h6">
+                        Segment drawer
+                      </Heading>
+                      <Text size="sm" tone="muted">
+                        Lifted to surface-4 from the dashboard
+                      </Text>
+                    </div>
+                    <Code>4</Code>
+                  </div>
+
+                  <div className="mt-5 grid gap-3">
+                    <div className="rounded-xl bg-surface-muted p-3">
+                      <Text size="sm" tone="muted">
+                        Account owner
+                      </Text>
+                      <div className="mt-2 flex items-center justify-between gap-3">
+                        <span className="text-sm font-medium">Mina Torres</span>
+                        <Button color="neutral" size="tiny" variant="soft">
+                          Change
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl border border-border p-3">
+                      <Text size="sm" tone="muted">
+                        Status filter
+                      </Text>
+                      <Button
+                        className="mt-2 w-full justify-between"
+                        color="neutral"
+                        size="small"
+                        suffix={<span className="text-secondary">3</span>}
+                        variant="soft"
+                      >
+                        Qualified leads
+                      </Button>
+                      <Surface
+                        lift={2}
+                        className="mt-2 grid gap-3 rounded-xl border border-border p-3"
+                      >
+                        <div>
+                          <Heading level={6} size="h6">
+                            Status popover
+                          </Heading>
+                          <Text size="sm" tone="muted">
+                            Lifted from the drawer context to surface-6.
+                          </Text>
+                        </div>
+
+                        <div className="grid gap-1">
+                          {["Qualified", "Proposal sent", "Needs review"].map(
+                            (status) => (
+                              <button
+                                key={status}
+                                type="button"
+                                className="rounded-lg px-2.5 py-1.5 text-left text-sm text-secondary transition-colors hover:bg-surface-hover hover:text-primary"
+                              >
+                                {status}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                      </Surface>
+                    </div>
+                  </div>
+                </Surface>
+              </Surface>
+            </div>
+          </TabsPanel>
+
+          <TabsPanel value="code">
+            <Snippet
+              className="mt-6"
+              code={dashboardSurfacePreviewCode}
+              filename="dashboard-overlay-stack.tsx"
+              language="tsx"
+              variant="soft"
+            />
+          </TabsPanel>
+        </TabsRoot>
+      </div>
+    </div>
+  );
+}
+
+function SurfaceContextPreview() {
+  const [cardLevel, setCardLevel] = React.useState<SurfacePreviewLevel>(3);
+  const nestedLevel = getSurfacePreviewLevel(cardLevel + 2);
+
+  return (
+    <div className="grid gap-4 pt-2">
+      <div className="grid gap-3">
+        <Heading level={4} size="h6" className="max-w-3xl">
+          One card, many substrates
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Move the card through the ladder. The neutral buttons, muted regions,
+          borders, and lifted menu all recompute from that card&apos;s current
+          surface instead of using fixed colors.
+        </Text>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface-current p-4 text-primary shadow-surface-2 sm:p-6">
+        <TabsRoot defaultValue="preview" variant="soft" color="neutral">
+          <TabsList>
+            <TabsTab value="preview">Preview</TabsTab>
+            <TabsTab value="code">Code</TabsTab>
+            <TabsIndicator />
+          </TabsList>
+
+          <TabsPanel value="preview">
+            <div className="grid gap-8 pt-6">
+              <div className="relative flex min-h-[28rem] items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface-1 p-6">
+                <SurfaceProvider value={1}>
+                  <Card
+                    surface={cardLevel}
+                    surfaceShadow={cardLevel}
+                    shape="round"
+                    size="large"
+                    className="relative max-w-md overflow-visible"
+                  >
+                    <CardHeader>
+                      <CardTitle>Workspace review</CardTitle>
+                      <CardDescription>
+                        Card substrate surface-{cardLevel}
+                      </CardDescription>
+                      <CardAction>
+                        <Button color="neutral" size="tiny" variant="soft">
+                          Approve
+                        </Button>
+                      </CardAction>
+                    </CardHeader>
+
+                    <CardContent className="grid gap-3">
+                      <div className="grid gap-2 rounded-xl bg-surface-muted p-3">
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-secondary">Pending edits</span>
+                          <span className="font-mono text-primary">12</span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-surface-active">
+                          <div className="h-full w-2/3 rounded-full bg-primary" />
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <Button
+                          color="neutral"
+                          size="small"
+                          variant="outline"
+                          className="w-full"
+                        >
+                          Details
+                        </Button>
+                        <Button
+                          color="neutral"
+                          size="small"
+                          variant="ghost"
+                          className="w-full"
+                        >
+                          Snooze
+                        </Button>
+                      </div>
+
+                      <Surface
+                        lift={2}
+                        className="w-full rounded-2xl border border-border p-3 sm:ml-auto sm:w-64"
+                      >
+                        <div className="grid gap-2">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm font-medium">
+                              Nested menu
+                            </span>
+                            <Code>surface-{nestedLevel}</Code>
+                          </div>
+                          <button
+                            type="button"
+                            className="rounded-lg px-2 py-1.5 text-left text-sm text-secondary transition-colors hover:bg-surface-hover hover:text-primary"
+                          >
+                            Reassign owner
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded-lg px-2 py-1.5 text-left text-sm text-secondary transition-colors hover:bg-surface-hover hover:text-primary"
+                          >
+                            Schedule follow-up
+                          </button>
+                        </div>
+                      </Surface>
+                    </CardContent>
+                  </Card>
+                </SurfaceProvider>
+              </div>
+
+              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 px-1 pb-2 sm:px-20">
+                <span className="font-mono text-sm text-secondary">
+                  surface-{cardLevel}
+                </span>
+                <Slider
+                  aria-label="Card surface level"
+                  color="neutral"
+                  max={8}
+                  min={1}
+                  onValueChange={(value) => {
+                    const nextValue = Array.isArray(value) ? value[0] : value;
+
+                    if (typeof nextValue === "number") {
+                      setCardLevel(getSurfacePreviewLevel(nextValue));
+                    }
+                  }}
+                  shape="round"
+                  size="small"
+                  step={1}
+                  value={cardLevel}
+                  variant="soft"
+                />
+              </div>
+            </div>
+          </TabsPanel>
+
+          <TabsPanel value="code">
+            <Snippet
+              className="mt-6"
+              code={contextualSurfacePreviewCode}
+              filename="contextual-surface.tsx"
+              language="tsx"
+              variant="soft"
+            />
+          </TabsPanel>
+        </TabsRoot>
+      </div>
+    </div>
+  );
+}
+
+function SurfaceRangePreview() {
+  const [range, setRange] = React.useState<[number, number]>([1, 8]);
+  const low = Math.min(range[0], range[1]);
+  const high = Math.max(range[0], range[1]);
+  const levels = surfaceLevels.filter((level) => level >= low && level <= high);
+
+  return (
+    <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+      <div className="grid gap-3">
+        <Heading level={3} size="h5" className="max-w-3xl">
+          Move through levels
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Drag both knobs to choose which slice of the ladder to nest. Each
+          layer lifts a single step off the one it sits in, whether the stack
+          spans two levels or all eight.
+        </Text>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface-current p-4 text-primary shadow-surface-2 sm:p-6">
+        <TabsRoot defaultValue="preview" variant="soft" color="neutral">
+          <TabsList>
+            <TabsTab value="preview">Preview</TabsTab>
+            <TabsTab value="code">Code</TabsTab>
+            <TabsIndicator />
+          </TabsList>
+
+          <TabsPanel value="preview">
+            <div className="grid gap-8 pt-6">
+              <div
+                role="img"
+                aria-label={`Nested surface preview from level ${low} to level ${high}.`}
+                className="relative flex min-h-[24rem] items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface-1 p-6 sm:min-h-[32rem]"
+              >
+                <SurfaceProvider value={low}>
+                  <SurfaceStackLayer levels={levels} />
+                </SurfaceProvider>
+              </div>
+
+              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 px-1 pb-2 sm:px-20">
+                <span className="font-mono text-sm text-secondary">
+                  {low} - {high}
+                </span>
+                <Slider
+                  aria-label="Surface level range"
+                  color="neutral"
+                  max={8}
+                  min={1}
+                  onValueChange={(value) => {
+                    const values = Array.isArray(value)
+                      ? value
+                      : [value, value];
+
+                    setRange([values[0] ?? 1, values[1] ?? values[0] ?? 1]);
+                  }}
+                  shape="round"
+                  size="small"
+                  step={1}
+                  thumbLabels={["Lower surface level", "Upper surface level"]}
+                  value={range}
+                  variant="soft"
+                />
+              </div>
+            </div>
+          </TabsPanel>
+
+          <TabsPanel value="code">
+            <Snippet
+              className="mt-6"
+              code={surfacePreviewCode}
+              filename="surface-preview.tsx"
+              language="tsx"
+              variant="soft"
+            />
+          </TabsPanel>
+        </TabsRoot>
+      </div>
+
+      <SurfaceContextPreview />
+
+      <DashboardSurfacePreview />
+    </section>
+  );
+}
+
+type TokenGroupListToken = {
+  name: string;
+  className: string;
+  description: string;
+  previewClassName?: string;
+};
+
+type TokenGroupListGroup = {
+  title: string;
+  tokens: readonly TokenGroupListToken[];
+};
+
+function TokenGroupList({
+  groups,
+}: {
+  groups: readonly TokenGroupListGroup[];
+}) {
+  return (
+    <section className="grid gap-8">
+      {groups.map((group) => (
+        <div
+          key={group.title}
+          className="grid gap-4 border-t border-neutral-200 pt-6 dark:border-white/15"
+        >
+          <Heading level={3} size="h5">
+            {group.title}
+          </Heading>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {group.tokens.map((token) => (
+              <div
+                key={token.name}
+                className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-3"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`${token.previewClassName ?? "size-10 rounded-lg"} border border-neutral-200 dark:border-white/15 ${token.className}`}
+                />
+                <span className="min-w-0">
+                  <Code>{token.name}</Code>
+                  <Text size="sm" tone="muted" className="mt-1">
+                    {token.description}
+                  </Text>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+const surfaceGuidelines = [
+  {
+    title: "Choose a substrate",
+    body: "Use surface-1 for the page or application canvas, then reserve higher levels for content that visually moves forward.",
+  },
+  {
+    title: "Lift from context",
+    body: "Use lift when a component should sit above whatever surface contains it. Nested overlays stay separated without hard-coded colors.",
+  },
+  {
+    title: "Keep meaning separate",
+    body: "Use neutral surfaces for depth. Use action, success, warning, destructive, and info colors only when the UI needs semantic meaning.",
+  },
+] as const;
+
+const surfaceLayerRows = [
+  {
+    title: "Tokens",
+    example: "--surface-1, --surface-current, --surface-hover",
+    description:
+      "CSS custom properties that define colors, shadows, and contextual treatments. Tokens do not choose a level by themselves.",
+  },
+  {
+    title: "Class names",
+    example: "bg-surface-current, border-border, shadow-surface-3",
+    description:
+      "Tailwind utilities mapped to the tokens. Use these when styling markup inside an already resolved surface.",
+  },
+  {
+    title: "React API",
+    example: "SurfaceProvider value, Surface level, Surface lift",
+    description:
+      "Components that resolve the current level, publish it to descendants, and update contextual tokens for the subtree.",
+  },
+  {
+    title: "Component props",
+    example: "surface, surfaceLift, surfaceShadow",
+    description:
+      "Built-in surface controls on Aspekt components. Most overlays already lift from their current context by default.",
+  },
+] as const;
+
+const surfaceApiRows = [
+  {
+    name: "SurfaceProvider",
+    props: ["value={1}"],
+    description:
+      "Sets the current surface context for descendants. Values are rounded and clamped from 1 to 8.",
+  },
+  {
+    name: "Surface",
+    props: ["level={2}", "lift={1}", "shadow={false}"],
+    description:
+      "Creates a plane, resolves absolute or relative depth, applies the matching surface background and shadow, then publishes the resolved level.",
+  },
+  {
+    name: "ElevatedSurface",
+    props: ["lift={1}"],
+    description:
+      "A convenience wrapper around Surface for the common case where something should lift one step from its parent.",
+  },
+  {
+    name: "Component props",
+    props: ["surface", "surfaceLift", "surfaceShadow"],
+    description:
+      "Surface controls built into overlays and framed primitives. Use them when the component should override its default depth.",
+  },
+] as const;
+
+const surfaceBuiltInRows = [
+  {
+    component: "Small overlays",
+    examples: ["PopoverPopup", "SelectPopup", "ComboboxPopup"],
+    default: "surfaceLift={2}",
+    description:
+      "Small overlays lift two levels above the surface that opened them.",
+  },
+  {
+    component: "Prominent overlays",
+    examples: ["DialogContent", "DrawerContent", "Toast"],
+    default: "surfaceLift={4}",
+    description:
+      "Prominent overlays move further forward from the application canvas or current overlay.",
+  },
+  {
+    component: "Framed content",
+    examples: ["Card", "Table", "ScrollArea"],
+    default: "outline lifts by 1",
+    description:
+      "Framed content surfaces lift one level for outline variants and stay in context for softer variants.",
+  },
+  {
+    component: "Dock surfaces",
+    examples: ["DockBar", "DockPanel"],
+    default: "surfaceLift={3} / {4}",
+    description:
+      "Mobile dock controls and panels reserve higher planes for persistent foreground UI.",
+  },
+] as const;
+
+const surfaceNextJsExampleTabs = [
+  {
+    label: "Root layout",
+    filename: "app/layout.tsx",
+    language: "tsx",
+    code: `import type { ReactNode } from "react";
+
+import { SurfaceProvider } from "@/components/aspekt/surface";
+import "@/app/globals.css";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body className="bg-surface-current text-primary">
+        <SurfaceProvider value={1}>{children}</SurfaceProvider>
+      </body>
+    </html>
+  );
+}`,
+  },
+  {
+    label: "Dashboard page",
+    filename: "app/dashboard/page.tsx",
+    language: "tsx",
+    code: `import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/aspekt/card";
+import {
+  PopoverArrow,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverPopup,
+  PopoverPortal,
+  PopoverPositioner,
+  PopoverRoot,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/aspekt/popover";
+import { Surface } from "@/components/aspekt/surface";
+
+export default function DashboardPage() {
+  return (
+    <Surface level={1} className="min-h-screen p-6">
+      <main className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <Card surface={2} surfaceShadow={2}>
+          <CardHeader>
+            <CardTitle>Pipeline</CardTitle>
+            <CardDescription>
+              This card sits on surface-2 above the app canvas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Surface lift={1} className="rounded-xl border border-border p-3">
+              Local detail panel resolves to surface-3.
+            </Surface>
+          </CardContent>
+        </Card>
+
+        <Surface lift={3} className="rounded-2xl border border-border p-4">
+          <PopoverRoot>
+            <PopoverTrigger color="neutral" variant="soft">
+              Segment
+            </PopoverTrigger>
+            <PopoverPortal>
+              <PopoverPositioner sideOffset={8}>
+                <PopoverPopup surfaceLift={2} className="w-72">
+                  <PopoverArrow />
+                  <PopoverHeader>
+                    <PopoverTitle>Status filter</PopoverTitle>
+                    <PopoverDescription>
+                      The popover lifts two levels from the side panel.
+                    </PopoverDescription>
+                  </PopoverHeader>
+                </PopoverPopup>
+              </PopoverPositioner>
+            </PopoverPortal>
+          </PopoverRoot>
+        </Surface>
+      </main>
+    </Surface>
+  );
+}`,
+  },
+] as const;
+
+function SurfaceDocumentation() {
+  return (
+    <div className="grid gap-12">
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <Heading level={2} size="h5" className="max-w-3xl">
+          Depth before decoration
+        </Heading>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Surfaces are Aspekt&apos;s neutral z-axis. The scale runs from{" "}
+          <Code>surface-1</Code> through <Code>surface-8</Code>, where each step
+          describes a plane moving toward the viewer rather than a louder visual
+          priority.
+        </Text>
+        <Text size="base" tone="muted" className="max-w-3xl">
+          Components read the nearest surface context and can lift from it. That
+          keeps popovers, dropdowns, dialogs, drawers, and toasts visibly
+          separated even when they open inside another elevated component.
+        </Text>
+      </section>
+
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <div className="grid gap-3">
+          <Heading level={3} size="h5" className="max-w-3xl">
+            Tokens, classes, and API
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            Surface tokens and class names are styling tools. The React API is
+            what calculates the current surface level and passes that level to
+            nested components.
+          </Text>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface-current">
+          {surfaceLayerRows.map((row, index) => (
+            <div
+              key={row.title}
+              className={[
+                "grid gap-2 p-4 md:grid-cols-[10rem_minmax(0,16rem)_minmax(0,1fr)] md:gap-6",
+                index === 0 ? "" : "border-t border-border",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <Heading level={4} size="h6">
+                {row.title}
+              </Heading>
+              <Code className="max-w-full break-words leading-5">
+                {row.example}
+              </Code>
+              <Text size="sm" tone="muted">
+                {row.description}
+              </Text>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-4">
+        <div className="grid gap-3">
+          <Heading level={3} size="h5" className="max-w-3xl">
+            How the model works
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            A surface sets <Code>--surface-current</Code> for its subtree.
+            Muted, hover, active, border, and ring treatments are then mixed
+            from that current substrate, so neutral UI states keep the right
+            contrast at every depth.
+          </Text>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          {surfaceGuidelines.map((item) => (
+            <div
+              key={item.title}
+              className="grid gap-2 rounded-2xl border border-border bg-surface-current p-4 shadow-sm"
+            >
+              <Heading level={4} size="h6">
+                {item.title}
+              </Heading>
+              <Text size="sm" tone="muted">
+                {item.body}
+              </Text>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <SurfaceRangePreview />
+
+      <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
+        <div className="grid gap-3">
+          <Heading level={3} size="h5" className="max-w-3xl">
+            API shape
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            The exported surface primitives are small by design. Most product
+            code should set an explicit level at major app boundaries, then let
+            relative lift calculate nested panels and overlays from the current
+            context.
+          </Text>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            The calculation is automatic when you use <Code>Surface</Code>,
+            <Code>ElevatedSurface</Code>, or a component with{" "}
+            <Code>surfaceLift</Code>. A class like{" "}
+            <Code>bg-surface-current</Code> only reads the already resolved
+            token.
+          </Text>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          {surfaceApiRows.map((row) => (
+            <div
+              key={row.name}
+              className="grid content-start gap-3 rounded-xl border border-border bg-surface-current p-4"
+            >
+              <div className="grid gap-2">
+                <span className="font-mono text-sm font-medium text-primary">
+                  {row.name}
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {row.props.map((prop) => (
+                    <span
+                      key={prop}
+                      className="rounded-md border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs leading-5 text-secondary"
+                    >
+                      {prop}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <Text size="sm" tone="muted">
+                {row.description}
+              </Text>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-3 pt-4">
+          <Heading level={4} size="h6" className="max-w-3xl">
+            Built-in component surfaces
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            Components that create a new plane already participate in the
+            surface model. Override <Code>surface</Code>,{" "}
+            <Code>surfaceLift</Code>, or <Code>surfaceShadow</Code> only when a
+            product flow needs a different depth.
+          </Text>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {surfaceBuiltInRows.map((row) => (
+              <div
+                key={row.component}
+                className="grid content-start gap-3 rounded-xl border border-border bg-surface-current p-4"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <Text as="span" size="sm" weight="medium">
+                    {row.component}
+                  </Text>
+                  <span className="rounded-md border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs leading-5 text-secondary">
+                    {row.default}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {row.examples.map((example) => (
+                    <span
+                      key={example}
+                      className="rounded-md bg-surface-muted px-1.5 py-0.5 font-mono text-xs leading-5 text-secondary"
+                    >
+                      {example}
+                    </span>
+                  ))}
+                </div>
+                <Text size="sm" tone="muted">
+                  {row.description}
+                </Text>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-3 pt-4">
+          <Heading level={4} size="h6" className="max-w-3xl">
+            Next.js placement
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-3xl">
+            In the App Router, set the base context once near the root layout,
+            then let pages and overlays choose absolute levels or relative lift
+            based on the plane they introduce.
+          </Text>
+          <Snippet
+            className="max-w-3xl"
+            tabs={surfaceNextJsExampleTabs}
+            variant="soft"
+          />
+        </div>
+      </section>
+
+      <TokenGroupList groups={surfaceTokenGroups} />
+    </div>
+  );
+}
+
 function ColorsDocumentation() {
   return (
     <div className="grid gap-12">
       <section className="grid gap-4 border-t border-neutral-200 pt-8 dark:border-white/15">
         <Heading level={2} size="h5" className="max-w-3xl">
-          Color on the z axis
+          Color roles
         </Heading>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Aspekt treats neutral surface tokens as planes in depth. The stack
-          runs from deepest to foremost: <Code>surface-sunken</Code>,{" "}
-          <Code>surface</Code>, <Code>surface-raised</Code>, and{" "}
-          <Code>surface-floating</Code>. Deeper planes are darker; foremost
-          planes are brighter.
+          Colors document meaning and contrast: text depth, inverse text, action
+          color, status color, structure, and radius tokens. Neutral depth has
+          its own{" "}
+          <Link
+            href="/surfaces"
+            className="font-medium text-link underline underline-offset-4"
+          >
+            Surfaces
+          </Link>{" "}
+          page so the z-axis model can be explained with examples.
         </Text>
         <Text size="base" tone="muted" className="max-w-3xl">
-          Text follows its own depth ramp from primary to disabled. Role tokens
-          handle inverse surfaces, colored fills, and links. Intent colors still
-          describe meaning: action, selection, success, warning, destructive,
-          and information states.
+          Intent colors should describe what a state means, not how high it is.
+          Use action, success, warning, destructive, and info tokens for product
+          meaning; use surface levels when the interface needs spatial
+          separation.
         </Text>
       </section>
 
-      <section className="grid gap-8">
-        {colorTokenGroups.map((group) => (
-          <div
-            key={group.title}
-            className="grid gap-4 border-t border-neutral-200 pt-6 dark:border-white/15"
-          >
-            <Heading level={3} size="h5">
-              {group.title}
-            </Heading>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {group.tokens.map((token) => (
-                <div
-                  key={token.name}
-                  className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-3"
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`${"previewClassName" in token ? token.previewClassName : "size-10 rounded-lg"} border border-neutral-200 dark:border-white/15 ${token.className}`}
-                  />
-                  <span className="min-w-0">
-                    <Code>{token.name}</Code>
-                    <Text size="sm" tone="muted" className="mt-1">
-                      {token.description}
-                    </Text>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </section>
+      <TokenGroupList groups={colorTokenGroups} />
     </div>
   );
 }
@@ -4927,7 +7203,7 @@ function SonificationDocumentation() {
           </Text>
         </div>
 
-        <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-surface-raised px-4 py-10 dark:bg-neutral-900/70">
+        <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl bg-surface-current px-4 py-10 dark:bg-neutral-900/70">
           <SoundProviderPreview />
         </div>
       </section>
@@ -5316,7 +7592,11 @@ function AvatarApiUsageDocumentation({
   );
 }
 
-function IconApiUsageDocumentation({ settings }: { settings: IconApiSettings }) {
+function IconApiUsageDocumentation({
+  settings,
+}: {
+  settings: IconApiSettings;
+}) {
   const src = getIconApiImageSrc(settings);
   const target = getIconApiTarget(settings.target);
   const usageCode = [
@@ -5408,7 +7688,7 @@ function AvatarApiControls({
   onSettingsChange: React.Dispatch<React.SetStateAction<AvatarApiSettings>>;
 }) {
   return (
-    <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+    <div className="grid divide-y divide-neutral-200 dark:divide-white/10 ">
       <AvatarApiSeedOptionRow
         value={settings.seed}
         onValueChange={(seed) =>
@@ -5577,6 +7857,10 @@ function FoundationDocumentation({
     return <TypographyDocumentation {...typographyProps} />;
   }
 
+  if (activePage === "surfaces") {
+    return <SurfaceDocumentation />;
+  }
+
   if (activePage === "colors") {
     return <ColorsDocumentation />;
   }
@@ -5595,16 +7879,21 @@ function IntroDocumentation({ activePage }: { activePage: IntroPage }) {
 export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [aspectRatioSettings, setAspectRatioSettings] =
     React.useState<AspectRatioSettings>(defaultAspectRatioSettings);
+  const [scrollAreaSettings, setScrollAreaSettings] =
+    React.useState<ScrollAreaSettings>(defaultScrollAreaSettings);
   const [avatarApiSettings, setAvatarApiSettings] =
     React.useState<AvatarApiSettings>(defaultAvatarApiSettings);
-  const [iconApiSettings, setIconApiSettings] =
-    React.useState<IconApiSettings>(defaultIconApiSettings);
+  const [iconApiSettings, setIconApiSettings] = React.useState<IconApiSettings>(
+    defaultIconApiSettings,
+  );
   const [avatarSettings, setAvatarSettings] = React.useState<AvatarSettings>(
     defaultAvatarSettings,
   );
   const [buttonSettings, setButtonSettings] = React.useState<ButtonSettings>(
     defaultButtonSettings,
   );
+  const [cardSettings, setCardSettings] =
+    React.useState<CardSettings>(defaultCardSettings);
   const [checkboxSettings, setCheckboxSettings] =
     React.useState<CheckboxSettings>(defaultCheckboxSettings);
   const [switchSettings, setSwitchSettings] = React.useState<SwitchSettings>(
@@ -5634,6 +7923,8 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const [popoverSettings, setPopoverSettings] = React.useState<PopoverSettings>(
     defaultPopoverSettings,
   );
+  const [dockSettings, setDockSettings] =
+    React.useState<DockSettings>(defaultDockSettings);
   const [toastSettings, setToastSettings] =
     React.useState<ToastSettings>(defaultToastSettings);
   const [tabsSettings, setTabsSettings] =
@@ -5682,6 +7973,7 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   const activeComponent = isComponentPreview(activePage) ? activePage : null;
   const activeIntroPage = isIntroPage(activePage) ? activePage : null;
   const activeFoundationPage = isFoundationPage(activePage) ? activePage : null;
+  const activeUtilityPage = isUtilityPage(activePage) ? activePage : null;
   const activeApiPage = isApiPage(activePage) ? activePage : null;
   const avatarApiVariants = useAvatarApiVariants(
     activeApiPage === "avatar-api",
@@ -5811,14 +8103,16 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
   }
 
   const previewStageClassName = [
-    "relative mb-12 flex items-center justify-center overflow-hidden rounded-2xl bg-surface-sunken dark:bg-surface-raised",
-    activeComponent === "sidebar" || activeComponent === "app-tabs"
+    "relative mb-12 flex items-center justify-center overflow-hidden rounded-2xl bg-surface-muted dark:bg-surface-2",
+    activeComponent === "sidebar" ||
+    activeComponent === "app-tabs" ||
+    activeComponent === "dock"
       ? "min-h-[38rem] sm:min-h-[40rem] lg:min-h-[42rem]"
-      : "min-h-80 sm:min-h-80 lg:min-h-80",
+      : "min-h-120 sm:min-h-120 lg:min-h-120",
   ].join(" ");
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-surface text-primary">
+    <main className="min-h-screen overflow-x-hidden bg-surface-current text-primary">
       <MobileNavbar onMenuOpen={() => setMobileMenuOpen(true)} />
       <MobileMenu
         activePage={activePage}
@@ -5849,8 +8143,12 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                 <div className={previewStageClassName}>
                   {activeComponent === "aspect-ratio" ? (
                     <AspectRatioPreview settings={aspectRatioSettings} />
+                  ) : activeComponent === "scroll-area" ? (
+                    <ScrollAreaPreview settings={scrollAreaSettings} />
                   ) : activeComponent === "avatar" ? (
                     <AvatarPreview settings={avatarSettings} />
+                  ) : activeComponent === "card" ? (
+                    <CardPreview settings={cardSettings} />
                   ) : activeComponent === "button" ? (
                     <div className="flex flex-wrap items-center justify-center gap-3">
                       <Button
@@ -5993,6 +8291,16 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     <DrawerPreview settings={drawerSettings} />
                   ) : activeComponent === "popover" ? (
                     <PopoverPreview settings={popoverSettings} />
+                  ) : activeComponent === "dock" ? (
+                    <DockPreview
+                      settings={dockSettings}
+                      onPanelChange={(panel) =>
+                        setDockSettings((settings) => ({
+                          ...settings,
+                          panel,
+                        }))
+                      }
+                    />
                   ) : activeComponent === "app-tabs" ? (
                     <AppTabsPreview settings={appTabsSettings} />
                   ) : activeComponent === "sidebar" ? (
@@ -6061,6 +8369,69 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                       </div>
                     )}
 
+                    {activeComponent === "scroll-area" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="variant"
+                          values={scrollAreaOptions.variant}
+                          active={scrollAreaSettings.variant}
+                          onValueChange={(variant) =>
+                            setScrollAreaSettings((settings) => ({
+                              ...settings,
+                              variant,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="size"
+                          values={scrollAreaOptions.size}
+                          active={scrollAreaSettings.size}
+                          onValueChange={(size) =>
+                            setScrollAreaSettings((settings) => ({
+                              ...settings,
+                              size,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="shape"
+                          values={scrollAreaOptions.shape}
+                          active={scrollAreaSettings.shape}
+                          onValueChange={(shape) =>
+                            setScrollAreaSettings((settings) => ({
+                              ...settings,
+                              shape,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="axis"
+                          values={scrollAreaOptions.axis}
+                          active={scrollAreaSettings.axis}
+                          onValueChange={(axis) =>
+                            setScrollAreaSettings((settings) => ({
+                              ...settings,
+                              axis,
+                            }))
+                          }
+                        />
+
+                        <BooleanOptionRow
+                          label="fade"
+                          checked={scrollAreaSettings.fade}
+                          onCheckedChange={(fade) =>
+                            setScrollAreaSettings((settings) => ({
+                              ...settings,
+                              fade,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
                     {activeComponent === "avatar" && (
                       <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
                         <OptionRow
@@ -6094,6 +8465,46 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                             setAvatarSettings((settings) => ({
                               ...settings,
                               image,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
+                    {activeComponent === "card" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="variant"
+                          values={cardOptions.variant}
+                          active={cardSettings.variant}
+                          onValueChange={(variant) =>
+                            setCardSettings((settings) => ({
+                              ...settings,
+                              variant,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="size"
+                          values={cardOptions.size}
+                          active={cardSettings.size}
+                          onValueChange={(size) =>
+                            setCardSettings((settings) => ({
+                              ...settings,
+                              size,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="shape"
+                          values={cardOptions.shape}
+                          active={cardSettings.shape}
+                          onValueChange={(shape) =>
+                            setCardSettings((settings) => ({
+                              ...settings,
+                              shape,
                             }))
                           }
                         />
@@ -6989,6 +9400,46 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                       </div>
                     )}
 
+                    {activeComponent === "dock" && (
+                      <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
+                        <OptionRow
+                          label="size"
+                          values={dockOptions.size}
+                          active={dockSettings.size}
+                          onValueChange={(size) =>
+                            setDockSettings((settings) => ({
+                              ...settings,
+                              size,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="shape"
+                          values={dockOptions.shape}
+                          active={dockSettings.shape}
+                          onValueChange={(shape) =>
+                            setDockSettings((settings) => ({
+                              ...settings,
+                              shape,
+                            }))
+                          }
+                        />
+
+                        <OptionRow
+                          label="panel"
+                          values={dockOptions.panel}
+                          active={dockSettings.panel}
+                          onValueChange={(panel) =>
+                            setDockSettings((settings) => ({
+                              ...settings,
+                              panel,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+
                     {activeComponent === "sidebar" && (
                       <div className="grid divide-y divide-neutral-200 dark:divide-white/10">
                         <OptionRow
@@ -7751,6 +10202,9 @@ export function DocsApp({ initialPage = "getting-started" }: DocsAppProps) {
                     setTextSettings={setTextSettings}
                     textSettings={textSettings}
                   />
+                )}
+                {activeUtilityPage && (
+                  <UtilityDocumentation activePage={activeUtilityPage} />
                 )}
                 {activeApiPage && (
                   <>

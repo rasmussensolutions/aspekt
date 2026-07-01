@@ -8,10 +8,19 @@ import { cn } from "cnfast";
 import { Button, ButtonShapeProvider } from "./button";
 import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
+import {
+  SurfaceProvider,
+  getSurfaceClassName,
+  getSurfaceStyle,
+  resolveSurfaceShadow,
+  type SurfaceLevelValue,
+  type SurfaceShadow,
+  useResolvedSurfaceLevel,
+} from "./surface";
 
 const popoverPopupVariants = cva(
   [
-    "relative z-50 grid max-w-[calc(100vw-2rem)] gap-4 border border-border bg-surface-floating text-primary shadow-xl outline-none",
+    "relative z-50 grid max-w-[calc(100vw-2rem)] gap-4 border border-border text-primary outline-none",
     "origin-[var(--transform-origin)] transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
@@ -85,6 +94,9 @@ type PopoverPopupProps = Omit<
   className?: string;
   shape?: PopoverShape | null;
   size?: PopoverSize | null;
+  surface?: SurfaceLevelValue | null;
+  surfaceLift?: number | null;
+  surfaceShadow?: SurfaceShadow | null;
 };
 
 type PopoverArrowProps = Omit<
@@ -236,19 +248,41 @@ const PopoverBackdrop = React.forwardRef<HTMLDivElement, PopoverBackdropProps>(
 );
 
 const PopoverPopup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(
-  function PopoverPopup({ className, shape, size, ...props }, ref) {
+  function PopoverPopup(
+    {
+      className,
+      shape,
+      size,
+      style,
+      surface,
+      surfaceLift,
+      surfaceShadow,
+      ...props
+    },
+    ref,
+  ) {
     const inheritedShape = React.useContext(PopoverShapeContext);
+    const resolvedSurface = useResolvedSurfaceLevel({
+      level: surface,
+      lift: surfaceLift ?? 2,
+    });
+    const resolvedShadow = resolveSurfaceShadow(surfaceShadow, resolvedSurface);
 
     return (
-      <PopoverPrimitive.Popup
-        ref={ref}
-        data-slot="popover-popup"
-        className={cn(
-          popoverPopupVariants({ shape: shape ?? inheritedShape, size }),
-          className,
-        )}
-        {...props}
-      />
+      <SurfaceProvider value={resolvedSurface}>
+        <PopoverPrimitive.Popup
+          ref={ref}
+          data-slot="popover-popup"
+          data-surface-level={resolvedSurface}
+          className={cn(
+            getSurfaceClassName(resolvedSurface, resolvedShadow),
+            popoverPopupVariants({ shape: shape ?? inheritedShape, size }),
+            className,
+          )}
+          style={getSurfaceStyle(resolvedSurface, style)}
+          {...props}
+        />
+      </SurfaceProvider>
     );
   },
 );
@@ -264,7 +298,7 @@ const PopoverArrow = React.forwardRef<HTMLDivElement, PopoverArrowProps>(
           "data-[side=bottom]:top-[-6px] data-[side=left]:right-[-9px] data-[side=left]:rotate-90",
           "data-[side=right]:left-[-9px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-6px] data-[side=top]:rotate-180",
           "before:absolute before:bottom-0 before:left-1/2 before:size-2 before:-translate-x-1/2 before:translate-y-1/2",
-          "before:rotate-45 before:border before:border-border before:bg-surface-floating before:content-['']",
+          "before:rotate-45 before:border before:border-border before:bg-surface-current before:content-['']",
           className,
         )}
         {...props}

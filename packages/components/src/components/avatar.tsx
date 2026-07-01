@@ -10,7 +10,7 @@ import { aspektConfig } from "./config";
 const avatarRootVariants = cva(
   [
     "relative inline-flex shrink-0 overflow-hidden align-middle",
-    "bg-surface-sunken text-primary ring-1 ring-border/70 select-none",
+    "bg-surface-muted text-primary ring-1 ring-border/70 select-none",
   ],
   {
     variants: {
@@ -36,7 +36,7 @@ const avatarRootVariants = cva(
 const avatarFallbackVariants = cva(
   [
     "flex size-full items-center justify-center",
-    "bg-surface-sunken font-medium text-secondary uppercase",
+    "bg-surface-muted font-medium text-secondary uppercase",
   ],
   {
     variants: {

@@ -32,7 +32,7 @@ const inlineSliderSurfaceVariants = cva(
     "transition-[background-color,border-color,box-shadow,opacity,transform,width] duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none",
     "data-[dragging]:duration-0 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
     "data-[invalid]:ring-2 data-[invalid]:ring-destructive/15",
-    "focus-visible:ring-2 focus-visible:ring-current/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
+    "focus-visible:ring-2 focus-visible:ring-current/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-current",
   ],
   {
     variants: {
@@ -41,9 +41,9 @@ const inlineSliderSurfaceVariants = cva(
         round: "rounded-full",
       },
       variant: {
-        solid: "border border-transparent bg-control-soft",
-        soft: "border border-transparent bg-control-soft/80",
-        outline: "border border-border bg-surface",
+        solid: "border border-transparent bg-surface-active",
+        soft: "border border-transparent bg-surface-muted",
+        outline: "border border-border bg-surface-current",
       },
     },
     defaultVariants: {

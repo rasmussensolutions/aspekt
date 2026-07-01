@@ -20,9 +20,9 @@ const switchVariants = cva(
   {
     variants: {
       variant: {
-        solid: "border-border bg-surface hover:bg-surface-sunken/80",
-        soft: "border-transparent bg-control-soft hover:bg-control-soft/80",
-        outline: "border-border bg-surface hover:bg-surface-sunken",
+        solid: "border-border bg-surface-current hover:bg-surface-hover",
+        soft: "border-transparent bg-surface-muted hover:bg-surface-hover",
+        outline: "border-border bg-surface-current hover:bg-surface-hover",
       },
       color: {
         accent: "",
@@ -153,7 +153,7 @@ const switchVariants = cva(
 const switchThumbVariants = cva(
   [
     "pointer-events-none block size-[var(--switch-thumb-size)] rounded-[var(--switch-thumb-radius)]",
-    "bg-surface shadow-sm ring-1 ring-border",
+    "bg-surface-current shadow-sm ring-1 ring-border",
     "transition-[translate,background-color,box-shadow] duration-200 ease-out",
     "data-[checked]:translate-x-[var(--switch-thumb-translate)]",
     "data-[checked]:bg-on-color",
@@ -165,7 +165,7 @@ const switchThumbVariants = cva(
         info: "data-[checked]:bg-on-color",
         destructive: "data-[checked]:bg-on-color",
         warning: "data-[checked]:bg-on-color",
-        neutral: "data-[checked]:bg-surface",
+        neutral: "data-[checked]:bg-surface-current",
       },
       variant: {
         solid: "",

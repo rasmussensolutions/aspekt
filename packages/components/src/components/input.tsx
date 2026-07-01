@@ -11,7 +11,7 @@ import { playSound, type SoundName } from "./sound";
 
 const inputVariants = cva(
   [
-    "group/input relative inline-flex w-full shrink-0 items-center border bg-[var(--input-background)] [--input-background:var(--surface)]",
+    "group/input relative inline-flex w-full shrink-0 items-center border bg-[var(--input-background)] [--input-background:var(--surface-current)]",
     "[--input-ring:color-mix(in_oklab,var(--ring)_25%,transparent)]",
     "text-primary shadow-[0_0_0_1px_transparent]",
     "transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-out",
@@ -23,9 +23,10 @@ const inputVariants = cva(
     variants: {
       variant: {
         outline: "border-border",
-        soft: "border-transparent [--input-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface-floating))] hover:[--input-background:color-mix(in_oklab,var(--text-primary)_8%,var(--surface))] dark:[--input-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))] dark:hover:[--input-background:color-mix(in_oklab,var(--text-primary)_12%,var(--surface))]",
+        soft:
+          "border-transparent [--input-background:var(--surface-muted)] hover:[--input-background:var(--surface-hover)]",
         ghost:
-          "border-transparent [--input-background:transparent] hover:[--input-background:color-mix(in_oklab,var(--text-primary)_5%,var(--surface))] focus-within:[--input-background:transparent] dark:hover:[--input-background:color-mix(in_oklab,var(--text-primary)_10%,var(--surface))]",
+          "border-transparent [--input-background:transparent] hover:[--input-background:var(--surface-hover)] focus-within:[--input-background:transparent]",
       },
       size: {
         micro: "h-6.5 px-2 text-sm [&_svg:not([class*='size-'])]:size-3.5",

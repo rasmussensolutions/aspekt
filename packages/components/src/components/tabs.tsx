@@ -30,9 +30,9 @@ const tabsListVariants = cva(
     variants: {
       variant: {
         line: "data-[orientation=horizontal]:border-b data-[orientation=vertical]:border-r border-border",
-        soft: "rounded-lg bg-surface-sunken p-1 data-[orientation=vertical]:w-full",
+        soft: "rounded-lg bg-surface-muted p-1 data-[orientation=vertical]:w-full",
         outline:
-          "rounded-lg border border-border bg-surface p-1 data-[orientation=vertical]:w-full",
+          "rounded-lg border border-border bg-surface-current p-1 data-[orientation=vertical]:w-full",
       },
       shape: {
         square: "",
@@ -122,9 +122,9 @@ const tabsIndicatorVariants = cva(
     variants: {
       variant: {
         line: "bg-[var(--tabs-indicator-color)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-0.5 data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-0.5",
-        soft: "rounded-[inherit] bg-surface-raised dark:bg-surface-floating shadow-sm data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
+        soft: "rounded-[inherit] bg-surface-current shadow-sm data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
         outline:
-          "rounded-[inherit] bg-surface-sunken dark:bg-surface-floating data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
+          "rounded-[inherit] bg-surface-active data-[orientation=horizontal]:top-[var(--active-tab-top)] data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[orientation=vertical]:left-[var(--active-tab-left)] data-[orientation=vertical]:w-[var(--active-tab-width)]",
       },
       color: {
         accent: "[--tabs-indicator-color:var(--action)]",

@@ -21,8 +21,8 @@ const snippetVariants = cva(
   {
     variants: {
       variant: {
-        outline: "border-border bg-surface-raised",
-        soft: "border-transparent bg-surface-sunken",
+        outline: "border-border bg-surface-current",
+        soft: "border-transparent bg-surface-muted",
       },
       shape: {
         square: "rounded-[var(--overlay-radius-square)]",
@@ -447,7 +447,7 @@ function Snippet({
         <figcaption
           data-slot="snippet-header"
           className={cn(
-            "flex min-h-10 items-center justify-between gap-3 border-b border-border bg-surface py-2",
+            "flex min-h-10 items-center justify-between gap-3 border-b border-border bg-surface-current py-2",
             resolvedShape === "round" ? "px-5" : "px-3",
           )}
         >
@@ -470,8 +470,8 @@ function Snippet({
                         "inline-flex h-6 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-none transition-[background-color,color,box-shadow]",
                         "focus-visible:ring-2 focus-visible:ring-current/25",
                         selected
-                          ? "bg-surface text-primary shadow-sm ring-1 ring-border"
-                          : "text-secondary hover:bg-surface hover:text-primary",
+                          ? "bg-surface-active text-primary shadow-sm ring-1 ring-border"
+                          : "text-secondary hover:bg-surface-hover hover:text-primary",
                       )}
                       id={tab.tabId}
                       onClick={() => handleTabChange(tab.value)}
@@ -494,7 +494,7 @@ function Snippet({
                   </span>
                 ) : null}
                 {selectedLanguage ? (
-                  <span className="inline-flex h-4 items-center rounded-md bg-surface px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-secondary">
+                  <span className="inline-flex h-4 items-center rounded-md bg-surface-muted px-1.5 text-[0.625rem] leading-none uppercase tracking-wide text-secondary">
                     {normalizedLanguage}
                   </span>
                 ) : null}

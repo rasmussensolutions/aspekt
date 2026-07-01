@@ -22,6 +22,15 @@ import { cn } from "cnfast";
 import * as React from "react";
 
 import { aspektConfig } from "./config";
+import {
+  SurfaceProvider,
+  getSurfaceClassName,
+  getSurfaceStyle,
+  resolveSurfaceShadow,
+  type SurfaceLevelValue,
+  type SurfaceShadow,
+  useResolvedSurfaceLevel,
+} from "./surface";
 
 const tableWrapperVariants = cva(
   [
@@ -31,8 +40,8 @@ const tableWrapperVariants = cva(
   {
     variants: {
       variant: {
-        outline: "border border-border bg-surface-raised shadow-sm",
-        soft: "border border-transparent bg-surface-sunken",
+        outline: "border border-border",
+        soft: "border border-transparent bg-surface-muted",
         ghost: "border border-transparent bg-transparent",
       },
       size: {
@@ -61,11 +70,11 @@ const tableRowVariants = cva(
   {
     variants: {
       hoverable: {
-        true: "hover:bg-surface-sunken",
+        true: "hover:bg-surface-hover",
         false: "",
       },
       striped: {
-        true: "odd:bg-transparent even:bg-surface-sunken/60",
+        true: "odd:bg-transparent even:bg-surface-muted",
         false: "",
       },
     },
@@ -115,6 +124,9 @@ type TableProps<TData extends RowData> = Omit<
     sorting?: SortingState;
     stickyHeader?: boolean;
     striped?: boolean;
+    surface?: SurfaceLevelValue | null;
+    surfaceLift?: number | null;
+    surfaceShadow?: SurfaceShadow | null;
     tableClassName?: string;
     variant?: TableVariant | null;
   };
@@ -174,6 +186,10 @@ function Table<TData extends RowData>({
   sorting: sortingProp,
   stickyHeader = false,
   striped = false,
+  style,
+  surface,
+  surfaceLift,
+  surfaceShadow,
   tableClassName,
   variant,
   ...props
@@ -212,21 +228,40 @@ function Table<TData extends RowData>({
   const rows = table.getRowModel().rows;
   const columnCount = getColumnCount(table);
   const resolvedShape = shape ?? aspektConfig.shape;
+  const resolvedVariant = variant ?? "outline";
+  const resolvedSurface = useResolvedSurfaceLevel({
+    level: surface,
+    lift: surfaceLift ?? (resolvedVariant === "outline" ? 1 : 0),
+  });
+  const resolvedShadow =
+    resolvedVariant === "outline"
+      ? resolveSurfaceShadow(surfaceShadow, resolvedSurface)
+      : false;
 
   return (
-    <div
-      data-slot="table-wrapper"
-      className={cn(
-        tableWrapperVariants({ shape: resolvedShape, size, variant }),
-        className,
-      )}
-      {...props}
-    >
-      <div data-slot="table-scroll" className="max-w-full overflow-auto">
-        <table
-          data-slot="table"
-          className={cn("w-full border-collapse text-left", tableClassName)}
-        >
+    <SurfaceProvider value={resolvedSurface}>
+      <div
+        data-slot="table-wrapper"
+        data-surface-level={resolvedSurface}
+        className={cn(
+          resolvedVariant === "outline"
+            ? getSurfaceClassName(resolvedSurface, resolvedShadow)
+            : null,
+          tableWrapperVariants({
+            shape: resolvedShape,
+            size,
+            variant: resolvedVariant,
+          }),
+          className,
+        )}
+        style={getSurfaceStyle(resolvedSurface, style)}
+        {...props}
+      >
+        <div data-slot="table-scroll" className="max-w-full overflow-auto">
+          <table
+            data-slot="table"
+            className={cn("w-full border-collapse text-left", tableClassName)}
+          >
           {caption ? (
             <caption
               data-slot="table-caption"
@@ -342,9 +377,10 @@ function Table<TData extends RowData>({
               ))
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
-    </div>
+    </SurfaceProvider>
   );
 }
 

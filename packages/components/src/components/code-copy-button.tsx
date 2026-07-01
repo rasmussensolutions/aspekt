@@ -83,11 +83,11 @@ function CodeCopyButton({
         [
           "inline-flex shrink-0 items-center justify-center rounded-md",
           "text-secondary outline-none transition-[background-color,color,opacity,transform] duration-150",
-          "hover:bg-surface-sunken hover:text-primary active:scale-95",
+          "hover:bg-surface-hover hover:text-primary active:scale-95",
           "focus-visible:ring-2 focus-visible:ring-current/25",
           "disabled:pointer-events-none disabled:opacity-50",
           placement === "block"
-            ? "absolute right-2 top-2 size-7 bg-surface-raised/80 shadow-sm backdrop-blur"
+            ? "absolute right-2 top-2 size-7 bg-surface-current/80 shadow-sm backdrop-blur"
             : "size-[1.45em] rounded-sm bg-transparent",
         ],
         className,

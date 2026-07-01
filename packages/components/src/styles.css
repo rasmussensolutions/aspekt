@@ -5,10 +5,80 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --surface-sunken: oklch(0.9461 0 0);
-  --surface: oklch(0.9791 0 0);
-  --surface-raised: oklch(1 0 0);
-  --surface-floating: #ffffff;
+  --surface-1: oklch(0.9791 0 0);
+  --surface-2: oklch(1 0 0);
+  --surface-3: oklch(1 0 0);
+  --surface-4: #ffffff;
+  --surface-5: #ffffff;
+  --surface-6: #ffffff;
+  --surface-7: #ffffff;
+  --surface-8: #ffffff;
+  --surface-current: var(--surface-1);
+  --surface-muted-strength: 4%;
+  --surface-hover-strength: 6%;
+  --surface-active-strength: 9%;
+  --surface-border-strength: 11%;
+  --surface-border-strong-strength: 18%;
+  --surface-ring-strength: 30%;
+  --surface-muted: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-muted-strength),
+    var(--surface-current)
+  );
+  --surface-hover: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-hover-strength),
+    var(--surface-current)
+  );
+  --surface-active: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-active-strength),
+    var(--surface-current)
+  );
+  --surface-border: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-border-strength),
+    var(--surface-current)
+  );
+  --surface-border-strong: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-border-strong-strength),
+    var(--surface-current)
+  );
+  --surface-ring: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-ring-strength),
+    transparent
+  );
+  --surface-shadow-color: rgb(0 0 0 / 6%);
+  --surface-shadow-1: 0 0 0 1px var(--surface-shadow-color);
+  --surface-shadow-2:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 2px -1px rgb(0 0 0 / 10%);
+  --surface-shadow-3:
+    0 0 0 1px var(--surface-shadow-color),
+    0 2px 4px -2px rgb(0 0 0 / 12%),
+    0 8px 16px -12px rgb(0 0 0 / 16%);
+  --surface-shadow-4:
+    0 0 0 1px var(--surface-shadow-color),
+    0 4px 8px -4px rgb(0 0 0 / 14%),
+    0 14px 28px -18px rgb(0 0 0 / 18%);
+  --surface-shadow-5:
+    0 0 0 1px var(--surface-shadow-color),
+    0 8px 16px -8px rgb(0 0 0 / 16%),
+    0 24px 48px -24px rgb(0 0 0 / 20%);
+  --surface-shadow-6:
+    0 0 0 1px var(--surface-shadow-color),
+    0 12px 24px -12px rgb(0 0 0 / 18%),
+    0 36px 72px -36px rgb(0 0 0 / 22%);
+  --surface-shadow-7:
+    0 0 0 1px var(--surface-shadow-color),
+    0 16px 32px -16px rgb(0 0 0 / 20%),
+    0 48px 96px -48px rgb(0 0 0 / 24%);
+  --surface-shadow-8:
+    0 0 0 1px var(--surface-shadow-color),
+    0 20px 40px -20px rgb(0 0 0 / 22%),
+    0 64px 128px -64px rgb(0 0 0 / 26%);
   --overlay-scrim: rgb(0 0 0 / 40%);
   --text-primary: #171717;
   --text-secondary: #737373;
@@ -20,13 +90,12 @@
   --action: #171717;
   --action-secondary: oklch(94.8% 0.006 250);
   --accent: oklch(94.8% 0.006 250);
-  --control-soft: color-mix(in oklab, var(--text-primary) 10%, var(--surface));
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-surface: oklch(0.97 0.025 27.325);
   --destructive-border: oklch(0.78 0.09 27.325);
-  --border: oklch(88% 0.006 250);
-  --input: oklch(88% 0.006 250);
-  --ring: #737373;
+  --border: var(--surface-border);
+  --input: var(--surface-border);
+  --ring: var(--surface-ring);
   --success: oklch(0.8118 0.2245 134.56);
   --success-surface: oklch(0.96 0.04 145);
   --success-border: oklch(0.76 0.09 145);
@@ -45,10 +114,93 @@
 }
 
 :root.dark {
-  --surface-sunken: #0a0a0a;
-  --surface: #111111;
-  --surface-raised: #171717;
-  --surface-floating: #1f1f1f;
+  --surface-1: #111111;
+  --surface-2: #171717;
+  --surface-3: #1f1f1f;
+  --surface-4: #262626;
+  --surface-5: #2d2d2d;
+  --surface-6: #353535;
+  --surface-7: #3e3e3e;
+  --surface-8: #484848;
+  --surface-current: var(--surface-1);
+  --surface-muted-strength: 8%;
+  --surface-hover-strength: 11%;
+  --surface-active-strength: 15%;
+  --surface-border-strength: 14%;
+  --surface-border-strong-strength: 22%;
+  --surface-ring-strength: 36%;
+  --surface-muted: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-muted-strength),
+    var(--surface-current)
+  );
+  --surface-hover: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-hover-strength),
+    var(--surface-current)
+  );
+  --surface-active: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-active-strength),
+    var(--surface-current)
+  );
+  --surface-border: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-border-strength),
+    var(--surface-current)
+  );
+  --surface-border-strong: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-border-strong-strength),
+    var(--surface-current)
+  );
+  --surface-ring: color-mix(
+    in oklab,
+    var(--text-primary) var(--surface-ring-strength),
+    transparent
+  );
+  --surface-shadow-ring: rgb(255 255 255 / 7%);
+  --surface-shadow-highlight: rgb(255 255 255 / 6%);
+  --surface-shadow-color: rgb(0 0 0 / 46%);
+  --surface-shadow-1:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-color);
+  --surface-shadow-2:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 1px 2px -1px var(--surface-shadow-color),
+    0 4px 8px -6px rgb(0 0 0 / 50%);
+  --surface-shadow-3:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 2px 4px -2px var(--surface-shadow-color),
+    0 10px 20px -12px rgb(0 0 0 / 56%);
+  --surface-shadow-4:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 4px 8px -4px var(--surface-shadow-color),
+    0 18px 36px -20px rgb(0 0 0 / 60%);
+  --surface-shadow-5:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 6px 12px -6px var(--surface-shadow-color),
+    0 28px 56px -30px rgb(0 0 0 / 64%);
+  --surface-shadow-6:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 8px 16px -8px var(--surface-shadow-color),
+    0 40px 80px -42px rgb(0 0 0 / 68%);
+  --surface-shadow-7:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 12px 24px -12px var(--surface-shadow-color),
+    0 56px 112px -58px rgb(0 0 0 / 72%);
+  --surface-shadow-8:
+    inset 0 1px 0 var(--surface-shadow-highlight),
+    inset 0 0 0 1px var(--surface-shadow-ring),
+    0 16px 32px -16px var(--surface-shadow-color),
+    0 72px 144px -74px rgb(0 0 0 / 76%);
   --overlay-scrim: rgb(0 0 0 / 64%);
   --text-primary: #ededed;
   --text-secondary: #a1a1a1;
@@ -63,9 +215,9 @@
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-surface: oklch(0.22 0.045 22.216);
   --destructive-border: oklch(0.62 0.11 22.216);
-  --border: rgb(255 255 255 / 15%);
-  --input: rgb(255 255 255 / 15%);
-  --ring: #a1a1a1;
+  --border: var(--surface-border);
+  --input: var(--surface-border);
+  --ring: var(--surface-ring);
   --success: oklch(0.7 0.16 145);
   --success-surface: oklch(0.22 0.04 145);
   --success-border: oklch(0.62 0.1 145);
@@ -83,10 +235,21 @@
 }
 
 @theme inline {
-  --color-surface-sunken: var(--surface-sunken);
-  --color-surface: var(--surface);
-  --color-surface-raised: var(--surface-raised);
-  --color-surface-floating: var(--surface-floating);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
+  --color-surface-5: var(--surface-5);
+  --color-surface-6: var(--surface-6);
+  --color-surface-7: var(--surface-7);
+  --color-surface-8: var(--surface-8);
+  --color-surface-current: var(--surface-current);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-surface-border: var(--surface-border);
+  --color-surface-border-strong: var(--surface-border-strong);
+  --color-surface-ring: var(--surface-ring);
   --color-overlay-scrim: var(--overlay-scrim);
   --color-primary: var(--text-primary);
   --color-secondary: var(--text-secondary);
@@ -98,7 +261,6 @@
   --color-action: var(--action);
   --color-action-secondary: var(--action-secondary);
   --color-accent: var(--accent);
-  --color-control-soft: var(--control-soft);
   --color-destructive: var(--destructive);
   --color-destructive-surface: var(--destructive-surface);
   --color-destructive-border: var(--destructive-border);
@@ -123,6 +285,14 @@
   --radius-overlay-square: var(--overlay-radius-square);
   --radius-overlay-round: var(--overlay-radius-round);
   --radius-full: 9999px;
+  --shadow-surface-1: var(--surface-shadow-1);
+  --shadow-surface-2: var(--surface-shadow-2);
+  --shadow-surface-3: var(--surface-shadow-3);
+  --shadow-surface-4: var(--surface-shadow-4);
+  --shadow-surface-5: var(--surface-shadow-5);
+  --shadow-surface-6: var(--surface-shadow-6);
+  --shadow-surface-7: var(--surface-shadow-7);
+  --shadow-surface-8: var(--surface-shadow-8);
   --default-font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
@@ -131,6 +301,350 @@
 @layer base {
   * {
     @apply border-border;
+  }
+}
+
+@property --scroll-fade-top-opacity {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --scroll-fade-right-opacity {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --scroll-fade-bottom-opacity {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --scroll-fade-left-opacity {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --shimmer-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 20deg;
+}
+
+@property --shimmer-image {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --shimmer-text-fill {
+  syntax: "*";
+  inherits: false;
+}
+
+@theme inline {
+  @keyframes aspekt-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+
+    to {
+      background-position: 0 0;
+    }
+  }
+}
+
+@utility scroll-fade-* {
+  --scroll-fade-size: --value([length], [percentage]);
+  --scroll-fade-size: calc(var(--spacing) * --value(number));
+}
+
+@utility scroll-fade-t-* {
+  --scroll-fade-top-size: --value([length], [percentage]);
+  --scroll-fade-top-size: calc(var(--spacing) * --value(number));
+}
+
+@utility scroll-fade-r-* {
+  --scroll-fade-right-size: --value([length], [percentage]);
+  --scroll-fade-right-size: calc(var(--spacing) * --value(number));
+}
+
+@utility scroll-fade-b-* {
+  --scroll-fade-bottom-size: --value([length], [percentage]);
+  --scroll-fade-bottom-size: calc(var(--spacing) * --value(number));
+}
+
+@utility scroll-fade-l-* {
+  --scroll-fade-left-size: --value([length], [percentage]);
+  --scroll-fade-left-size: calc(var(--spacing) * --value(number));
+}
+
+@utility scroll-fade-s-* {
+  --scroll-fade-start-size: --value([length], [percentage]);
+  --scroll-fade-start-size: calc(var(--spacing) * --value(number));
+}
+
+@utility scroll-fade-e-* {
+  --scroll-fade-end-size: --value([length], [percentage]);
+  --scroll-fade-end-size: calc(var(--spacing) * --value(number));
+}
+
+@utility shimmer {
+  --_shimmer-spread: var(--shimmer-spread, calc(3ch + 40px));
+  --_shimmer-base: currentColor;
+  --_shimmer-highlight: var(
+    --shimmer-color,
+    oklch(from currentColor l c h / calc(alpha * 0.2))
+  );
+  background-image: var(
+    --shimmer-image,
+    linear-gradient(
+      calc(90deg + var(--shimmer-angle)),
+      var(--_shimmer-base) calc(50% - var(--_shimmer-spread)),
+      color-mix(in oklch, var(--_shimmer-highlight), var(--_shimmer-base) 50%)
+        calc(50% - var(--_shimmer-spread) * 0.5),
+      var(--_shimmer-highlight) 50%,
+      color-mix(in oklch, var(--_shimmer-highlight), var(--_shimmer-base) 50%)
+        calc(50% + var(--_shimmer-spread) * 0.5),
+      var(--_shimmer-base) calc(50% + var(--_shimmer-spread))
+    )
+  );
+  background-repeat: no-repeat;
+  background-size: calc(200% + var(--_shimmer-spread) * 2) 100%;
+  background-position: 0 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: var(--shimmer-text-fill, transparent);
+  animation: aspekt-shimmer var(--shimmer-duration, 2s) linear infinite;
+
+  @variant dark {
+    --_shimmer-highlight: var(
+      --shimmer-color,
+      oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.4))
+    );
+  }
+
+  &:where([dir="rtl"], [dir="rtl"] *) {
+    animation-direction: reverse;
+  }
+}
+
+@utility shimmer-once {
+  animation-iteration-count: 1;
+}
+
+@utility shimmer-reverse {
+  animation-direction: reverse;
+}
+
+@utility shimmer-none {
+  --shimmer-image: none;
+  --shimmer-text-fill: currentColor;
+}
+
+@utility shimmer-color-* {
+  --shimmer-color: --value(--color, [color]);
+  --shimmer-color: color-mix(
+    in oklch,
+    --value(--color, [color]) calc(--modifier(integer) * 1%),
+    transparent
+  );
+}
+
+@utility shimmer-duration-* {
+  --shimmer-duration: --value([time]);
+  --shimmer-duration: calc(--value(integer) * 1ms);
+}
+
+@utility shimmer-spread-* {
+  --shimmer-spread: --value([length], [percentage]);
+  --shimmer-spread: calc(var(--spacing) * --value(integer));
+}
+
+@utility shimmer-angle-* {
+  --shimmer-angle: --value([angle]);
+  --shimmer-angle: calc(--value(integer) * 1deg);
+}
+
+@layer utilities {
+  .scroll-fade,
+  .scroll-fade-y,
+  .scroll-fade-x,
+  .scroll-fade-t,
+  .scroll-fade-r,
+  .scroll-fade-b,
+  .scroll-fade-l,
+  .scroll-fade-s,
+  .scroll-fade-e {
+    --scroll-fade-size: clamp(2rem, 12%, 5rem);
+    --scroll-fade-reveal: 6rem;
+    --scroll-fade-start-size: var(--scroll-fade-size);
+    --scroll-fade-end-size: var(--scroll-fade-size);
+    --scroll-fade-top-size: var(--scroll-fade-size);
+    --scroll-fade-right-size: var(--scroll-fade-size);
+    --scroll-fade-bottom-size: var(--scroll-fade-size);
+    --scroll-fade-left-size: var(--scroll-fade-size);
+    --scroll-fade-top-opacity: 1;
+    --scroll-fade-right-opacity: 0;
+    --scroll-fade-bottom-opacity: 0;
+    --scroll-fade-left-opacity: 1;
+    --scroll-fade-block-mask: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / var(--scroll-fade-top-opacity)) 0,
+      #000 var(--scroll-fade-top-size),
+      #000 calc(100% - var(--scroll-fade-bottom-size)),
+      rgb(0 0 0 / var(--scroll-fade-bottom-opacity)) 100%
+    );
+    --scroll-fade-inline-mask: linear-gradient(
+      to right,
+      rgb(0 0 0 / var(--scroll-fade-left-opacity)) 0,
+      #000 var(--scroll-fade-left-size),
+      #000 calc(100% - var(--scroll-fade-right-size)),
+      rgb(0 0 0 / var(--scroll-fade-right-opacity)) 100%
+    );
+    animation-duration: 1ms;
+    animation-fill-mode: both;
+    animation-timing-function: linear;
+  }
+
+  .scroll-fade,
+  .scroll-fade-y {
+    -webkit-mask-image: var(--scroll-fade-block-mask);
+    mask-image: var(--scroll-fade-block-mask);
+    animation-name: aspekt-scroll-fade-top-start, aspekt-scroll-fade-bottom-end;
+    animation-range:
+      0 var(--scroll-fade-reveal),
+      calc(100% - var(--scroll-fade-reveal)) 100%;
+    animation-timeline:
+      scroll(self y),
+      scroll(self y);
+  }
+
+  .scroll-fade-x {
+    --scroll-fade-left-size: var(--scroll-fade-start-size);
+    --scroll-fade-right-size: var(--scroll-fade-end-size);
+    -webkit-mask-image: var(--scroll-fade-inline-mask);
+    mask-image: var(--scroll-fade-inline-mask);
+    animation-name: aspekt-scroll-fade-left-start, aspekt-scroll-fade-right-end;
+    animation-range:
+      0 var(--scroll-fade-reveal),
+      calc(100% - var(--scroll-fade-reveal)) 100%;
+    animation-timeline:
+      scroll(self inline),
+      scroll(self inline);
+  }
+
+  :where([dir="rtl"] .scroll-fade-x, .scroll-fade-x:dir(rtl)) {
+    --scroll-fade-left-opacity: 0;
+    --scroll-fade-right-opacity: 1;
+    --scroll-fade-left-size: var(--scroll-fade-end-size);
+    --scroll-fade-right-size: var(--scroll-fade-start-size);
+    animation-name: aspekt-scroll-fade-right-start, aspekt-scroll-fade-left-end;
+  }
+
+  .scroll-fade-t {
+    --scroll-fade-bottom-size: 0px;
+    --scroll-fade-bottom-opacity: 1;
+    -webkit-mask-image: var(--scroll-fade-block-mask);
+    mask-image: var(--scroll-fade-block-mask);
+    animation-name: aspekt-scroll-fade-top-start;
+    animation-range: 0 var(--scroll-fade-reveal);
+    animation-timeline: scroll(self y);
+  }
+
+  .scroll-fade-b {
+    --scroll-fade-top-size: 0px;
+    -webkit-mask-image: var(--scroll-fade-block-mask);
+    mask-image: var(--scroll-fade-block-mask);
+    animation-name: aspekt-scroll-fade-bottom-end;
+    animation-range: calc(100% - var(--scroll-fade-reveal)) 100%;
+    animation-timeline: scroll(self y);
+  }
+
+  .scroll-fade-l {
+    --scroll-fade-right-size: 0px;
+    --scroll-fade-right-opacity: 1;
+    -webkit-mask-image: var(--scroll-fade-inline-mask);
+    mask-image: var(--scroll-fade-inline-mask);
+    animation-name: aspekt-scroll-fade-left-start;
+    animation-range: 0 var(--scroll-fade-reveal);
+    animation-timeline: scroll(self inline);
+  }
+
+  :where([dir="rtl"] .scroll-fade-l, .scroll-fade-l:dir(rtl)) {
+    --scroll-fade-left-opacity: 0;
+    animation-name: aspekt-scroll-fade-left-end;
+    animation-range: calc(100% - var(--scroll-fade-reveal)) 100%;
+  }
+
+  .scroll-fade-r {
+    --scroll-fade-left-size: 0px;
+    --scroll-fade-left-opacity: 1;
+    -webkit-mask-image: var(--scroll-fade-inline-mask);
+    mask-image: var(--scroll-fade-inline-mask);
+    animation-name: aspekt-scroll-fade-right-end;
+    animation-range: calc(100% - var(--scroll-fade-reveal)) 100%;
+    animation-timeline: scroll(self inline);
+  }
+
+  :where([dir="rtl"] .scroll-fade-r, .scroll-fade-r:dir(rtl)) {
+    --scroll-fade-right-opacity: 1;
+    animation-name: aspekt-scroll-fade-right-start;
+    animation-range: 0 var(--scroll-fade-reveal);
+  }
+
+  .scroll-fade-s {
+    --scroll-fade-left-size: var(--scroll-fade-start-size);
+    --scroll-fade-right-size: 0px;
+    --scroll-fade-right-opacity: 1;
+    -webkit-mask-image: var(--scroll-fade-inline-mask);
+    mask-image: var(--scroll-fade-inline-mask);
+    animation-name: aspekt-scroll-fade-left-start;
+    animation-range: 0 var(--scroll-fade-reveal);
+    animation-timeline: scroll(self inline);
+  }
+
+  :where([dir="rtl"] .scroll-fade-s, .scroll-fade-s:dir(rtl)) {
+    --scroll-fade-left-size: 0px;
+    --scroll-fade-right-size: var(--scroll-fade-start-size);
+    --scroll-fade-left-opacity: 1;
+    --scroll-fade-right-opacity: 1;
+    animation-name: aspekt-scroll-fade-right-start;
+  }
+
+  .scroll-fade-e {
+    --scroll-fade-left-size: 0px;
+    --scroll-fade-left-opacity: 1;
+    --scroll-fade-right-size: var(--scroll-fade-end-size);
+    -webkit-mask-image: var(--scroll-fade-inline-mask);
+    mask-image: var(--scroll-fade-inline-mask);
+    animation-name: aspekt-scroll-fade-right-end;
+    animation-range: calc(100% - var(--scroll-fade-reveal)) 100%;
+    animation-timeline: scroll(self inline);
+  }
+
+  :where([dir="rtl"] .scroll-fade-e, .scroll-fade-e:dir(rtl)) {
+    --scroll-fade-left-size: var(--scroll-fade-end-size);
+    --scroll-fade-right-size: 0px;
+    --scroll-fade-left-opacity: 0;
+    --scroll-fade-right-opacity: 1;
+    animation-name: aspekt-scroll-fade-left-end;
+  }
+
+  .scroll-fade-none {
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation-name: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer {
+      animation: none;
+      background-image: none;
+      -webkit-text-fill-color: currentColor;
+    }
   }
 }
 
@@ -154,5 +668,65 @@
 
   80% {
     transform: translateX(0.125rem);
+  }
+}
+
+@keyframes aspekt-scroll-fade-top-start {
+  from {
+    --scroll-fade-top-opacity: 1;
+  }
+
+  to {
+    --scroll-fade-top-opacity: 0;
+  }
+}
+
+@keyframes aspekt-scroll-fade-bottom-end {
+  from {
+    --scroll-fade-bottom-opacity: 0;
+  }
+
+  to {
+    --scroll-fade-bottom-opacity: 1;
+  }
+}
+
+@keyframes aspekt-scroll-fade-left-start {
+  from {
+    --scroll-fade-left-opacity: 1;
+  }
+
+  to {
+    --scroll-fade-left-opacity: 0;
+  }
+}
+
+@keyframes aspekt-scroll-fade-left-end {
+  from {
+    --scroll-fade-left-opacity: 0;
+  }
+
+  to {
+    --scroll-fade-left-opacity: 1;
+  }
+}
+
+@keyframes aspekt-scroll-fade-right-start {
+  from {
+    --scroll-fade-right-opacity: 1;
+  }
+
+  to {
+    --scroll-fade-right-opacity: 0;
+  }
+}
+
+@keyframes aspekt-scroll-fade-right-end {
+  from {
+    --scroll-fade-right-opacity: 0;
+  }
+
+  to {
+    --scroll-fade-right-opacity: 1;
   }
 }

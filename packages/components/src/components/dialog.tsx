@@ -8,11 +8,20 @@ import { cn } from "cnfast";
 import { Button, ButtonShapeProvider } from "./button";
 import { aspektConfig } from "./config";
 import { playSound, type SoundName } from "./sound";
+import {
+  SurfaceProvider,
+  getSurfaceClassName,
+  getSurfaceStyle,
+  resolveSurfaceShadow,
+  type SurfaceLevelValue,
+  type SurfaceShadow,
+  useResolvedSurfaceLevel,
+} from "./surface";
 
 const dialogContentVariants = cva(
   [
     "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5",
-    "border border-border bg-surface-floating text-primary shadow-2xl outline-none",
+    "border border-border dark:border-0 text-primary outline-none",
     "transition-[opacity,transform] duration-150 ease-out",
     "data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0",
     "data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
@@ -47,9 +56,7 @@ type DialogSize = "small" | "medium" | "large";
 
 type DialogShape = "square" | "round";
 
-const DialogShapeContext = React.createContext<DialogShape>(
-  aspektConfig.shape,
-);
+const DialogShapeContext = React.createContext<DialogShape>(aspektConfig.shape);
 
 type DialogRootPrimitiveProps = React.ComponentProps<
   typeof DialogPrimitive.Root
@@ -79,10 +86,13 @@ type DialogContentProps = Omit<
   React.ComponentProps<typeof DialogPrimitive.Popup>,
   "className"
 > & {
-    className?: string;
-    shape?: DialogShape | null;
-    size?: DialogSize | null;
-  };
+  className?: string;
+  shape?: DialogShape | null;
+  size?: DialogSize | null;
+  surface?: SurfaceLevelValue | null;
+  surfaceLift?: number | null;
+  surfaceShadow?: SurfaceShadow | null;
+};
 
 type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -196,19 +206,41 @@ const DialogOverlay = React.forwardRef<HTMLDivElement, DialogOverlayProps>(
 );
 
 const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
-  function DialogContent({ className, shape, size, ...props }, ref) {
+  function DialogContent(
+    {
+      className,
+      shape,
+      size,
+      style,
+      surface,
+      surfaceLift,
+      surfaceShadow,
+      ...props
+    },
+    ref,
+  ) {
     const inheritedShape = React.useContext(DialogShapeContext);
+    const resolvedSurface = useResolvedSurfaceLevel({
+      level: surface,
+      lift: surfaceLift ?? 4,
+    });
+    const resolvedShadow = resolveSurfaceShadow(surfaceShadow, resolvedSurface);
 
     return (
-      <DialogPrimitive.Popup
-        ref={ref}
-        data-slot="dialog-content"
-        className={cn(
-          dialogContentVariants({ shape: shape ?? inheritedShape, size }),
-          className,
-        )}
-        {...props}
-      />
+      <SurfaceProvider value={resolvedSurface}>
+        <DialogPrimitive.Popup
+          ref={ref}
+          data-slot="dialog-content"
+          data-surface-level={resolvedSurface}
+          className={cn(
+            getSurfaceClassName(resolvedSurface, resolvedShadow),
+            dialogContentVariants({ shape: shape ?? inheritedShape, size }),
+            className,
+          )}
+          style={getSurfaceStyle(resolvedSurface, style)}
+          {...props}
+        />
+      </SurfaceProvider>
     );
   },
 );
@@ -345,10 +377,7 @@ const DialogDescription = React.forwardRef<
     <DialogPrimitive.Description
       ref={ref}
       data-slot="dialog-description"
-      className={cn(
-        "text-sm leading-6 text-secondary",
-        className,
-      )}
+      className={cn("text-sm leading-6 text-secondary", className)}
       {...props}
     />
   );
